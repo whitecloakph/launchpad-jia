@@ -1,0 +1,21 @@
+.container {
+  $size: 50px;
+  height: $size;
+  width: $size;
+  background: #ffffff;
+  border: 1px solid #dedede;
+  border-radius: 16px;
+  bottom: 24px;
+  box-shadow: 0px 4px 20px 0px #0000000d;
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 8px;
+  position: fixed;
+  right: 24px;
+  z-index: 2;
+  img {
+    height: 100%;
+    width: 100%;
+    transform: rotate(-90deg);
+  }
+}

@@ -1,0 +1,198 @@
+@use "@/lib/styles/commonV2/animations.scss" as *;
+
+.background {
+  display: flex;
+  justify-content: center;
+  .background,
+  .sphereLeft,
+  .sphereRight {
+    position: fixed;
+    z-index: 0;
+  }
+  .background {
+    height: 100%;
+    width: 100%;
+    top: 0;
+  }
+  .sphereLeft {
+    bottom: 0;
+    left: 0;
+  }
+  .sphereRight {
+    right: 0;
+    top: 122px;
+  }
+  .homeContainer {
+    width: 100%;
+    max-width: 1063px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    margin: 0 40px;
+    padding: 56.5px 0 40px 0;
+    .topContainer {
+      position: relative;
+      .textContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 19.5px;
+        position: relative;
+        z-index: 1;
+        @extend .fadeIn;
+        .title {
+          max-width: 449px;
+          z-index: 1;
+          font-weight: 700;
+          font-size: 59px;
+          line-height: 70.5px;
+          color: var(--Text-text-primary, #181d27);
+        }
+        .description {
+          max-width: 383px;
+          z-index: 1;
+          font-weight: 400;
+          font-size: 19.5px;
+          line-height: 29.5px;
+          color: var(--Text-text-secondary, #414651);
+          .bold {
+            font-weight: 700;
+          }
+        }
+      }
+      .owl {
+        position: absolute;
+        right: 0;
+        top: -59px;
+        @extend .popup;
+      }
+    }
+    .bottomContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 22.5px;
+      .gradientContainer {
+        background: linear-gradient(
+          270deg,
+          #9fcaed -0.44%,
+          #ceb6da 32.7%,
+          #ebacc9 65.85%,
+          #fccec0 100%
+        );
+        border-radius: 12px;
+        box-sizing: border-box;
+        padding: 8px 0 0 0;
+        .inputContainer {
+          background: #ffffff;
+          border: 1px solid var(--Neutral-200, #ebebf5);
+          border-radius: 0 0 12px 12px;
+          box-shadow: 0px 0px 1px 0px #00103529 inset;
+          box-sizing: border-box;
+          display: flex;
+          gap: 36.5px;
+          padding: 35.5px 65px;
+          position: relative;
+          .search {
+            left: 80px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+          button {
+            padding: 10px 42.5px;
+          }
+        }
+      }
+      span {
+        z-index: 0;
+        text-align: center;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 23.5px;
+        color: var(--Text-text-primary, #181d27);
+        .redirection {
+          cursor: pointer;
+          color: var(--Text-text-tertiary, #717680);
+          text-decoration: underline;
+          &:hover {
+          }
+          &:active {
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .background {
+    .homeContainer {
+      max-width: unset;
+      gap: 0;
+      margin: 0;
+      padding: 48px 16px;
+      .topContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 31px;
+        .textContainer {
+          gap: 16px;
+          .title {
+            max-width: 343px;
+            font-size: 36px;
+            line-height: 44px;
+          }
+          .description {
+            max-width: 343px;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 24px;
+            color: var(--Text-text-tertiary, #717680);
+          }
+        }
+        .owl {
+          width: 100%;
+          position: relative;
+          top: 0;
+          right: -16px;
+          z-index: 1;
+        }
+        .sphereMobile {
+          bottom: 0;
+          bottom: -72.5px;
+          left: -16px;
+          position: absolute;
+        }
+      }
+      .bottomContainer {
+        margin: -28px 0 0 0;
+        gap: 32px;
+        z-index: 1;
+        .gradientContainer {
+          .inputContainer {
+            flex-direction: column;
+            gap: 12px;
+            padding: 19.5px;
+            .search {
+              left: 33.5px;
+              top: 25%;
+              transform: translateY(-25%);
+            }
+          }
+        }
+        span {
+          // font-weight: 500;
+          // font-size: 12px;
+          // line-height: 18px;
+          .redirection {
+            // font-weight: 700;
+            &:hover {
+            }
+            &:active {
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+// Compose Email Modal Styles
+.compose-email-modal {
+  // Ensure modal appears above other content
+  z-index: 1050 !important;
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .modal-content {
+      margin: 10px;
+      max-width: calc(100vw - 20px);
+      max-height: calc(100vh - 20px);
+    }
+  }
+
+  @media (max-width: 576px) {
+    .modal-content {
+      margin: 5px;
+      max-width: calc(100vw - 10px);
+      max-height: calc(100vh - 10px);
+    }
+
+    .toolbar {
+      flex-wrap: wrap;
+      gap: 4px;
+
+      button {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// Rich text editor toolbar responsive adjustments
+.compose-email-toolbar {
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    padding: 8px 0;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 2px;
+    }
+  }
+}
+
+// Form field responsive adjustments
+.compose-email-form {
+  @media (max-width: 576px) {
+    .form-section {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-textarea {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+  }
+}
+
+// Footer responsive adjustments
+.compose-email-footer {
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px;
+
+    .footer-left,
+    .footer-right {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .footer-right {
+      gap: 8px;
+    }
+  }
+}
+
+// Loading spinner animation
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

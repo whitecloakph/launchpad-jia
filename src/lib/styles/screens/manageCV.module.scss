@@ -1,0 +1,319 @@
+@use "@/lib/styles/commonV2/animations.scss" as *;
+
+.manageCV {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  overflow: hidden;
+  .textContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    .name {
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 32px;
+      color: #2a2a2a;
+    }
+    .description {
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 24px;
+      color: #6a6a6a;
+    }
+  }
+  .cvContainer {
+    height: 100%;
+    display: flex;
+    gap: 32px;
+    .gradient {
+      height: fit-content;
+      width: 100%;
+      background: linear-gradient(
+        90deg,
+        rgba(159, 202, 237, 0.5) 0%,
+        rgba(206, 182, 218, 0.5) 34%,
+        rgba(235, 172, 201, 0.5) 67%,
+        rgba(252, 206, 192, 0.5) 100%
+      );
+      border-radius: 24px;
+      box-sizing: border-box;
+      padding: 8px 0 0 0;
+      &.maxWidth {
+        min-width: 0;
+        max-width: 388px;
+      }
+      .cvDetailsCard {
+        background: var(--Surface-dashboard-bg_light, #f8f9fc);
+        border-radius: 24px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 8px 8px 8px;
+      }
+    }
+    .gradient {
+      .cvDetailsCard {
+        .uploadTitle {
+          align-items: center;
+          display: flex;
+          gap: 8px;
+          margin: 0 12px;
+          position: relative;
+          font-weight: 700;
+          font-size: 18px;
+          line-height: 28px;
+          color: var(--Text-text-primary, #181d27);
+          .uploadIcon {
+            $size: 32px;
+            height: $size;
+            width: $size;
+            align-items: center;
+            background: var(--Colors-Primary_Colors-Neutrals-900, #181d27);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+          }
+          .refreshIcon {
+            $size: 24px;
+            height: $size;
+            width: $size;
+            cursor: pointer;
+            margin: 0 0 0 auto;
+          }
+          .hoverContainer {
+            align-items: center;
+            background: var(--Colors-Primary_Colors-Neutrals-900, #181d27);
+            border-radius: 8px;
+            box-sizing: border-box;
+            display: flex;
+            padding: 8px 12px;
+            position: absolute;
+            right: 0;
+            top: -38px;
+            span {
+              font-weight: 700;
+              font-size: 12px;
+              line-height: 18px;
+              color: var(--Text-text-primary_white, #ffffff);
+            }
+          }
+        }
+        .uploadDetailsContainer {
+          background: var(--Surface-white, #ffffff);
+          border-radius: 16px;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          padding: 24px;
+          .fileUpload {
+            align-items: center;
+            border: 1px dashed var(--Border-primary, #e9eaeb);
+            border-radius: 10px;
+            box-sizing: border-box;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            margin: 0 0 8px 0;
+            padding: 30px 10px;
+            &:hover {
+            }
+            &:active {
+            }
+            &.uploaded {
+              background: var(--Surface-gray, #fafafa);
+              border: 1px solid var(--Border-primary, #e9eaeb);
+              padding: 20px 17px;
+              .uploadedFile {
+                width: 100%;
+                align-items: center;
+                display: flex;
+                gap: 10px;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 20px;
+                text-wrap: nowrap;
+                color: var(--Text-text-secondary, #414651);
+                span {
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  font-weight: 700;
+                  color: var(--Text-text-primary, #181d27);
+                }
+                .xIcon {
+                  margin: 0 0 0 auto;
+                }
+              }
+            }
+            .uploadFileText {
+              margin: 11px 0 4px 0;
+              font-weight: 500;
+              font-size: 16px;
+              line-height: 24px;
+              text-align: center;
+              color: var(--Text-text-secondary, #414651);
+              span {
+                font-weight: 700;
+                color: var(--Text-text-primary, #181d27);
+              }
+            }
+            .uploadFileRules {
+              font-weight: 500;
+              font-size: 12px;
+              line-height: 18px;
+              text-align: center;
+              color: var(--Text-text-tertiary, #717680);
+            }
+          }
+          .uploadDetails {
+            margin: 8px 0 4px 0;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 20px;
+            text-align: center;
+            color: #6a6a6a;
+          }
+          .cvUploaded {
+            align-items: center;
+            background: var(--Button-bg-primary_disabled, #d5d7da);
+            border: 1px solid var(--Button-bg-primary_disabled, #d5d7da);
+            border-radius: 24px;
+            box-shadow: 0px 1px 2px 0px #0a0d120d;
+            box-sizing: border-box;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            padding: 10px 0;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 20px;
+            color: var(--Button-text-primary, #ffffff);
+          }
+          button {
+            margin: 8px 0 0 0;
+            padding: 10px 0;
+          }
+          .loadingContainer {
+            align-items: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            img {
+              height: 89.6px;
+              width: 114px;
+              object-fit: cover;
+            }
+            .cvExtract {
+              margin: 12px 0 4px 0;
+              font-weight: 700;
+              font-size: 16px;
+              line-height: 24px;
+              text-align: center;
+              color: var(--Text-text-secondary, #414651);
+            }
+            .building {
+              font-weight: 500;
+              font-size: 14px;
+              line-height: 20px;
+              text-align: center;
+              color: var(--Text-text-tertiary, #717680);
+            }
+          }
+        }
+      }
+    }
+    .cvDetailsContainer {
+      height: calc(100% - 92px);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: scroll;
+      .gradient {
+        .cvDetailsCard {
+          .sectionTitle {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            margin: 0 12px;
+            font-weight: 700;
+            font-size: 18px;
+            line-height: 28px;
+            color: var(--Text-text-primary, #181d27);
+            .editIcon {
+              $size: 36px;
+              height: $size;
+              width: $size;
+              align-items: center;
+              background: var(--Button-bg-secondary, #ffffff);
+              border: 1px solid var(--Button-border-primary, #d5d7da);
+              border-radius: 50%;
+              cursor: pointer;
+              display: flex;
+              justify-content: center;
+              &:hover {
+              }
+              &:active {
+              }
+            }
+          }
+          .detailsContainer {
+            background: var(--Surface-white, #ffffff);
+            border-radius: 16px;
+            box-shadow: 0px 0px 2px 0px #00103529 inset;
+            box-sizing: border-box;
+            padding: 24px;
+            .sectionDetails {
+              font-weight: 500;
+              font-size: 14px;
+              line-height: 20px;
+              color: var(--Text-text-tertiary, #717680);
+              &.withDetails {
+                color: #6a6a6a;
+                p {
+                  margin: revert;
+                }
+              }
+              p {
+                margin: 0;
+              }
+              .loading {
+                height: 20px;
+                width: 100%;
+                background: #e0e0e0;
+                border-radius: 8px;
+                @extend .blink;
+                &:first-of-type {
+                  margin: 0 0 4px 0;
+                }
+              }
+            }
+            textarea {
+              height: 300px !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .manageCV {
+    box-sizing: border-box;
+    gap: 24px;
+    padding: 48px 16px;
+    .cvContainer {
+      flex-direction: column;
+      gap: 16px;
+      .gradient {
+        &.maxWidth {
+          max-width: unset;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+
+# screen cv
+POST https://hellojia.ai/api/custom-log
+Content-Type: application/json
+
+{
+  "data": {
+    "name": "[Test Custom Log]",
+    "message": "Custom log on new Relic",
+    "interviewID": "bb3e9ec2-1de3-4a43-be32-6dfe3e9af5ac",
+    "userEmail": "bryce.mercines@gmail.com"
+  }
+}

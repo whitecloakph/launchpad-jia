@@ -1,0 +1,273 @@
+.bg {
+  height: 100%;
+  width: 100%;
+  background: #ffffff;
+  position: fixed;
+  top: 0;
+}
+
+.home {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 44.71px;
+  margin: 62.67px 0 48px 0;
+  .topContainer {
+    width: 100%;
+    max-width: 1083px;
+    position: relative;
+    .textContainer {
+      display: flex;
+      flex-direction: column;
+      margin: 0 0 0 23px;
+      text-wrap: nowrap;
+      .title {
+        z-index: 1;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 52px;
+        line-height: 59.22px;
+        color: #000000;
+        &.whitecloak {
+          width: fit-content;
+          background: linear-gradient(90.11deg, #000000 0.13%, #666666 74.08%);
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+      }
+      .description {
+        z-index: 1;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 20px;
+        line-height: 32.23px;
+        color: #6a6a6a;
+        &.withMargin {
+          margin: 18px 0 0 0;
+        }
+        .bold {
+          font-weight: 700;
+          font-style: Bold;
+        }
+      }
+    }
+    .imageContainer {
+      width: 68.58%;
+      height: 156.26%;
+      position: absolute;
+      right: 0;
+      top: -51px;
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+  .bottomContainer {
+    width: 100%;
+    max-width: 1083px;
+    display: flex;
+    flex-direction: column;
+    gap: 25.29px;
+    z-index: 0;
+    .inputContainer {
+      background: #f6f6f6;
+      border-radius: 19.5px;
+      box-shadow: 0px 1.95px 29.26px 0px #00000040;
+      box-sizing: border-box;
+      display: flex;
+      gap: 37.06px;
+      margin: 0 15.74px;
+      padding: 35.95px 58.74px 38.05px 59.26px;
+      position: relative;
+      img {
+        $size: 16px;
+        height: $size;
+        width: $size;
+        left: 73.89px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      input {
+        width: 100%;
+        background: #ffffff;
+        border: 3px solid #6a6a6a80;
+        border-radius: 9.75px;
+        box-sizing: border-box;
+        padding: 9.53px 14.63px 9.53px 45.26px;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 16px;
+        line-height: 38.03px;
+        color: #2a2a2a;
+        &::placeholder {
+          color: #6a6a6a80;
+        }
+        &:focus-visible,
+        &:hover {
+          border-color: #9747ff;
+        }
+        &:active {
+          border-color: #6a6a6a80;
+        }
+      }
+      button {
+        background: #1e1e1e;
+        border: unset;
+        border-radius: 9.75px;
+        box-sizing: border-box;
+        padding: 11.38px 45.05px;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 16px;
+        line-height: 38.03px;
+        text-align: center;
+        color: #ffffff;
+        &:focus-visible,
+        &:hover {
+          opacity: 0.8;
+        }
+        &:active {
+          opacity: 1;
+        }
+      }
+    }
+    span {
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 16px;
+      line-height: 38.57px;
+      text-align: center;
+      color: #000000;
+      a {
+        font-weight: 700;
+        font-style: Bold;
+        text-decoration: underline;
+        color: #6a6a6a;
+        &:focus-visible,
+        &:hover {
+          color: #9747ff;
+        }
+        &:active {
+          color: #6a6a6a;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .home {
+    align-items: unset;
+    box-sizing: border-box;
+    gap: 0;
+    margin: 0;
+    padding: 48px 0;
+    .topContainer {
+      max-width: unset;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
+      padding: 0 16px;
+      .textContainer {
+        margin: 0;
+        text-wrap: unset;
+        .title {
+          z-index: unset;
+          font-size: 36px;
+          line-height: 44px;
+          letter-spacing: -2%;
+          color: #181d27;
+          &.whitecloak {
+            background: linear-gradient(
+              90.03deg,
+              #000000 0.04%,
+              #666666 56.04%
+            );
+            background-clip: text;
+          }
+        }
+        .description {
+          z-index: unset;
+          font-size: 16px;
+          line-height: 28px;
+          color: #535862;
+          &.withMargin {
+            margin: 16px 0 0 0;
+          }
+        }
+      }
+      .imageContainer {
+        width: 125.07%;
+        position: relative;
+        right: 12.53%;
+        top: 0;
+      }
+    }
+    .bottomContainer {
+      max-width: unset;
+      box-sizing: border-box;
+      gap: 24px;
+      padding: 0 16px;
+      position: relative;
+      top: -24px;
+      .inputContainer {
+        border-radius: 10.65px;
+        box-shadow: 0px 1.06px 15.97px 0px #00000040;
+        flex-direction: column;
+        gap: 20.09px;
+        margin: 0;
+        padding: 24px;
+        img {
+          $size: 20px;
+          height: $size;
+          width: $size;
+          left: 38px;
+          top: 25%;
+          transform: translateY(-25%);
+        }
+        input {
+          border: 3px solid #d5d7da;
+          border-radius: 8px;
+          box-shadow: 0px 1px 2px 0px #0a0d120d;
+          padding: 10px 14px 10px 42px;
+          font-size: 16px;
+          line-height: 24px;
+          color: #181d27;
+          &:active {
+            border-color: #d5d7da;
+          }
+        }
+        button {
+          width: 100%;
+          border-radius: 8px;
+          padding: 12px 0;
+          font-size: 16px;
+          line-height: 24px;
+          &:focus-visible,
+          &:hover {
+            opacity: 1;
+          }
+          &:active {
+            opacity: 0.8;
+          }
+        }
+      }
+      span {
+        a {
+          &:focus-visible,
+          &:hover {
+            color: #6a6a6a;
+          }
+          &:active {
+            color: #9747ff;
+          }
+        }
+      }
+    }
+  }
+}

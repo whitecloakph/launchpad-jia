@@ -1,0 +1,280 @@
+.jobOpenings {
+  height: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 40px 79px;
+  .backContainer {
+    width: 100%;
+    background: #ffffff;
+    box-sizing: border-box;
+    left: 0;
+    padding: 21px 0 21px 79px;
+    position: fixed;
+    a {
+      font-weight: 600;
+      font-style: Semi Bold;
+      font-size: 16.7px;
+      line-height: 31.08px;
+      color: #6a6a6a;
+      &:focus-visible,
+      &:hover {
+        color: #9747ff;
+      }
+      &:active {
+        color: #6a6a6a;
+      }
+    }
+  }
+  .resultContainer {
+    width: 100%;
+    max-width: 998px;
+    align-self: center;
+    margin: 126px 0 0 0;
+    .selectJob {
+      display: flex;
+      flex-direction: column;
+      span {
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 19.17px;
+        line-height: 23.96px;
+        color: #6a6a6a;
+        &:first-of-type {
+          margin: 19.33px 0 0 0;
+        }
+      }
+    }
+    .jobDetailsContainer {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      padding: 50px 50px 81px 50px;
+      .titleContainer {
+        // align-items: center;
+        // display: flex;
+        span {
+          font-weight: 700;
+          font-style: Bold;
+          font-size: 28px;
+          line-height: 24px;
+          color: #2a2a2a;
+          // margin: 0 auto 0 0;
+        }
+        // img {
+        //   cursor: pointer;
+        //   &:first-of-type {
+        //     margin: 0 20px 0 0;
+        //   }
+        // }
+      }
+      .jobDetails {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 11px;
+        margin: 12px 0 0 0;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 16px;
+        line-height: 24px;
+        color: #6a6a6a;
+        hr {
+          height: 20px;
+          width: 2px;
+          background: #6a6a6a4d;
+          border: unset;
+          margin: 0 1px;
+        }
+      }
+      // .tagContainer {
+      //   display: flex;
+      //   gap: 16px;
+      //   span {
+      //     background: #f4f4f5;
+      //     border-radius: 5.83px;
+      //     box-sizing: border-box;
+      //     margin: 20px 0;
+      //     padding: 5.83px 8.75px;
+      //     font-weight: 700;
+      //     font-style: Bold;
+      //     font-size: 11.67px;
+      //     line-height: 14px;
+      //     color: #6a6a6a;
+      //     &.urgent {
+      //       background: #fee2e2;
+      //       color: #bf2c2b;
+      //     }
+      //   }
+      // }
+      .buttonContainer {
+        // display: flex;
+        // gap: 15.63px;
+        margin: 18px 0 0 0;
+        button {
+          align-items: center;
+          border: unset;
+          border-radius: 10px;
+          box-sizing: border-box;
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+          padding: 1.5px 18px;
+          font-weight: 700;
+          font-style: Bold;
+          font-size: 16px;
+          line-height: 39px;
+          text-align: center;
+          &.apply {
+            background: #9747ff;
+            color: #ffffff;
+            &:focus-visible,
+            &:hover {
+              opacity: 0.8;
+            }
+            &:active {
+              opacity: 1;
+            }
+          }
+          // &.save {
+          //   background: #ffffff;
+          //   color: #9747ff;
+          //   &:focus-visible,
+          //   &:hover {
+          //     box-shadow: 0 4px 12px rgba(151, 71, 255, 0.5);
+          //   }
+          //   &:active {
+          //     box-shadow: none;
+          //   }
+          // }
+        }
+      }
+      .appliedDetails {
+        align-items: center;
+        display: flex;
+        margin: 16px 0 0 0;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 16px;
+        line-height: 39px;
+        div {
+          align-items: center;
+          display: flex;
+          span {
+            margin: 0 0 0 12px;
+            color: #9747ff;
+          }
+        }
+        hr {
+          height: 20px;
+          width: 2px;
+          background: #6a6a6a4d;
+          border: unset;
+          margin: 0 12px;
+        }
+        a {
+          color: #75767c;
+          &:focus-visible,
+          &:hover {
+            color: #9747ff;
+          }
+          &:active {
+            color: #75767c;
+          }
+        }
+      }
+      p {
+        margin: 40px 0 0 0;
+        white-space: pre-wrap;
+        font-weight: 400;
+        font-style: Bold;
+        font-size: 1.2rem; // 14px
+        line-height: 1.5; // 24px;
+        color: #2a2a2a;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .jobOpenings {
+    padding: 0 16px 48px 16px;
+    .backContainer {
+      background: #f6f6f6;
+      padding: 24px 0 16px 16px;
+      a {
+        &:focus-visible,
+        &:hover {
+          color: #6a6a6a;
+        }
+        &:active {
+          color: #9747ff;
+        }
+      }
+    }
+    .resultContainer {
+      max-width: unset;
+      margin: 72px 0 0 0;
+      padding: 0 16px;
+      .jobDetailsContainer {
+        padding: 24px;
+        .titleContainer {
+          span {
+            font-size: 24px;
+            line-height: 32px;
+            letter-spacing: -2%;
+            color: #181d27;
+          }
+        }
+        .jobDetails {
+          gap: 9.44px;
+          margin: 16px 0 0 0;
+          font-size: 14px;
+          line-height: 20.59px;
+        }
+        .buttonContainer {
+          width: 100%;
+          margin: 32px 0 0 0;
+          button {
+            width: 100%;
+            border-radius: 8px;
+            display: flex;
+            gap: 8px;
+            padding: 12px 0;
+            font-family: Inter;
+            line-height: 24px;
+            &.apply {
+              &:focus-visible,
+              &:hover {
+                opacity: 1;
+              }
+              &:active {
+                opacity: 0.8;
+              }
+            }
+          }
+        }
+        .appliedDetails {
+          align-items: flex-start;
+          flex-direction: column;
+          margin: 12px 0 0 0;
+          a {
+            &:focus-visible,
+            &:hover {
+              color: #75767c;
+            }
+            &:active {
+              color: #9747ff;
+            }
+          }
+        }
+        p {
+          margin: 32px 0 0 0;
+        }
+      }
+    }
+  }
+}

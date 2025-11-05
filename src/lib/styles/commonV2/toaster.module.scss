@@ -1,0 +1,60 @@
+.toasterContainer {
+  width: 100%;
+  max-width: 420px;
+  align-items: center;
+  background: var(--Colors-Primary_Colors-Neutrals-White, #ffffff);
+  border: 1px solid var(--Border-primary, #e9eaeb);
+  border-radius: 16px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 12px;
+  left: 50%;
+  padding: 16px;
+  position: fixed;
+  top: 40px;
+  transform: translatex(-50%);
+  z-index: 3;
+  //   &.cancel,
+  //   &.reminder {
+  //     .xIcon {
+  //       margin: 0;
+  //       position: absolute;
+  //       right: 16px;
+  //       top: 16px;
+  //     }
+  //   }
+  //   &.cancel {
+  //     max-width: 570px;
+  //   }
+  //   &.reminder {
+  //     max-width: 562px;
+  //   }
+  .xIcon {
+    cursor: pointer;
+    margin: 0 0 0 auto;
+  }
+  .logo {
+    $size: 32px;
+    height: $size;
+    width: $size;
+  }
+  .textContainer {
+    display: flex;
+    flex-direction: column;
+    .header {
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--Text-text-primary, #181d27);
+    }
+    // .description {
+    //   font-weight: 500;
+    //   font-size: 14px;
+    //   line-height: 20px;
+    //   color: var(--Text-text-tertiary, #717680);
+    //   .bold {
+    //     font-weight: 700;
+    //   }
+    // }
+  }
+}

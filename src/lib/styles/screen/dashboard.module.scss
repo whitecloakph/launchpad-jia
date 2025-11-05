@@ -1,0 +1,671 @@
+.dashboard {
+  height: calc(100dvh - 80px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  .infoFilter {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    .textContainer {
+      display: flex;
+      flex-direction: column;
+      .name {
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 24px;
+        line-height: 49.58px;
+        color: #2a2a2a;
+      }
+      .description {
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 14px;
+        line-height: 20px;
+        color: #6a6a6a;
+      }
+    }
+    .buttonContainer {
+      position: relative;
+      display: flex;
+      gap: 13.84px;
+      .search {
+        left: 12.2px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      input {
+        background: #ffffff;
+        border: 0.68px solid #6a6a6a80;
+        border-radius: 6.78px;
+        box-sizing: border-box;
+        padding: 3.63px 12.2px 3.63px 35.41px;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 13.02px;
+        line-height: 30.95px;
+        color: #2a2a2a;
+        &::placeholder {
+          color: #6a6a6a80;
+        }
+        &:focus-visible,
+        &:hover {
+          box-shadow: 0 0 6px rgba(151, 71, 255, 0.25);
+          border-color: #9747ff;
+        }
+        &:active {
+          box-shadow: none;
+          border-color: #6a6a6a80;
+        }
+      }
+      button {
+        align-items: center;
+        background: #ffffff;
+        border: 0.68px solid #6a6a6a80;
+        border-radius: 6.78px;
+        box-sizing: border-box;
+        display: flex;
+        gap: 12.21px;
+        padding: 3.63px 12.2px;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 13.02px;
+        line-height: 30.95px;
+        text-align: center;
+        color: #2a2a2a;
+        &:focus-visible,
+        &:hover {
+          background: #2a2a2a;
+          color: #ffffff;
+        }
+        &:active {
+          background: #ffffff;
+          color: #2a2a2a;
+        }
+      }
+    }
+  }
+  .tabContainer {
+    display: flex;
+    gap: 25px;
+    margin: 45px 0 39px 0;
+    span {
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 16px;
+      line-height: 100%;
+      color: #2a2a2a;
+      hr {
+        border: 2px solid transparent;
+        border-radius: 0.4px;
+        transition: 0.3s;
+      }
+      &.active {
+        font-weight: 600;
+        font-style: Semi Bold;
+        hr {
+          border: 2px solid #9747ff;
+        }
+      }
+      &:hover {
+        hr {
+          border: 2px solid #9747ff;
+        }
+      }
+      &:active {
+        hr {
+          border: 2px solid transparent;
+        }
+      }
+    }
+  }
+  .emptyContainer {
+    align-items: center;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px 0px #0000000d;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 62px 0px;
+    .emptyTitle {
+      margin: 16px 0;
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 20px;
+      line-height: 90%;
+      text-align: center;
+      color: #2a2a2a;
+    }
+    .emptyDescription {
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 12px;
+      line-height: 20px;
+      text-align: center;
+      color: #6a6a6a;
+    }
+    button {
+      background: #1e1e1e;
+      border: unset;
+      border-radius: 7.19px;
+      box-sizing: border-box;
+      margin: 20px;
+      padding: 6.5px 21.57px;
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 14.38px;
+      line-height: 28.05px;
+      text-align: center;
+      color: #ffffff;
+      &:focus-visible,
+      &:hover {
+        opacity: 0.8;
+      }
+      &:active {
+        opacity: 1;
+      }
+    }
+  }
+  .applicationContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: auto;
+    .applicationDetailsContainer {
+      background: #ffffff;
+      box-shadow: 0px 4px 20px 0px #0000000d;
+      box-sizing: border-box;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      padding: 25.16px 0 29.92px 0;
+      position: relative;
+      .title {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 30px 22.84px 30px;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 16px;
+        line-height: 90%;
+        color: #000000;
+        img {
+          cursor: pointer;
+          transform: rotate(90deg);
+        }
+      }
+      .dropDownContainer {
+        background: #ffffff;
+        border: 1px solid #e9eaeb;
+        border-radius: 12px;
+        box-sizing: border-box;
+        box-shadow: 0px 4px 6px -2px #0a0d1208, 0px 12px 16px -4px #0a0d1214;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px 0;
+        position: absolute;
+        right: 30px;
+        top: 50px;
+        span {
+          width: 100%;
+          padding: 4px 24px;
+          transition: 0.3s;
+          font-family: Inter;
+          font-weight: 600;
+          line-height: 24px;
+          color: #625b71;
+          &:hover {
+            color: #9747ff;
+          }
+        }
+      }
+      hr {
+        width: 100%;
+        height: 1px;
+        background: #dadce0;
+        border: unset;
+        margin: 0;
+      }
+      .applicationStepContainer {
+        display: flex;
+        gap: 40px;
+        margin: 42px 104.23px 18.65px 61px;
+        .stepContainer {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          &:last-of-type {
+            width: unset;
+          }
+          .indicator {
+            align-items: center;
+            display: flex;
+            gap: 20px;
+            margin: 0 0 16px 0;
+            hr {
+              height: 6px;
+              background: unset;
+              border-radius: 10px;
+              &.pending {
+                background: #d9d9d9;
+              }
+              &.completed {
+                background: #9747ff;
+              }
+              &.in-progress {
+                background: linear-gradient(to right, #9747ff 50%, #d9d9d9 50%);
+              }
+            }
+          }
+          .stepStatus {
+            width: fit-content;
+            border: 1px solid transparent;
+            border-radius: 16.4px;
+            box-sizing: border-box;
+            padding: 4.78px 7.17px;
+            font-weight: 700;
+            font-style: Bold;
+            font-size: 9.56px;
+            line-height: 11.48px;
+            text-wrap: nowrap;
+            &.pending {
+              border-color: #6a6a6a4d;
+              color: #6a6a6a80;
+            }
+            &.completed {
+              background: #dbf8e5;
+              color: #186a35;
+            }
+            &.in-progress {
+              background: #f5edff;
+              color: #9747ff;
+            }
+          }
+          .stepDetails {
+            display: flex;
+            .textContainer {
+              display: flex;
+              flex-direction: column;
+              .stepNumber {
+                font-weight: 500;
+                font-style: Medium;
+                font-size: 10px;
+                line-height: 100%;
+                letter-spacing: 1px;
+                color: #6a6a6a;
+              }
+              .stepDescription {
+                margin: 7px 0;
+                font-weight: 700;
+                font-style: Bold;
+                font-size: 14px;
+                line-height: 20px;
+                color: #2a2a2a;
+                text-wrap: nowrap;
+                &.pending {
+                  color: #6a6a6a80;
+                }
+              }
+              .stepDate,
+              .stepNote {
+                margin: 7px 0 0 0;
+                font-weight: 400;
+                font-style: Regular;
+                font-size: 10px;
+                line-height: 16px;
+              }
+              .stepNote {
+                font-style: Italic;
+              }
+            }
+          }
+        }
+      }
+      .buttonContainer {
+        align-items: center;
+        align-self: flex-end;
+        display: flex;
+        gap: 23.15px;
+        margin: 18.15px 36.15px 0 0;
+        &.dropped {
+          margin: 30px 40px 0 0;
+          button {
+            padding: 6.5px 63.5px;
+          }
+        }
+        span {
+          font-weight: 500;
+          font-style: Medium;
+          font-size: 14px;
+          line-height: 21px;
+        }
+        button {
+          align-items: center;
+          background: #1e1e1e;
+          border: unset;
+          border-radius: 7.19px;
+          box-sizing: border-box;
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+          padding: 6.69px 30.85px;
+          font-weight: 700;
+          font-style: Bold;
+          font-size: 14.38px;
+          line-height: 28.05px;
+          text-align: center;
+          color: #ffffff;
+          &.disabled {
+            background: #75767c;
+            color: #d4d4d8;
+            pointer-events: none;
+          }
+          &:focus-visible,
+          &:hover {
+            opacity: 0.8;
+          }
+          &:active {
+            opacity: 1;
+          }
+        }
+      }
+      .updateContainer {
+        display: flex;
+        gap: 16px;
+        margin: 32.37px 40px 52px 40px;
+        &.dropped {
+          margin: 27px 40px 0 40px;
+        }
+        .textContainer {
+          display: flex;
+          flex-direction: column;
+          .statusTitle {
+            font-weight: 700;
+            font-style: Bold;
+            font-size: 18px;
+            line-height: 24px;
+            color: #2a2a2a;
+          }
+          .statusDescription {
+            margin: 7px 0 24px 0;
+            font-weight: 400;
+            font-style: Regular;
+            font-size: 14px;
+            line-height: 24px;
+            color: #2a2a2a;
+            &.cancelled {
+              margin: 9px 0 7px 0;
+              font-weight: 700;
+              font-style: Italic;
+              color: #6a6a6a;
+            }
+          }
+          .statusDetails {
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+            .detailsContainer {
+              display: flex;
+              gap: 16px;
+              .detailsTitle {
+                min-width: 254px;
+                font-weight: 700;
+                font-style: Bold;
+                font-size: 14px;
+                line-height: 24px;
+                color: #5d6770;
+              }
+              .detailsStatus {
+                background: #fee2e2;
+                border-radius: 16.4px;
+                padding: 4.78px 7.17px;
+                font-weight: 700;
+                font-style: Bold;
+                font-size: 9.56px;
+                color: #bf2c2b;
+              }
+              .detailsDate {
+                font-weight: 400;
+                font-style: Regular;
+                font-size: 14px;
+                line-height: 24px;
+                color: #6a6a6a;
+              }
+              .detailsReason {
+                font-weight: 700;
+                font-style: Bold;
+                font-size: 14px;
+                line-height: 24px;
+                color: #6a6a6a;
+                span {
+                  font-weight: 400;
+                }
+              }
+            }
+          }
+          .bottomTextContainer {
+            display: flex;
+            gap: 14px;
+            .tipsContainer {
+              font-weight: 400;
+              font-style: Regular;
+              font-size: 14px;
+              line-height: 24px;
+              color: #6a6a6a;
+              .tipsTitle {
+                font-weight: 700;
+                font-style: Bold;
+              }
+              ul {
+                margin: 0;
+                padding: 0 0 0 20px;
+              }
+            }
+            .reminderContainer {
+              display: flex;
+              flex-direction: column;
+              gap: 26px;
+              margin: 0 auto;
+              .dateContainer {
+                display: flex;
+                gap: 14px;
+                img {
+                  margin: 3px 0 0 0;
+                }
+                .dateTextContainer {
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  line-height: 24px;
+                  color: #6a6a6a;
+                  .dateTitle {
+                    font-weight: 700;
+                    font-style: Bold;
+                  }
+                  .date {
+                    display: flex;
+                    gap: 4px;
+                    font-weight: 400;
+                    font-style: Regular;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    height: auto;
+    padding: 48px 16px;
+    .infoFilter {
+      align-items: unset;
+      flex-direction: column;
+      gap: 24px;
+      justify-content: unset;
+      .textContainer {
+        gap: 8px;
+        .name {
+          line-height: 32px;
+          letter-spacing: -2%;
+        }
+      }
+      .buttonContainer {
+        gap: 12px;
+        .search {
+          left: 14px;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+        input {
+          width: 100%;
+          border: 1px solid #d5d7da;
+          border-radius: 8px;
+          padding: 10px 14px 10px 42px;
+          font-size: 16px;
+          line-height: 24px;
+          color: #181d27;
+          &::placeholder {
+            color: #717680;
+          }
+        }
+        button {
+          gap: 8px;
+          padding: 6.5px 16px;
+          font-family: Inter;
+          font-size: 16px;
+        }
+      }
+    }
+    .tabContainer {
+      margin: 24px 0;
+    }
+    .applicationContainer {
+      .applicationDetailsContainer {
+        padding: 16px 0;
+        .title {
+          margin: 0 16px 16px 16px;
+          line-height: 24px;
+        }
+        .applicationStepContainer {
+          flex-direction: column;
+          gap: 24px;
+          margin: 16px 0;
+          padding: 0 16px;
+          .stepContainer {
+            .stepStatus {
+              margin: 14px 0 0 auto;
+            }
+            .stepDetails {
+              gap: 16px;
+              .textContainer {
+                .stepDescription {
+                  margin: 4px 0 0 0;
+                }
+                .stepDate,
+                .stepNote {
+                  margin: 4px 0 0 0;
+                  font-size: 12px;
+                  line-height: 20px;
+                }
+              }
+            }
+          }
+        }
+        .buttonContainer {
+          align-items: unset;
+          align-self: unset;
+          flex-direction: column;
+          gap: 8;
+          margin: 24px 16px 0 16px;
+          &.dropped {
+            margin: 24px 16px 0 16px;
+            button {
+              padding: 7.19px 0;
+            }
+          }
+          button {
+            width: 100%;
+            border-radius: 8px;
+            padding: 12px 0;
+            font-size: 16x;
+            line-height: 24px;
+          }
+        }
+        .updateContainer {
+          margin: 16px 16px 22.44px 16px;
+          &.dropped {
+            margin: 16px 16px 0 16px;
+          }
+          .textContainer {
+            .statusTitle {
+              align-items: center;
+              display: flex;
+              gap: 12px;
+            }
+            .statusDescription {
+              &.cancelled {
+                margin: 8px 0 16px 0;
+              }
+            }
+            .statusDetails {
+              gap: 8px;
+              .detailsContainer {
+                flex-direction: column;
+                gap: 8px;
+                .detailsTitle {
+                  min-width: unset;
+                  color: #75767c;
+                }
+                .detailsStatus {
+                  width: fit-content;
+                }
+              }
+            }
+            .bottomTextContainer {
+              flex-direction: column;
+              gap: 16px;
+              .tipsContainer {
+                .tipsTitle {
+                  align-items: center;
+                  display: flex;
+                  gap: 12px;
+                }
+                ul {
+                  padding: 8px 0 0 25px;
+                }
+              }
+              .reminderContainer {
+                gap: 16px;
+                margin: 0 auto 0 0;
+                .dateContainer {
+                  gap: 12px;
+                  .dateTextContainer {
+                    gap: 4px;
+                  }
+                }
+              }
+            }
+          }
+        }
+        .dropDownContainer {
+          right: 16px;
+          top: 40px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,712 @@
+.modal {
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  .modalContainer {
+    width: 100%;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    &.signIn,
+    &.welcomePrompt,
+    &.cvUploaded {
+      .topIcon {
+        padding: 14px;
+        img {
+          $size: 36px;
+          height: $size;
+          width: $size;
+        }
+      }
+    }
+    &.signIn {
+      max-width: 447px;
+      padding: 29px 0 35px 0;
+      .xIcon {
+        right: 20px;
+        top: 17px;
+      }
+      .topIcon {
+        margin: 0 0 15px 0;
+      }
+      .title {
+        color: #2a2a2a;
+      }
+      button {
+        max-width: 355px;
+        margin: 16px 0 0 0;
+      }
+      .bottomText {
+        margin: 16px 0 0 0;
+      }
+    }
+    &.welcomePrompt {
+      max-width: 476px;
+      background: #f4f4f5;
+      padding: 33px 0 28px 0;
+      .xIcon {
+        right: 18px;
+        top: 23px;
+      }
+      .topIcon {
+        margin: 0 0 14px 0;
+      }
+      .body {
+        font-size: 14px;
+        line-height: 24px;
+      }
+      button {
+        max-width: 388px;
+        margin: 14px 0 0 0;
+      }
+      .bottomText {
+        cursor: pointer;
+        margin: 14px 0 0 0;
+        line-height: 16px;
+        color: #9747ff;
+        &:hover {
+          color: #2a2a2a;
+        }
+        &:active {
+          color: #9747ff;
+        }
+      }
+    }
+    &.loading {
+      max-width: 396px;
+      padding: 46px 0;
+    }
+    &.application {
+      max-width: 396px;
+      padding: 33px 0 32px 0;
+      .xIcon {
+        right: 16px;
+        top: 23px;
+      }
+      .topIcon {
+        margin: 0 0 14px 0;
+        padding: 18px;
+        img {
+          $size: 28px;
+          height: $size;
+          width: $size;
+        }
+      }
+      .body {
+        font-size: 14px;
+        line-height: 22px;
+        .role {
+          font-weight: 600;
+          font-style: Semi Bold;
+        }
+      }
+      button {
+        max-width: 316px;
+        margin: 18px 0 0 0;
+      }
+    }
+    &.cvUploaded {
+      background: #f4f4f5;
+      max-width: 385px;
+      padding: 40px 0 30px 0;
+      .xIcon {
+        right: 30px;
+        top: 30px;
+      }
+      .topIcon {
+        margin: 0 0 14px 0;
+      }
+      .title {
+        font-size: 20px;
+        line-height: 40px;
+      }
+      .body {
+        font-size: 14px;
+        line-height: 24px;
+      }
+      button {
+        max-width: 325px;
+        margin: 12px 0 0 0;
+        &.browseBtn {
+          background: #1e1e1e;
+          border: unset;
+          margin: 16px 0 0 0;
+          padding: 6.5px 0;
+          font-weight: 700;
+          font-style: Bold;
+          font-size: 14.38px;
+          line-height: 28.05px;
+          color: #ffffff;
+          &:focus-visible,
+          &:hover {
+            opacity: 0.8;
+          }
+          &:active {
+            opacity: 1;
+          }
+        }
+      }
+    }
+    &.retake {
+      background: #f4f4f5;
+      max-width: 461px;
+      padding: 30px 40px;
+      .xIcon {
+        right: 18px;
+        top: 23px;
+      }
+      .topIcon {
+        margin: 0 0 10px 0;
+      }
+      .title {
+        font-size: 20px;
+        line-height: 40px;
+      }
+      .body {
+        font-size: 14px;
+        line-height: 22px;
+      }
+      textarea {
+        height: 200px !important;
+        margin: 19px 0 0 0;
+      }
+      .bottomText {
+        margin: 7px auto 0 0;
+        font-size: 10px;
+        line-height: 20px;
+        color: #6a6a6a;
+      }
+      button {
+        width: fit-content;
+        background: #1e1e1e;
+        border: unset;
+        border-radius: 7.19px;
+        margin: 3px 0 0 auto;
+        padding: 6.5px 21.57px;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 14.38px;
+        line-height: 28.05px;
+        color: #ffffff;
+        &.disabled {
+          background: #75767c;
+          color: #d4d4d8;
+          pointer-events: none;
+        }
+        &:not(.disabled):focus-visible,
+        &:not(.disabled):hover {
+          opacity: 0.8;
+        }
+        &:not(.disabled):active {
+          opacity: 1;
+        }
+      }
+    }
+    &.cancelApplication {
+      align-items: flex-start;
+      background: #f4f4f5;
+      max-width: 459px;
+      padding: 33.75px 39px 27.5px 39px;
+      .xIcon {
+        right: 33.7px;
+        top: 27px;
+        img {
+          $size: 23.14px;
+          height: $size;
+          width: $size;
+        }
+      }
+      .topIcon {
+        margin: 0 0 7.71x 0;
+        padding: 13.5px;
+        img {
+          $size: 34.71px;
+          height: $size;
+          width: $size;
+        }
+      }
+      .title {
+        margin: 0 0 9.93px 0;
+        font-size: 23.14px;
+        line-height: 45.29px;
+        text-align: left;
+      }
+      .body {
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 15.43px;
+        line-height: 23.14px;
+        color: #2a2a2a;
+        text-align: left;
+        &.role {
+          font-weight: 700;
+          font-style: Bold;
+        }
+      }
+      form {
+        margin: 23.68px 0 21.51px 0;
+      }
+      textarea {
+        height: 69px !important;
+      }
+      .buttonContainer {
+        margin: 23px 0 0 0;
+        button {
+          border: 1.39px solid #323131;
+          border-radius: 6.93px;
+          padding: 6.5px 20.8px;
+          font-weight: 700;
+          font-style: Bold;
+          font-size: 13.87px;
+          line-height: 27.05px;
+          text-align: center;
+          color: #323131;
+          &.cancel {
+            background: #1e1e1e;
+            border: unset;
+            color: #ffffff;
+            &:focus-visible,
+            &:hover {
+              opacity: 0.8;
+            }
+            &:active {
+              opacity: 1;
+            }
+          }
+          &.disabled {
+            background: #75767c;
+            color: #d4d4d8;
+            pointer-events: none;
+          }
+          &:not(.cancel):not(.disabled):focus-visible,
+          &:not(.cancel):not(.disabled):hover {
+            background: #2a2a2a;
+            color: #ffffff;
+          }
+          &:not(.cancel):not(.disabled):active {
+            background: #ffffff;
+            color: #2a2a2a;
+          }
+        }
+      }
+    }
+    &.cancelletionSuccess {
+      align-items: flex-start;
+      background: #f4f4f5;
+      max-width: 448.43px;
+      padding: 49px 40px 27px 40px;
+      .xIcon {
+        right: 40px;
+        top: 27px;
+        img {
+          $size: 23.14px;
+          height: $size;
+          width: $size;
+        }
+      }
+      .topIcon {
+        margin: 0 0 8px 0;
+        padding: 13.5px;
+        img {
+          $size: 34.71px;
+          height: $size;
+          width: $size;
+        }
+      }
+      .title {
+        margin: 0 0 7.32px 0;
+        font-size: 23.14px;
+        line-height: 45.29px;
+        text-align: left;
+      }
+      .body {
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 15.43px;
+        line-height: 23.14px;
+        color: #75767c;
+        text-align: left;
+        .role {
+          font-weight: 700;
+          font-style: Bold;
+        }
+      }
+      .buttonContainer {
+        margin: 21px 0 0 0;
+        button {
+          border: 1.39px solid #323131;
+          border-radius: 6.93px;
+          padding: 6.5px 38px;
+          font-weight: 700;
+          font-style: Bold;
+          font-size: 13.87px;
+          line-height: 27.05px;
+          text-align: center;
+          color: #323131;
+          &:focus-visible,
+          &:hover {
+            background: #2a2a2a;
+            color: #ffffff;
+          }
+          &:active {
+            background: #ffffff;
+            color: #2a2a2a;
+          }
+        }
+      }
+    }
+    .xIcon {
+      cursor: pointer;
+      position: absolute;
+      $size: 24px;
+      height: $size;
+      width: $size;
+    }
+    .topIcon {
+      display: flex;
+      background: #f7e8f4;
+      border-radius: 50%;
+      box-sizing: border-box;
+      padding: 14px;
+    }
+    .title {
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 24px;
+      line-height: 46.97px;
+      text-align: center;
+      color: #2a2a2a;
+    }
+    .body {
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 14.99px;
+      line-height: 27.9px;
+      text-align: center;
+      color: #6a6a6a;
+    }
+    button {
+      width: 100%;
+      align-items: center;
+      background: #ffffff;
+      border: 2px solid #6a6a6a33;
+      border-radius: 10px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 5px 0;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+      line-height: 31.75px;
+      text-align: center;
+      color: #2a2a2a;
+      &:focus-visible,
+      &:hover {
+        background: #2a2a2a;
+        color: #ffffff;
+      }
+      &:active {
+        background: #ffffff;
+        color: #2a2a2a;
+      }
+    }
+    .bottomText {
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 11px;
+      line-height: 18px;
+      text-align: center;
+      color: #2a2a2a;
+      a {
+        font-weight: 500;
+        color: #9747ff;
+        &:focus-visible,
+        &:hover {
+          color: #2a2a2a;
+        }
+        &:active {
+          color: #9747ff;
+        }
+      }
+    }
+    textarea {
+      width: 100%;
+      background: #d9d9d980;
+      border-color: transparent;
+      box-sizing: border-box;
+      padding: 10px 18px;
+      resize: none;
+      white-space: pre-wrap;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 14.38px;
+      line-height: 28.05px;
+      letter-spacing: 0%;
+      color: #2a2a2a;
+      &::placeholder {
+        color: #6a6a6a80;
+      }
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10.68px;
+      input {
+        accent-color: #9747ff;
+      }
+      label {
+        align-items: center;
+        display: flex;
+        gap: 13.5px;
+        font-weight: 600;
+        font-style: Semi Bold;
+        font-size: 13.5px;
+        line-height: 23.14px;
+        color: #6a6a6a;
+        &:not(span) {
+          gap: 5px;
+        }
+        span {
+          font-weight: 400;
+          font-style: Italic;
+          font-size: 13.5px;
+        }
+      }
+    }
+    .buttonContainer {
+      align-self: flex-end;
+      display: flex;
+      gap: 11.57px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    .modalContainer {
+      &.signIn {
+        max-width: 319.91px;
+        border-radius: 18.65px;
+        padding: 31.71px 0 21.18px 0;
+        .xIcon {
+          $size: 22.38px;
+          height: $size;
+          width: $size;
+          right: 14.92px;
+          top: 14.92px;
+        }
+        .topIcon {
+          margin: 0 0 9.33px 0;
+          padding: 13.06px;
+          img {
+            $size: 33.58px;
+            height: $size;
+            width: $size;
+          }
+        }
+        .title {
+          font-size: 22.38px;
+          line-height: 43.81px;
+        }
+        .body {
+          font-size: 13.06px;
+          line-height: 22.38px;
+        }
+        button {
+          max-width: 275.14px;
+          border-radius: 9.33px;
+          gap: 9.33px;
+          margin: 14.92px 0 0 0;
+          padding: 4.59px 0;
+          font-size: 13.06px;
+          line-height: 29.61px;
+        }
+        .bottomText {
+          margin: 14.92px 0 0 0;
+          font-size: 10.26px;
+          line-height: 16.79px;
+        }
+      }
+      &.welcomePrompt {
+        max-width: 343px;
+        padding: 34px 0 24px 0;
+        .body {
+          width: 100%;
+          max-width: 295px;
+          font-size: 12px;
+          line-height: 21px;
+        }
+        button {
+          max-width: 295px;
+          margin: 16px 0 0 0;
+        }
+        .bottomText {
+          margin: 16px 0 0 0;
+          font-size: 12px;
+          line-height: 16px;
+        }
+      }
+      &.loading {
+        max-width: 343px;
+        padding: 42px 0;
+      }
+      &.application {
+        max-width: 343px;
+        padding: 34px 0 24px 0;
+        .body {
+          font-size: 14px;
+          line-height: 24px;
+          .role {
+            font-weight: 700;
+            font-style: Bold;
+          }
+        }
+        button {
+          max-width: 295px;
+          margin: 16px 0 0 0;
+        }
+      }
+      &.cvUploaded {
+        max-width: 343px;
+        padding: 34px 0 24px 0;
+        .title {
+          font-size: 24px;
+          line-height: 32px;
+        }
+        button {
+          max-width: 295px;
+        }
+      }
+      &.retake {
+        background: #ffffff;
+        max-width: 343px;
+        padding: 34px 24px 24px 24px;
+        .title {
+          font-size: 20px;
+          line-height: 40px;
+        }
+        .body {
+          font-size: 14px;
+          line-height: 24px;
+        }
+        textarea {
+          height: 120px !important;
+          margin: 19px 0 0 0;
+        }
+        button {
+          width: 100%;
+          border-radius: 8px;
+          margin: 16px 0 0 0;
+          padding: 12px 0;
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+      &.cancelApplication {
+        max-width: 343px;
+        padding: 31.93px 27px 24px 27px;
+        .xIcon {
+          right: 20.18px;
+          top: 20.18px;
+          img {
+            $size: 17.29px;
+            height: $size;
+            width: $size;
+          }
+        }
+        .topIcon {
+          margin: 0 0 10px 0;
+          padding: 11.56px;
+          img {
+            $size: 23px;
+            height: $size;
+            width: $size;
+          }
+        }
+        .title {
+          margin: 0 0 11px 0;
+          font-size: 24px;
+          line-height: 33.85px;
+        }
+        .body {
+          font-size: 14px;
+          line-height: 20px;
+        }
+        form {
+          margin: 23.68px 0 14.4px 0;
+        }
+        .buttonContainer {
+          width: 100%;
+          flex-direction: column-reverse;
+          button {
+            border: 1.04px solid #323131;
+            border-radius: 5.18px;
+            padding: 9.5px 0;
+            font-size: 12px;
+            line-height: 20.22px;
+          }
+        }
+      }
+      &.cancelletionSuccess {
+        max-width: 343px;
+        padding: 31.93px 27px 24px 27px;
+        .xIcon {
+          right: 20.18px;
+          top: 20.18px;
+          img {
+            $size: 17.29px;
+            height: $size;
+            width: $size;
+          }
+        }
+        .topIcon {
+          margin: 0 0 10px 0;
+          padding: 11.56px;
+          img {
+            $size: 23px;
+            height: $size;
+            width: $size;
+          }
+        }
+        .title {
+          margin: 0 0 17px 0;
+          font-size: 24px;
+          line-height: 33.85px;
+        }
+        .body {
+          font-size: 14px;
+          line-height: 17.7px;
+        }
+        .buttonContainer {
+          width: 100%;
+          button {
+            border: 1.04px solid #323131;
+            border-radius: 5.18px;
+            padding: 9.5px 0;
+            font-size: 12px;
+            line-height: 20.22px;
+          }
+        }
+      }
+      .xIcon {
+        right: 16px;
+        top: 16px;
+      }
+      .topIcon {
+        margin: 0 0 10px 0;
+      }
+    }
+  }
+}

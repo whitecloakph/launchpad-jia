@@ -1,0 +1,656 @@
+.bg {
+  height: 100%;
+  width: 100%;
+  background: #ffffff;
+  position: fixed;
+  top: 0;
+}
+
+.uploadCVContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 46px;
+  padding: 58px 0 72.63px 0;
+  .uploadCVHeader {
+    display: flex;
+    flex-direction: column;
+    z-index: 0;
+    .tag {
+      align-items: center;
+      display: flex;
+      gap: 10px;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 16px;
+      line-height: 20px;
+      color: #6a6a6a;
+      img {
+        $size: 24px;
+        height: $size;
+        width: $size;
+      }
+    }
+    .title {
+      margin: 13px 0 12px 35px;
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 28px;
+      line-height: 24px;
+      color: #2a2a2a;
+    }
+    .location {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 11px;
+      margin: 0 0 0 35px;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 16px;
+      line-height: 24px;
+      color: #6a6a6a;
+      hr {
+        height: 20px;
+        width: 2px;
+        background: #6a6a6a4d;
+        border: unset;
+        margin: 0 1px;
+      }
+    }
+  }
+  .stepContainer {
+    width: 100%;
+    max-width: 544px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    z-index: 0;
+    .step {
+      display: flex;
+      justify-content: space-between;
+      .stepBar {
+        align-items: center;
+        width: 100%;
+        display: flex;
+        &:last-of-type {
+          width: unset;
+        }
+        hr {
+          height: 1.5px;
+          width: 100%;
+          background: #d4d4d8;
+          border: unset;
+          &.done {
+            border-color: #9747ff;
+          }
+        }
+      }
+      .stepDetails {
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 13px;
+        line-height: 22px;
+        color: #18181b;
+        &.pending {
+          color: #a1a1aa;
+        }
+        &:first-of-type {
+          margin: 0 0 0 -20px;
+        }
+        &:nth-of-type(2) {
+          margin: 0 0 0 20px;
+        }
+        &:last-of-type {
+          margin: 0 -50px 0 0;
+        }
+      }
+    }
+  }
+  .fileContainer {
+    width: 100%;
+    max-width: 591px;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0px 4px 20px 0px #0000001a;
+    box-sizing: border-box;
+    display: flex;
+    margin: 1px 0 0 0;
+    padding: 28px 35px 28px 27px;
+    z-index: 0;
+    .title {
+      margin: 0 13px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+      line-height: 20px;
+      color: #9747ff;
+    }
+    .description {
+      margin: 0 0 0 auto;
+      font-weight: 400;
+      font-style: Italic;
+      font-size: 14px;
+      line-height: 20px;
+      text-wrap: nowrap;
+      color: #6a6a6a80;
+    }
+    .xIcon {
+      cursor: pointer;
+      margin: 0 0 0 auto;
+    }
+    button {
+      background: #1e1e1e;
+      border: unset;
+      border-radius: 7.19px;
+      box-sizing: border-box;
+      padding: 6.5px 26px;
+      margin: 0 0 0 auto;
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 14.38px;
+      line-height: 28.05px;
+      text-align: center;
+      color: #ffffff;
+      &:focus-visible,
+      &:hover {
+        opacity: 0.8;
+      }
+      &:active {
+        opacity: 1;
+      }
+    }
+  }
+  .cvDetailsContainer {
+    width: 100%;
+    max-width: 591px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin: -22px 0 0 0;
+    z-index: 0;
+    .cvDetailsCard {
+      background: #ffffff;
+      box-shadow: 0px 4px 20px 0px #0000001a;
+      border-radius: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 25px 0 30px 0;
+      &:nth-of-type(2) {
+        margin: -12px 0 0 0;
+      }
+      .sectionTitle {
+        max-height: 20px;
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 33px;
+        transition: 0.3s;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 14px;
+        line-height: 20px;
+        color: #6a6a6a;
+        &.forEditing {
+          max-height: 40px;
+        }
+        img {
+          cursor: pointer;
+        }
+        button {
+          border-radius: 10px;
+          padding: 6.5px 31.25px !important;
+        }
+      }
+      hr {
+        border: 1.5px solid #d4d4d8;
+        margin: 0;
+      }
+      .sectionDetails {
+        margin: 0 33px;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 13.83px;
+        line-height: 20px;
+        color: #6a6a6a;
+        &.withDetails {
+          color: #6a6a6a;
+          h2 {
+            display: none;
+          }
+        }
+      }
+      textarea {
+        height: 300px !important;
+        background: #d9d9d980;
+        border: unset;
+        box-sizing: border-box;
+        margin: 0 33px;
+        padding: 12px;
+        resize: none;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 13.83px;
+        line-height: 20px;
+        color: #6a6a6a;
+        &::placeholder {
+          color: #6a6a6a80;
+        }
+        &:focus-visible,
+        &:hover {
+          box-shadow: 0 0 0 2px #9747ff40;
+        }
+        &:active {
+          box-shadow: none;
+        }
+      }
+    }
+    button {
+      background: #1e1e1e;
+      border: unset;
+      border-radius: 7.19px;
+      box-sizing: border-box;
+      margin: 0 0 0 auto;
+      padding: 6.69px 30.85px;
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 14.38px;
+      line-height: 28.05px;
+      text-align: center;
+      color: #ffffff;
+      &:focus-visible,
+      &:hover {
+        opacity: 0.8;
+      }
+      &:active {
+        opacity: 1;
+      }
+    }
+  }
+  .cvManageContainer {
+    display: flex;
+    gap: 30px;
+    z-index: 0;
+    .cvContainer {
+      width: 100%;
+      max-width: 380px;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0px 4px 20px 0px #0000001a;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      &.forUpload {
+        padding: 49px 72px 32px 68px;
+        button {
+          padding: 6.5px 31.35px;
+          margin: 26px 0 17.63px 0;
+        }
+      }
+      &.forReview {
+        padding: 49px 74px 52px 68px;
+        button {
+          padding: 6.5px 26px;
+          margin: 26px 0 18px 0;
+          &.disabled {
+            background: #75767c;
+            cursor: unset;
+            color: #d4d4d8;
+          }
+        }
+      }
+      img {
+        $size: 73px;
+        height: $size;
+        width: $size;
+      }
+      button {
+        background: #1e1e1e;
+        border: unset;
+        border-radius: 7.19px;
+        box-sizing: border-box;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 14.38px;
+        line-height: 28.05px;
+        text-align: center;
+        color: #ffffff;
+        &:not(.disabled):focus-visible,
+        &:not(.disabled):hover {
+          opacity: 0.8;
+        }
+        &:not(.disabled):active {
+          opacity: 1;
+        }
+      }
+      span {
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 13.83px;
+        line-height: 20px;
+        text-align: center;
+      }
+    }
+  }
+  .cvScreeningContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    z-index: 0;
+    img {
+      height: 37px;
+      width: 138px;
+      object-fit: cover;
+    }
+    .title {
+      margin: 30px 0 9px 0;
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 24.05px;
+      line-height: 42.08px;
+      text-align: center;
+      color: #9747ff;
+    }
+    .description {
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 15.51px;
+      line-height: 24.82px;
+      text-align: center;
+      color: #2a2a2a;
+    }
+  }
+  .cvResultContainer {
+    width: 100%;
+    max-width: 542px;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0px 4px 20px 0px #0000001a;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    z-index: 0;
+    &.forReview {
+      padding: 57px 0 52px 0;
+      img {
+        margin: 0 0 11px 0;
+      }
+      .description {
+        margin: 7px 0 0 0;
+      }
+      .buttonContainer {
+        margin: 27px 0 0 0;
+      }
+    }
+    &.forInterview {
+      padding: 49px 0 68px 0;
+      img {
+        margin: 0 0 23px 0;
+      }
+      .title {
+        margin: 0 0 11px 0;
+        line-height: 20px;
+      }
+      .description {
+        &.bold {
+          margin: 27px 0 0 0;
+          font-weight: 700;
+        }
+      }
+      .buttonContainer {
+        display: flex;
+        gap: 20px;
+        margin: 33px 0 0 0;
+        button {
+          &.secondaryBtn {
+            background: #ffffff;
+            border: 1.44px solid #323131;
+            color: #323131;
+            &:focus-visible,
+            &:hover {
+              background: #323131;
+              color: #ffffff;
+            }
+            &:active {
+              background: #ffffff;
+              color: #323131;
+            }
+          }
+        }
+      }
+    }
+    .title {
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 20px;
+      line-height: 29px;
+      text-align: center;
+      color: #9747ff;
+    }
+    .description {
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 13.83px;
+      line-height: 23px;
+      text-align: center;
+      color: #6a6a6a;
+    }
+    .buttonContainer {
+      button {
+        background: #1e1e1e;
+        border: unset;
+        border-radius: 7.19px;
+        box-sizing: border-box;
+        padding: 6.5px 17.5px;
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 14.38px;
+        line-height: 28.05px;
+        text-align: center;
+        color: #ffffff;
+        &:not(.secondaryBtn):focus-visible,
+        &:not(.secondaryBtn):hover {
+          opacity: 0.8;
+        }
+        &:not(.secondaryBtn):active {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .uploadCVContainer {
+    gap: 24px;
+    padding: 48px 16px;
+    .uploadCVHeader {
+      display: flex;
+      flex-direction: column;
+      .title {
+        margin: 8px 0 8px 35px;
+        font-size: 24px;
+        line-height: 32px;
+      }
+    }
+    .stepContainer {
+      max-width: unset;
+      gap: 12px;
+      .step {
+        padding: 0 28px;
+        .stepDetails {
+          font-size: 12px;
+          line-height: 20px;
+          text-align: center;
+          &:nth-of-type(2) {
+            margin: 0 0 0 30px;
+          }
+          &:last-of-type {
+            margin: 0 -30px 0 0;
+          }
+        }
+      }
+    }
+    .fileContainer {
+      max-width: unset;
+      margin: 0;
+      padding: 24px;
+      .title {
+        margin: 0 13px;
+      }
+      .description {
+        margin: 0 0 0 auto;
+      }
+      .xIcon {
+        margin: 0 0 0 auto;
+      }
+      button {
+        &:focus-visible,
+        &:hover {
+          opacity: 1;
+        }
+        &:active {
+          opacity: 0.8;
+        }
+      }
+    }
+    .cvDetailsContainer {
+      max-width: unset;
+      gap: 24px;
+      margin: 0;
+      .cvDetailsCard {
+        padding: 25px 25px 30px 25px;
+        &:nth-of-type(2) {
+          margin: 0;
+        }
+        .sectionTitle {
+          margin: 0;
+          button {
+            width: unset;
+            font-size: 14.38px !important;
+            line-height: 28.05px !important;
+          }
+        }
+        .sectionDetails {
+          margin: 0;
+        }
+        textarea {
+          height: 200px !important;
+          margin: 0;
+        }
+      }
+      button {
+        width: 100%;
+        margin: 0;
+        padding: 12px 0;
+        font-size: 16px;
+        line-height: 24px;
+        &:focus-visible,
+        &:hover {
+          opacity: 1;
+        }
+        &:active {
+          opacity: 0.8;
+        }
+      }
+    }
+    .cvManageContainer {
+      flex-direction: column;
+      gap: 24px;
+      .cvContainer {
+        max-width: unset;
+        &.forUpload {
+          padding: 24px 50px;
+        }
+        &.forReview {
+          padding: 24px 55px;
+        }
+        img {
+          $size: 48px;
+          height: $size;
+          width: $size;
+        }
+        button {
+          margin: 22px 0 !important;
+          &:not(.disabled):focus-visible,
+          &:not(.disabled):hover {
+            opacity: 1;
+          }
+          &:not(.disabled):active {
+            opacity: 0.8;
+          }
+        }
+        span {
+          font-size: 14px;
+        }
+      }
+    }
+    .cvScreeningContainer {
+      img {
+        margin: 24px 0 0 0;
+      }
+      .title {
+        margin: 16px 0;
+      }
+    }
+    .cvResultContainer {
+      max-width: unset;
+      padding: 24px !important;
+      &.forReview {
+        .description {
+          margin: 16px 0 0 0;
+        }
+      }
+      &.forInterview {
+        .title {
+          margin: 0 0 16px 0;
+        }
+        .buttonContainer {
+          width: 100%;
+          flex-direction: column;
+          gap: 12px;
+          button {
+            &.secondaryBtn {
+              &:focus-visible,
+              &:hover {
+                background: #ffffff;
+                color: #323131;
+              }
+              &:active {
+                background: #323131;
+                color: #ffffff;
+              }
+            }
+          }
+        }
+      }
+      img {
+        margin: 0 0 24px 0 !important;
+      }
+      .title {
+        line-height: 28px !important;
+      }
+      .buttonContainer {
+        margin: 16px 0 0 0 !important;
+        button {
+          &:not(.secondaryBtn):focus-visible,
+          &:not(.secondaryBtn):hover {
+            opacity: 1;
+          }
+          &:not(.secondaryBtn):active {
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+  }
+}

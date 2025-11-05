@@ -1,0 +1,8 @@
+.next/
+node_modules/
+
+.DS_Store
+.env*
+!.env.example
+bun.lock
+next-env.d.ts
