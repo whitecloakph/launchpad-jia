@@ -6,3 +6,5 @@ node_modules/
 !.env.example
 bun.lock
 next-env.d.ts
+
+GEMINI.md
