@@ -16,6 +16,8 @@ export async function POST(request: Request) {
     const { db } = await connectMongoDB();
     const admin = await db.collection("admins").findOne({ email: email });
 
+    console.log("Admin found:", admin);
+
     if (admin) {
       await db.collection("admins").updateOne(
         { email: email },
@@ -28,6 +30,8 @@ export async function POST(request: Request) {
         }
       );
 
+      console.log("Admin found:", admin);
+
       return NextResponse.json(admin);
     } else {
       const applicant = await db
@@ -39,10 +43,12 @@ export async function POST(request: Request) {
         .findOne({ email: email });
 
       if (employer) {
+        console.log("Employer found:", employer);
         return NextResponse.json(employer);
       }
 
       if (applicant) {
+        console.log("Applicant found:", applicant);
         return NextResponse.json(applicant);
       }
 
