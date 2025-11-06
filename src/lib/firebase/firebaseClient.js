@@ -105,7 +105,8 @@ export async function signInWithGoogle(type) {
           }
         });
 
-        localStorage.removeItem("user");
+        // Remove this code as it is causing issues if the user is an applicant
+        //localStorage.removeItem("user");
         return false;
       }
 
