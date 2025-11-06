@@ -34,6 +34,14 @@ export async function POST(request: Request) {
         .collection("applicants")
         .findOne({ email: email });
 
+      const employer = await db
+        .collection("members")
+        .findOne({ email: email });
+
+      if (employer) {
+        return NextResponse.json(employer);
+      }
+
       if (applicant) {
         return NextResponse.json(applicant);
       }
