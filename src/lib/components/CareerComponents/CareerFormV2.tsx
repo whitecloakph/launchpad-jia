@@ -1,5 +1,3 @@
-// John Alfred Alfonso
-
 "use client";
 
 import { useState } from "react";
@@ -12,6 +10,8 @@ import philippineCitiesAndProvinces from "../../../../public/philippines-locatio
 
 
 const step = ["Career Details & Team Access", "CV Review & Pre-screening", "AI Interview Setup", "Pipeline Stages", "Review Career"];
+
+const reviewSections = ["Career Details & Team Access", "CV Review & Pre-screening", "AI Interview Setup", "Pipeline Stages"];
 
 const workSetupOptions = [
     { name: "Fully Remote" },
@@ -134,6 +134,47 @@ export default function CareerFormV2() {
         { id: "worksetup", title: "Work Setup", question: "Are you willing to report to the office when required?", added: true },
         { id: "salary", title: "Asking Salary", question: "How much is your expected monthly salary?", added: true },
     ]);
+    const [pipelineStages, setPipelineStages] = useState([
+        {
+            id: 1,
+            name: "CV Screening",
+            isCore: true,
+            substages: [
+                { id: 1, name: "Waiting Submission", hasAutomation: true },
+                { id: 2, name: "For Review", hasAutomation: true },
+            ],
+        },
+        {
+            id: 2,
+            name: "AI Interview",
+            isCore: true,
+            substages: [
+                { id: 1, name: "Waiting Interview", hasAutomation: true },
+                { id: 2, name: "For Review", hasAutomation: true },
+            ],
+        },
+        {
+            id: 3,
+            name: "Final Human Interview",
+            isCore: false,
+            substages: [
+                { id: 1, name: "Waiting Schedule", hasAutomation: true },
+                { id: 2, name: "Waiting Interview", hasAutomation: true },
+                { id: 3, name: "For Review", hasAutomation: true },
+            ],
+        },
+        {
+            id: 4,
+            name: "Job Offer",
+            isCore: true,
+            substages: [
+                { id: 1, name: "For Final Review", hasAutomation: true },
+                { id: 2, name: "Waiting Offer Acceptance", hasAutomation: true },
+                { id: 3, name: "For Contract Signing", hasAutomation: true },
+            ],
+        },
+    ]);
+    const [openAccordion, setOpenAccordion] = useState("Career Details & Team Access");
 
     const stepStatus = ["Completed", "Pending", "In Progress"];
 
@@ -201,6 +242,55 @@ export default function CareerFormV2() {
                 ...q,
                 options: q.options.filter((_, idx) => idx !== optionIndex)
             } : q
+        ));
+    }
+
+    function addPipelineStage() {
+        const newStage = {
+            id: Date.now(),
+            name: "New Stage",
+            isCore: false,
+            substages: [],
+        };
+        setPipelineStages([...pipelineStages, newStage]);
+    }
+
+    function addSubstage(stageId: number) {
+        setPipelineStages(pipelineStages.map(stage =>
+            stage.id === stageId ? {
+                ...stage,
+                substages: [...stage.substages, { id: Date.now(), name: "New Substage", hasAutomation: false }]
+            } : stage
+        ));
+    }
+
+    function updateStageName(stageId: number, name: string) {
+        setPipelineStages(pipelineStages.map(stage =>
+            stage.id === stageId ? { ...stage, name } : stage
+        ));
+    }
+
+    function updateSubstageName(stageId: number, substageId: number, name: string) {
+        setPipelineStages(pipelineStages.map(stage =>
+            stage.id === stageId ? {
+                ...stage,
+                substages: stage.substages.map(sub =>
+                    sub.id === substageId ? { ...sub, name } : sub
+                )
+            } : stage
+        ));
+    }
+
+    function deleteStage(stageId: number) {
+        setPipelineStages(pipelineStages.filter(stage => stage.id !== stageId));
+    }
+
+    function deleteSubstage(stageId: number, substageId: number) {
+        setPipelineStages(pipelineStages.map(stage =>
+            stage.id === stageId ? {
+                ...stage,
+                substages: stage.substages.filter(sub => sub.id !== substageId)
+            } : stage
         ));
     }
 
@@ -611,7 +701,7 @@ export default function CareerFormV2() {
                                 </div>
                             </div>
                         </div>
-
+                        {/* John Alfred Alfonso */}
                         <div className="layered-card-outer">
                             <div className="layered-card-middle">
                                 <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -873,6 +963,7 @@ export default function CareerFormV2() {
                             </div>
                         </div>
                     </div>
+                    {/* Alfred */}
                     <div style={{ width: "30%", display: "flex", flexDirection: "column", gap: 8 }}>
                         <div className="layered-card-outer">
                             <div className="layered-card-middle">
@@ -982,6 +1073,655 @@ export default function CareerFormV2() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {currentStep === step[3] && (
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: 16, marginTop: 16 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <div>
+                            <h2 style={{ fontSize: 20, fontWeight: 700, color: "#181D27", marginBottom: 4 }}>Customize pipeline stages</h2>
+                            <p style={{ fontSize: 14, color: "#6B7280", margin: 0 }}>
+                                Create, modify, reorder, and delete stages and sub-stages. Core stages are fixed and can't be moved or edited as they are essential to Jia's system logic.
+                            </p>
+                        </div>
+                        <div style={{ display: "flex", gap: 12 }}>
+                            <button
+                                style={{
+                                    background: "#fff",
+                                    border: "1px solid #D1D5DB",
+                                    color: "#374151",
+                                    padding: "8px 16px",
+                                    borderRadius: "8px",
+                                    cursor: "pointer",
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 6
+                                }}
+                            >
+                                <i className="la la-undo" style={{ fontSize: 16 }}></i>
+                                Restore to default
+                            </button>
+                            <button
+                                style={{
+                                    background: "#fff",
+                                    border: "1px solid #D1D5DB",
+                                    color: "#374151",
+                                    padding: "8px 16px",
+                                    borderRadius: "8px",
+                                    cursor: "pointer",
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 6
+                                }}
+                            >
+                                Copy pipeline from existing job
+                                <i className="la la-angle-down" style={{ fontSize: 16 }}></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+                        {pipelineStages.map((stage, stageIndex) => (
+                            <div key={stage.id} style={{
+                                background: "#F9FAFB",
+                                border: "1px solid #E5E7EB",
+                                borderRadius: 12,
+                                padding: 16,
+                                position: "relative"
+                            }}>
+                                {stage.isCore && (
+                                    <div style={{
+                                        position: "absolute",
+                                        top: 12,
+                                        left: 12,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 4,
+                                        color: "#9CA3AF",
+                                        fontSize: 12
+                                    }}>
+                                        <i className="la la-lock" style={{ fontSize: 14 }}></i>
+                                        <span>Core stage, cannot move</span>
+                                    </div>
+                                )}
+
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: stage.isCore ? 24 : 0, marginBottom: 12 }}>
+                                    {!stage.isCore && (
+                                        <i className="la la-grip-vertical" style={{ color: "#9CA3AF", fontSize: 20, cursor: "grab" }}></i>
+                                    )}
+                                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+                                        {stage.isCore ? (
+                                            <>
+                                                <i className={`la ${stageIndex === 0 ? 'la-file-text' : stageIndex === 1 ? 'la-robot' : stageIndex === 2 ? 'la-users' : 'la-briefcase'}`} style={{ fontSize: 18, color: "#6B7280" }}></i>
+                                                <span style={{ fontSize: 16, fontWeight: 600, color: "#181D27" }}>{stage.name}</span>
+                                            </>
+                                        ) : (
+                                            <input
+                                                className="form-control"
+                                                value={stage.name}
+                                                onChange={(e) => updateStageName(stage.id, e.target.value)}
+                                                style={{ fontSize: 14, fontWeight: 600 }}
+                                            />
+                                        )}
+                                    </div>
+                                    {stage.isCore && (
+                                        <i className="la la-question-circle" style={{ color: "#9CA3AF", fontSize: 16, cursor: "help" }}></i>
+                                    )}
+                                    {stage.isCore && (
+                                        <i className="la la-lock" style={{ color: "#9CA3AF", fontSize: 16 }}></i>
+                                    )}
+                                    {!stage.isCore && (
+                                        <button
+                                            onClick={() => deleteStage(stage.id)}
+                                            style={{
+                                                background: "transparent",
+                                                border: "none",
+                                                cursor: "pointer",
+                                                padding: 4
+                                            }}
+                                        >
+                                            <i className="la la-ellipsis-v" style={{ color: "#6B7280", fontSize: 18 }}></i>
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div style={{ marginBottom: 8 }}>
+                                    <span style={{ fontSize: 12, color: "#6B7280", fontWeight: 600 }}>Substages</span>
+                                </div>
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {stage.substages.map((substage) => (
+                                        <div key={substage.id} style={{
+                                            background: "#fff",
+                                            border: "1px solid #E5E7EB",
+                                            borderRadius: 8,
+                                            padding: "10px 12px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 8
+                                        }}>
+                                            <input
+                                                className="form-control"
+                                                value={substage.name}
+                                                onChange={(e) => updateSubstageName(stage.id, substage.id, e.target.value)}
+                                                style={{ flex: 1, fontSize: 13, border: "none", padding: 0, background: "transparent" }}
+                                            />
+                                            {substage.hasAutomation && (
+                                                <i className="la la-bolt" style={{ color: "#F59E0B", fontSize: 16 }} title="Has automation"></i>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        <button
+                            onClick={addPipelineStage}
+                            style={{
+                                background: "#F9FAFB",
+                                border: "2px dashed #D1D5DB",
+                                borderRadius: 12,
+                                padding: 16,
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: 8,
+                                color: "#6B7280",
+                                fontSize: 14,
+                                fontWeight: 500,
+                                minHeight: 200
+                            }}
+                        >
+                            <i className="la la-plus" style={{ fontSize: 20 }}></i>
+                            Add Stage
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {currentStep === step[4] && (
+                <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: 16 }}>
+                    <div style={{ display: "flex", flexDirection: "column", width: "100%", maxWidth: 900, gap: 16 }}>
+                        {/* Career Details & Team Access Accordion */}
+                        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, overflow: "hidden" }}>
+                            <button
+                                onClick={() => setOpenAccordion(openAccordion === reviewSections[0] ? "" : reviewSections[0])}
+                                style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "16px 20px",
+                                    background: "#F9FAFB",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 16,
+                                    fontWeight: 600,
+                                    color: "#181D27"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className={`la la-angle-${openAccordion === reviewSections[0] ? 'down' : 'right'}`} style={{ fontSize: 20, color: "#6B7280" }}></i>
+                                    <span>Career Details & Team Access</span>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentStep(step[0]);
+                                    }}
+                                    style={{
+                                        background: "transparent",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        padding: 4
+                                    }}
+                                >
+                                    <i className="la la-pen" style={{ fontSize: 18, color: "#6B7280" }}></i>
+                                </button>
+                            </button>
+
+                            {/* John Alfred */}
+                            {openAccordion === reviewSections[0] && (
+                                <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
+                                    {/* Job Title */}
+                                    <div>
+                                        <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>Job Title</span>
+                                        <span style={{ fontSize: 14, color: "#181D27" }}>{jobTitle || "—"}</span>
+                                    </div>
+
+                                    {/* Employment Type & Work Arrangement */}
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>Employment Type</span>
+                                            <span style={{ fontSize: 14, color: "#181D27" }}>{employmentType}</span>
+                                        </div>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>Work Arrangement</span>
+                                            <span style={{ fontSize: 14, color: "#181D27" }}>{workSetup}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Location */}
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>Country</span>
+                                            <span style={{ fontSize: 14, color: "#181D27" }}>{country}</span>
+                                        </div>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>State / Province</span>
+                                            <span style={{ fontSize: 14, color: "#181D27" }}>{province}</span>
+                                        </div>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>City</span>
+                                            <span style={{ fontSize: 14, color: "#181D27" }}>{city}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Salary */}
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>Minimum Salary</span>
+                                            <span style={{ fontSize: 14, color: "#181D27" }}>
+                                                {salaryNegotiable ? "Negotiable" : minimumSalary ? `₱${minimumSalary} PHP` : "—"}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 4 }}>Maximum Salary</span>
+                                            <span style={{ fontSize: 14, color: "#181D27" }}>
+                                                {salaryNegotiable ? "Negotiable" : maximumSalary ? `₱${maximumSalary} PHP` : "—"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Job Description */}
+                                    <div>
+                                        <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 8 }}>Job Description</span>
+                                        <div
+                                            style={{
+                                                fontSize: 14,
+                                                color: "#181D27",
+                                                lineHeight: 1.6,
+                                                maxHeight: 200,
+                                                overflow: "auto"
+                                            }}
+                                            dangerouslySetInnerHTML={{ __html: aboutRole || "—" }}
+                                        />
+                                    </div>
+
+                                    {/* Team Access */}
+                                    <div>
+                                        <span style={{ fontSize: 14, color: "#6B7280", fontWeight: 600, display: "block", marginBottom: 12 }}>Team Access</span>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                            {teamMembers.map((member) => (
+                                                <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                                    <div style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: "50%",
+                                                        background: "#E5E7EB",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: 14,
+                                                        fontWeight: 600,
+                                                        color: "#374151"
+                                                    }}>
+                                                        {member.name.split(" ").map(n => n[0]).join("").substring(0, 2)}
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>
+                                                            {member.name} {member.isCurrentUser && "(You)"}
+                                                        </div>
+                                                        <div style={{ fontSize: 12, color: "#6B7280" }}>{member.email}</div>
+                                                    </div>
+                                                    <div style={{ fontSize: 14, color: "#6B7280" }}>{member.role}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* CV Review & Pre-Screening Questions Accordion */}
+                        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, overflow: "hidden" }}>
+                            <button
+                                onClick={() => setOpenAccordion(openAccordion === reviewSections[1] ? "" : reviewSections[1])}
+                                style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "16px 20px",
+                                    background: "#F9FAFB",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 16,
+                                    fontWeight: 600,
+                                    color: "#181D27"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className={`la la-angle-${openAccordion === reviewSections[1] ? 'down' : 'right'}`} style={{ fontSize: 20, color: "#6B7280" }}></i>
+                                    <span>CV Review & Pre-Screening Questions</span>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentStep(step[1]);
+                                    }}
+                                    style={{
+                                        background: "transparent",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        padding: 4
+                                    }}
+                                >
+                                    <i className="la la-pen" style={{ fontSize: 18, color: "#6B7280" }}></i>
+                                </button>
+                            </button>
+
+                            {openAccordion === reviewSections[1] && (
+                                <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 24 }}>
+                                    {/* CV Screening */}
+                                    <div>
+                                        <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600, display: "block", marginBottom: 8 }}>CV Screening</span>
+                                        <div style={{ fontSize: 14, color: "#6B7280" }}>
+                                            Automatically endorse candidates who are{" "}
+                                            <span style={{
+                                                color: "#3B82F6",
+                                                fontWeight: 600,
+                                                background: "#EFF6FF",
+                                                padding: "2px 8px",
+                                                borderRadius: 4
+                                            }}>
+                                                {screeningSetting}
+                                            </span>
+                                            {" "}and above
+                                        </div>
+                                    </div>
+
+                                    {/* CV Secret Prompt */}
+                                    {cvSecretPrompt && (
+                                        <div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                                                <i className="la la-magic" style={{ color: "#8B5CF6", fontSize: 18 }}></i>
+                                                <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>CV Secret Prompt</span>
+                                            </div>
+                                            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: "#6B7280", lineHeight: 1.8 }}>
+                                                {cvSecretPrompt.split('\n').filter(line => line.trim()).map((line, idx) => (
+                                                    <li key={idx}>{line.trim()}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Pre-Screening Questions */}
+                                    {preScreeningQuestions.length > 0 && (
+                                        <div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                                                <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>Pre-Screening Questions</span>
+                                                <span style={{
+                                                    background: "#F3F4F6",
+                                                    color: "#6B7280",
+                                                    padding: "2px 8px",
+                                                    borderRadius: "12px",
+                                                    fontSize: 12,
+                                                    fontWeight: 600
+                                                }}>
+                                                    {preScreeningQuestions.length}
+                                                </span>
+                                            </div>
+                                            <ol style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: "#181D27", lineHeight: 2 }}>
+                                                {preScreeningQuestions.map((q, idx) => (
+                                                    <li key={q.id} style={{ marginBottom: 12 }}>
+                                                        <div style={{ fontWeight: 500, marginBottom: 4 }}>{q.question}</div>
+                                                        {q.type === "Dropdown" && q.options.length > 0 && (
+                                                            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "#6B7280", lineHeight: 1.6 }}>
+                                                                {q.options.map((opt, optIdx) => (
+                                                                    <li key={optIdx}>{opt}</li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                        {q.type === "Range" && (q.rangeMin || q.rangeMax) && (
+                                                            <div style={{ fontSize: 13, color: "#6B7280", marginTop: 4 }}>
+                                                                Preferred: PHP {q.rangeMin || "0"} - PHP {q.rangeMax || "0"}
+                                                            </div>
+                                                        )}
+                                                    </li>
+                                                ))}
+                                            </ol>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* AI Interview Setup Accordion */}
+                        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, overflow: "hidden" }}>
+                            <button
+                                onClick={() => setOpenAccordion(openAccordion === reviewSections[2] ? "" : reviewSections[2])}
+                                style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "16px 20px",
+                                    background: "#F9FAFB",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 16,
+                                    fontWeight: 600,
+                                    color: "#181D27"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className={`la la-angle-${openAccordion === reviewSections[2] ? 'down' : 'right'}`} style={{ fontSize: 20, color: "#6B7280" }}></i>
+                                    <span>AI Interview Setup</span>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentStep(step[2]);
+                                    }}
+                                    style={{
+                                        background: "transparent",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        padding: 4
+                                    }}
+                                >
+                                    <i className="la la-pen" style={{ fontSize: 18, color: "#6B7280" }}></i>
+                                </button>
+                            </button>
+
+                            {openAccordion === reviewSections[2] && (
+                                <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 24 }}>
+                                    {/* AI Interview Screening */}
+                                    <div>
+                                        <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600, display: "block", marginBottom: 8 }}>AI Interview Screening</span>
+                                        <div style={{ fontSize: 14, color: "#6B7280" }}>
+                                            Automatically endorse candidates who are{" "}
+                                            <span style={{
+                                                color: "#3B82F6",
+                                                fontWeight: 600,
+                                                background: "#EFF6FF",
+                                                padding: "2px 8px",
+                                                borderRadius: 4
+                                            }}>
+                                                {aiInterviewScreening}
+                                            </span>
+                                            {" "}and above
+                                        </div>
+                                    </div>
+
+                                    {/* Require Video on Interview */}
+                                    <div>
+                                        <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600, display: "block", marginBottom: 8 }}>Require Video on Interview</span>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <span style={{ fontSize: 14, color: "#6B7280" }}>{requireVideo ? "Yes" : "No"}</span>
+                                            {requireVideo && (
+                                                <i className="la la-check-circle" style={{ color: "#10B981", fontSize: 18 }}></i>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* AI Interview Secret Prompt */}
+                                    {aiInterviewSecretPrompt && (
+                                        <div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                                                <i className="la la-magic" style={{ color: "#8B5CF6", fontSize: 18 }}></i>
+                                                <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>AI Interview Secret Prompt</span>
+                                            </div>
+                                            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: "#6B7280", lineHeight: 1.8 }}>
+                                                {aiInterviewSecretPrompt.split('\n').filter(line => line.trim()).map((line, idx) => (
+                                                    <li key={idx}>{line.trim()}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Interview Questions */}
+                                    {questions.some(cat => cat.questions.length > 0) && (
+                                        <div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                                                <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>Interview Questions</span>
+                                                <span style={{
+                                                    background: "#F3F4F6",
+                                                    color: "#6B7280",
+                                                    padding: "2px 8px",
+                                                    borderRadius: "12px",
+                                                    fontSize: 12,
+                                                    fontWeight: 600
+                                                }}>
+                                                    {questions.reduce((total, cat) => total + cat.questions.length, 0)}
+                                                </span>
+                                            </div>
+
+                                            {questions.filter(cat => cat.questions.length > 0).map((category) => (
+                                                <div key={category.id} style={{ marginBottom: 16 }}>
+                                                    <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600, display: "block", marginBottom: 8 }}>
+                                                        {category.category}
+                                                    </span>
+                                                    <ol style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: "#6B7280", lineHeight: 1.8 }}>
+                                                        {category.questions.map((q, idx) => (
+                                                            <li key={idx}>{typeof q === 'string' ? q : q.question}</li>
+                                                        ))}
+                                                    </ol>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Pipeline Stages Accordion */}
+                        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, overflow: "hidden" }}>
+                            <button
+                                onClick={() => setOpenAccordion(openAccordion === reviewSections[3] ? "" : reviewSections[3])}
+                                style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "16px 20px",
+                                    background: "#F9FAFB",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 16,
+                                    fontWeight: 600,
+                                    color: "#181D27"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className={`la la-angle-${openAccordion === reviewSections[3] ? 'down' : 'right'}`} style={{ fontSize: 20, color: "#6B7280" }}></i>
+                                    <span>Pipeline Stages</span>
+                                    <span style={{
+                                        background: "#F3F4F6",
+                                        color: "#6B7280",
+                                        padding: "2px 8px",
+                                        borderRadius: "12px",
+                                        fontSize: 12,
+                                        fontWeight: 600
+                                    }}>
+                                        {pipelineStages.length}
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentStep(step[3]);
+                                    }}
+                                    style={{
+                                        background: "transparent",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        padding: 4
+                                    }}
+                                >
+                                    <i className="la la-pen" style={{ fontSize: 18, color: "#6B7280" }}></i>
+                                </button>
+                            </button>
+
+                            {openAccordion === reviewSections[3] && (
+                                <div style={{ padding: "20px 24px" }}>
+                                    <div style={{
+                                        display: "flex",
+                                        gap: 16,
+                                        overflowX: "auto",
+                                        paddingBottom: 8
+                                    }}>
+                                        {pipelineStages.map((stage, stageIndex) => (
+                                            <div key={stage.id} style={{
+                                                minWidth: 240,
+                                                background: "#F9FAFB",
+                                                border: "1px solid #E5E7EB",
+                                                borderRadius: 12,
+                                                padding: 16,
+                                                flex: "0 0 auto"
+                                            }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                                                    <i className={`la ${stageIndex === 0 ? 'la-file-text' :
+                                                        stageIndex === 1 ? 'la-robot' :
+                                                            stageIndex === 2 ? 'la-users' :
+                                                                stageIndex === 3 ? 'la-briefcase' :
+                                                                    'la-layer-group'
+                                                        }`} style={{ fontSize: 18, color: "#6B7280" }}></i>
+                                                    <span style={{ fontSize: 14, fontWeight: 600, color: "#181D27" }}>{stage.name}</span>
+                                                </div>
+
+                                                <div style={{ marginBottom: 8 }}>
+                                                    <span style={{ fontSize: 12, color: "#6B7280", fontWeight: 600 }}>Substages</span>
+                                                </div>
+
+                                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                                    {stage.substages.map((substage) => (
+                                                        <div key={substage.id} style={{
+                                                            background: "#fff",
+                                                            border: "1px solid #E5E7EB",
+                                                            borderRadius: 8,
+                                                            padding: "10px 12px",
+                                                            fontSize: 13,
+                                                            color: "#6B7280"
+                                                        }}>
+                                                            {substage.name}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
