@@ -46,7 +46,13 @@ const employmentTypeOptions = [
     },
 ];
 
-export default function CareerForm({ career, formType, setShowEditModal }: { career?: any, formType: string, setShowEditModal?: (show: boolean) => void }) {
+export type CareerFormProps = {
+  career?: any;
+  formType: string;
+  setShowEditModal?(show: boolean): void;
+};
+
+export default function CareerForm({ career, formType, setShowEditModal }: CareerFormProps) {
     const { user, orgID } = useAppContext();
     const [jobTitle, setJobTitle] = useState(career?.jobTitle || "");
     const [description, setDescription] = useState(career?.description || "");
