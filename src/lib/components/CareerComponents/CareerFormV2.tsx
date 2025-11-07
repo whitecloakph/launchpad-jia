@@ -21,7 +21,7 @@ export default function CareerFormV2({
     "Career Details & Team Access",
     "CV Review & Pre-screening",
     "AI Interview Setup",
-    "Pipeline Stages",
+    // "Pipeline Stages",
     "Review Center"
   ] as const;
 
@@ -455,13 +455,6 @@ export default function CareerFormV2({
             )}
 
             {currentStep === 3 && (
-              <div className={styles.stepFieldsContainer}>
-                <h2>Pipeline Stages</h2>
-                <div className={styles.fieldsWrapper}></div>
-              </div>
-            )}
-
-            {currentStep === 4 && (
               <div className={styles.stepFieldsContainer}>
                 <h2>Review Center</h2>
                 <div className={styles.fieldsWrapper}></div>
