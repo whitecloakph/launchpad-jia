@@ -1,6 +1,13 @@
 .dropdownContainer {
   position: relative;
-  width: 100%;
+
+  &.fullWidth {
+    width: 100%;
+  }
+
+  &.fit {
+    width: fit-content;
+  }
 }
 
 .dropdownButton {
@@ -46,6 +53,7 @@
   color: #181d27;
   flex: 1;
   text-align: left;
+  padding-right: 10px;
 }
 
 .placeholder {
