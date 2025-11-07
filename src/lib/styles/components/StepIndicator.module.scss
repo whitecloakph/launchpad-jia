@@ -1,0 +1,133 @@
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  .step {
+    display: flex;
+    justify-content: space-between; // Distribute steps evenly
+    align-items: center; // Align items vertically
+    .stepBar {
+      display: flex;
+      align-items: center;
+      flex: 1; // Allow step bars to grow and fill space
+      gap: 16px; // Adjust gap between icon and line
+      &:last-of-type {
+        flex: none; // Don't let the last step bar stretch
+      }
+
+      .stepIcon {
+        $size: 28px; // Slightly larger icon size
+        height: $size;
+        width: $size;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+        font-size: 14px; // For step number
+        color: white; // Default text color for icon
+
+        &.pending {
+          background: #d9d9d9;
+          color: #a4a7ae; // Text color for pending icon
+          border: 1px solid #d9d9d9;
+        }
+        &.in_progress {
+          background: linear-gradient(
+            90deg,
+            #9fcaed 0%,
+            #ceb6da 33%,
+            #ebacc9 67%,
+            #fccec0 100%
+          ); // More vibrant gradient
+          border: 1px solid transparent; // No border for gradient
+          box-shadow: 0 0 0 2px #fff; // White ring around current step
+        }
+        &.completed {
+          background: #34c759; // Green for completed
+          border: 1px solid #34c759;
+        }
+
+        img {
+          height: 16px; // Icon inside the circle
+          width: 16px;
+          filter: brightness(0) invert(1); // Make icons white
+        }
+      }
+
+      hr {
+        height: 4px; // Thinner line
+        width: 100%;
+        border: unset;
+        border-radius: 2px;
+        margin: 0;
+
+        &.pending {
+          background: #d9d9d9;
+        }
+        &.completed {
+          background: linear-gradient(
+            90deg,
+            #fccec0 0%,
+            #ebacc9 33%,
+            #ceb6da 66%,
+            #9fcaed 100%
+          );
+        }
+        &.in_progress {
+          background: linear-gradient(
+            90deg,
+            #fccec0 0%,
+            #ebacc9 33%,
+            #ceb6da 66%,
+            #9fcaed 100%
+          );
+        }
+      }
+    }
+    .stepDetails {
+      flex: 1; // Allow details to grow
+      text-align: center; // Center text below icon
+      font-weight: 600; // Slightly bolder text
+      font-size: 15px; // Slightly larger font
+      line-height: 20px;
+      color: var(--Text-text-placeholder, #a4a7ae); // Default color
+
+      &.in_progress {
+        color: var(--Text-text-primary, #181d27); // Darker for in progress
+      }
+      &.completed {
+        color: var(--Text-text-secondary, #414651); // Secondary color for completed
+      }
+      &:last-of-type {
+        flex: none; // Don't let the last step detail stretch
+      }
+    }
+  }
+}
+
+// Mobile responsiveness for the step indicator
+@media (max-width: 768px) {
+  .stepContainer {
+    .step {
+      flex-wrap: wrap; // Allow steps to wrap on small screens
+      justify-content: space-around; // Evenly distribute wrapped items
+      gap: 10px; // Reduce gap for smaller screens
+
+      .stepBar {
+        flex: 0 0 auto; // Prevent stretching on mobile
+        width: auto;
+        gap: 8px;
+        hr {
+          display: none; // Hide lines on mobile if desired, or make them vertical
+        }
+      }
+      .stepDetails {
+        flex: 0 0 30%; // Adjust width of text for wrapping
+        font-size: 12px;
+        text-align: center;
+        margin-top: 5px; // Space between icon and text
+      }
+    }
+  }
+}

@@ -38,7 +38,7 @@ function CreateCareerFlowContent({ formType, career }) {
              <h1 style={{ fontSize: "24px", fontWeight: 550, color: "#111827", marginBottom: "2rem" }}>
                 {formType === "add" ? "Add New Career" : "Edit Career"}
             </h1>
-            <StepIndicator steps={steps} currentStep={currentStep} />
+            <StepIndicator steps={steps.map((step) => step.name)} currentStep={currentStep} />
             <div style={{ marginTop: "2rem" }}>
                 {renderStepComponent()}
             </div>
