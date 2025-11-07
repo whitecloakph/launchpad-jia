@@ -7,9 +7,18 @@ import CVReview from './CVReview';
 import AIInterview from './AIInterview';
 import ReviewCareer from './ReviewCareer';
 import NavigationButtons from './NavigationButtons';
+import CareerActionModal from '@/lib/components/CareerComponents/CareerActionModal'; // Ensure this path is correct
+import FullScreenLoadingAnimation from '@/lib/components/CareerComponents/FullScreenLoadingAnimation'; // Ensure this path is correct
 
 function CreateCareerFlowContent({ formType, career }) {
-    const { currentStep } = useCareerForm();
+    const {
+        currentStep,
+        showSaveModal,
+        isSavingCareer,
+        saveCareer,     // Used if formType is "add"
+        updateCareer,   // Used if formType is "edit"
+        // No need for confirmSaveCareer here, it's called by NavigationButtons
+    } = useCareerForm();
 
     const steps = [
         { name: "Career Details", component: <CareerDetails /> },
@@ -43,6 +52,22 @@ function CreateCareerFlowContent({ formType, career }) {
                 {renderStepComponent()}
             </div>
             <NavigationButtons formType={formType} />
+
+            {/* Render modals and loading animation at the top level */}
+            {showSaveModal && (
+                <CareerActionModal
+                    action={showSaveModal}
+                    onAction={(action) =>
+                        formType === "add" ? saveCareer(action) : updateCareer(action)
+                    }
+                />
+            )}
+            {isSavingCareer && (
+                <FullScreenLoadingAnimation
+                    title={formType === "add" ? "Saving career..." : "Updating career..."}
+                    subtext={`Please wait while we are ${formType === "add" ? "saving" : "updating"} the career`}
+                />
+            )}
         </div>
     );
 }
