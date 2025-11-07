@@ -50,6 +50,12 @@ export default function CareerFormV2({
     }
   };
 
+  const handleStepClick = (stepIndex: number) => {
+    if (stepIndex <= currentStep) {
+      setCurrentStep(stepIndex);
+    }
+  };
+
   const employmentTypeOptions = [
     "Full-time",
     "Part-time",
@@ -88,17 +94,26 @@ export default function CareerFormV2({
           <div className={styles.applicationStepContainer}>
             {formSteps.map((step, index) => {
               const stepStatus = getStepStatus(index);
+              const isClickable = index <= currentStep;
               
               return (
                 <div className={styles.stepContainer} key={index}>
-                  <div className={styles.indicator}>
+                  <div 
+                    className={styles.indicator}
+                    onClick={() => handleStepClick(index)}
+                    style={{ cursor: isClickable ? 'pointer' : 'default' }}
+                  >
                     <img alt="" src={stepStatus === "completed" ? assetConstants.completed : assetConstants.in_progress} />
                     {index < formSteps.length - 1 && (
                       <hr className={`webView ${styles[stepStatus]}`} />
                     )}
                   </div>
 
-                  <div className={styles.stepDetails}>
+                  <div 
+                    className={styles.stepDetails}
+                    onClick={() => handleStepClick(index)}
+                    style={{ cursor: isClickable ? 'pointer' : 'default' }}
+                  >
                     <div className={`webView ${styles.stepDescription} ${styles[stepStatus]}`}>{step}</div>
                   </div>
                 </div>
