@@ -2,7 +2,43 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 
-const CareerFormContext = createContext(undefined);
+
+
+interface CareerData {
+    jobTitle: string;
+    description: string;
+    employmentType: string;
+    workSetup: string;
+    workSetupRemarks: string;
+    salaryNegotiable: boolean;
+    minimumSalary: string;
+    maximumSalary: string;
+    country: string;
+    province: string;
+    location: string;
+    teamAccess: string[];
+
+    // CV Review
+    screeningSetting: string;
+    cvSecretPrompt: string;
+    prescreeningQuestions: any[]; // { id, type: 'text' | 'choice', text, options: [] }
+
+    // AI Interview
+    aiEndorsementSetting: string;
+    requireVideo: boolean;
+    aiInterviewSecretPrompt: string;
+    questions: any[];
+}
+
+interface CareerFormContextType {
+    careerData: CareerData;
+    currentStep: number;
+    goToStep: (step: number) => void;
+    updateCareerData: (data: CareerData) => void;
+    handleNext: () => void;
+    handleBack: () => void;
+    setCareerData: (data: CareerData) => void;
+}
 
 const intitialCareerData = {
     // Career Details
@@ -36,6 +72,16 @@ const intitialCareerData = {
         { id: 5, category: "Others", questions: [] },
     ],
 };
+
+export const CareerFormContext = createContext<CareerFormContextType>({
+    careerData: intitialCareerData,
+    currentStep: 1,
+    handleNext: () => {},
+    handleBack: () => {},
+    goToStep: (step: number) => {},
+    updateCareerData: (data: CareerData) => {},
+    setCareerData: (data: CareerData) => {},
+});
 
 export function CareerFormProvider({ children, existingCareer}) {
     const [currentStep, setCurrentStep] = useState(1);

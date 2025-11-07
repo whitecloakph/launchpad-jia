@@ -25,8 +25,30 @@ export async function POST(request: Request) {
       province,
       employmentType,
     } = await request.json();
+
+    console.log("Received data:", {
+      jobTitle,
+      description,
+      questions,
+      lastEditedBy,
+      createdBy,
+      screeningSetting,
+      orgID,
+      requireVideo,
+      location,
+      workSetup,
+      workSetupRemarks,
+      status,
+      salaryNegotiable,
+      minimumSalary,
+      maximumSalary,
+      country,
+      province,
+      employmentType
+    })
     // Validate required fields
     if (!jobTitle || !description || !questions || !location || !workSetup) {
+      console.error("Missing required fields");
       return NextResponse.json(
         {
           error:
@@ -68,7 +90,10 @@ export async function POST(request: Request) {
       },
     ]).toArray();
 
+    console.log(orgDetails);
+
     if (!orgDetails || orgDetails.length === 0) {
+      console.error("Organization not found");
       return NextResponse.json({ error: "Organization not found" }, { status: 404 });
     }
 
