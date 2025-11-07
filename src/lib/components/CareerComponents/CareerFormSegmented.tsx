@@ -80,8 +80,10 @@ export default function CareerFormSegmented({
   const { user, orgID } = useAppContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [invalidSteps, setInvalidSteps] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState("");
+  const [triggerValidation, setTriggerValidation] = useState(false);
   const savingRef = useRef(false);
   const draftSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -175,6 +177,56 @@ export default function CareerFormSegmented({
       formData.questions?.some((q: any) => q.questions.length > 0) &&
       formData.workSetup?.trim().length > 0
     );
+  };
+
+  const isCurrentStepValid = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          formData.jobTitle?.trim().length > 0 &&
+          formData.description?.trim().length > 0 &&
+          formData.employmentType?.trim().length > 0 &&
+          formData.workSetup?.trim().length > 0 &&
+          formData.country?.trim().length > 0 &&
+          formData.province?.trim().length > 0 &&
+          formData.city?.trim().length > 0 &&
+          !(
+            formData.minimumSalary &&
+            formData.maximumSalary &&
+            Number(formData.minimumSalary) > Number(formData.maximumSalary)
+          )
+        );
+      case 2:
+      case 3:
+      case 4:
+        return true; // Other steps handle their own validation
+      default:
+        return false;
+    }
+  };
+
+  const handleSaveContinue = () => {
+    if (currentStep === 5) {
+      // On final step, save as draft
+      confirmSaveCareer("inactive");
+    } else {
+      // Trigger validation for step 1
+      if (currentStep === 1) {
+        setTriggerValidation(true);
+        // Check if current step is valid after triggering validation
+        setTimeout(() => {
+          if (isCurrentStepValid()) {
+            handleNext();
+            setTriggerValidation(false);
+          }
+        }, 100);
+      } else {
+        // For other steps, just check validity
+        if (isCurrentStepValid()) {
+          handleNext();
+        }
+      }
+    }
   };
 
   const confirmSaveCareer = (status: string) => {
@@ -350,6 +402,17 @@ export default function CareerFormSegmented({
     }
   };
 
+  const handleStep1ValidationChange = (isValid: boolean) => {
+    setInvalidSteps((prev) => {
+      if (isValid) {
+        return prev.filter((step) => step !== 1);
+      } else if (!prev.includes(1)) {
+        return [...prev, 1];
+      }
+      return prev;
+    });
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -357,7 +420,8 @@ export default function CareerFormSegmented({
           <CareerFormStep1
             formData={formData}
             updateFormData={updateFormData}
-            onNext={handleNext}
+            onValidationChange={handleStep1ValidationChange}
+            triggerValidation={triggerValidation}
           />
         );
       case 2:
@@ -426,43 +490,54 @@ export default function CareerFormSegmented({
         <h1 style={{ fontSize: "24px", fontWeight: 550, color: "#111827" }}>
           {formType === "add" ? "Add new career" : "Edit Career Details"}
         </h1>
-        <div
-          style={{
-            height: "40px",
-            display: "flex",
-            gap: "1em",
-          }}
-        >
-          <button
+        {currentStep !== 5 && (
+          <div
             style={{
-              border: "2px solid #d5d7da",
-              backgroundColor: "transparent",
-              boxShadow: "none",
-              color: "#414651",
-              borderRadius: "2em",
-              paddingLeft: "1em",
-              paddingRight: "1em",
-              fontWeight: "500",
-              cursor: "pointer"
+              height: "40px",
+              display: "flex",
+              gap: "1em",
             }}
           >
-            Save as Unpublished
-          </button>
-          <button
-            style={{
-              borderColor: "#181d27",
-              backgroundColor: "#181d27",
-              color: "#fff",
-              borderRadius: "2em",
-              paddingLeft: "1em",
-              paddingRight: "1em",
-              fontWeight: "450",
-              cursor: "pointer"
-            }}
-          >
-            Save and Continue
-          </button>
-        </div>
+            <button
+              onClick={() => confirmSaveCareer("inactive")}
+              style={{
+                border: "2px solid #d5d7da",
+                backgroundColor: "transparent",
+                boxShadow: "none",
+                color: "#414651",
+                borderRadius: "2em",
+                paddingLeft: "1em",
+                paddingRight: "1em",
+                fontWeight: "500",
+                cursor: "pointer",
+              }}
+            >
+              Save as Unpublished
+            </button>
+            <button
+              onClick={handleSaveContinue}
+              style={{
+                borderColor: "#181d27",
+                backgroundColor: "#181d27",
+                color: "#fff",
+                borderRadius: "2em",
+                paddingLeft: "1em",
+                paddingRight: "1em",
+                fontWeight: "450",
+                cursor: "pointer",
+              }}
+            >
+              Save and Continue
+              <i
+                className="la la-arrow-right"
+                style={{
+                  scale: 1.5,
+                  marginLeft: "0.75em",
+                }}
+              ></i>
+            </button>
+          </div>
+        )}
         {currentStep === 5 && formType === "add" && (
           <div
             style={{
@@ -519,6 +594,7 @@ export default function CareerFormSegmented({
       <CareerFormStepper
         currentStep={currentStep}
         completedSteps={completedSteps}
+        invalidSteps={invalidSteps}
       />
 
       {renderStep()}

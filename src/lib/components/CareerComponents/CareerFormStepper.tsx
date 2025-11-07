@@ -3,6 +3,7 @@ import React from "react";
 interface CareerFormStepperProps {
   currentStep: number;
   completedSteps: number[];
+  invalidSteps?: number[];
 }
 
 const steps = [
@@ -16,25 +17,44 @@ const steps = [
 export default function CareerFormStepper({
   currentStep,
   completedSteps,
+  invalidSteps = [],
 }: CareerFormStepperProps) {
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-      gap: "1em",
-      margin: "0 auto 32px auto",
-      width: "100%",
-      maxWidth: "1200px",
-    }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: "1em",
+        margin: "0 auto 32px auto",
+        width: "100%",
+        maxWidth: "1200px",
+      }}
+    >
       {steps.map((step, index) => (
-        <div key={step.id} style={{ display: "grid", gridTemplateRows: "auto auto", gap: "12px", flex: 1 }}>
+        <div
+          key={step.id}
+          style={{
+            display: "grid",
+            gridTemplateRows: "auto auto",
+            gap: "12px",
+            flex: 1,
+          }}
+        >
           <div style={{ display: "flex", alignItems: "center" }}>
             {/* Step Icons */}
-            {completedSteps.includes(step.id) ? (
+            {invalidSteps.includes(step.id) && currentStep === step.id ? (
+              <img
+                src="/career-form/warning-step-icon.svg"
+                alt="Warning step"
+              />
+            ) : completedSteps.includes(step.id) ? (
               <img src="/career-form/done-step-icon.svg" alt="Done step" />
             ) : currentStep === step.id ? (
-              <img src="/career-form/current-step-icon.svg" alt="Current step" />
+              <img
+                src="/career-form/current-step-icon.svg"
+                alt="Current step"
+              />
             ) : (
               <img src="/career-form/next-step-icon.svg" alt="Next step" />
             )}
@@ -46,10 +66,11 @@ export default function CareerFormStepper({
                   height: "6px",
                   borderRadius: "1em",
                   flex: 1,
-                  background:
-                    completedSteps.includes(step.id) || currentStep === step.id
-                      ? "linear-gradient(90deg, rgba(159, 202, 237, 1) 0%, rgba(206, 182, 218, 1) 17%, rgba(235, 172, 201, 1) 33.5%, rgba(252, 206, 192, 1) 50%, #e9eaeb 50%)"
-                      : "#e9eaeb",
+                  background: completedSteps.includes(step.id)
+                    ? "linear-gradient(90deg, rgba(159, 202, 237, 1) 0%, rgba(206, 182, 218, 1) 34%, rgba(235, 172, 201, 1) 67%, rgba(252, 206, 192, 1) 100%)"
+                    : currentStep === step.id
+                    ? "linear-gradient(90deg, rgba(159, 202, 237, 1) 0%, rgba(206, 182, 218, 1) 17%, rgba(235, 172, 201, 1) 33.5%, rgba(252, 206, 192, 1) 50%, #e9eaeb 50%)"
+                    : "#e9eaeb",
                   marginLeft: "8px",
                   transition: "all 0.3s ease",
                 }}

@@ -3,13 +3,10 @@
 import { useState, useEffect } from "react";
 import RichTextEditor from "@/lib/components/CareerComponents/RichTextEditor";
 import CustomDropdown from "@/lib/components/CareerComponents/CustomDropdown";
-import philippineCitiesAndProvinces from "../../../../public/philippines-locations.json";
+import philippineCitiesAndProvinces from "@/../public/philippines-locations.json";
 import { useAppContext } from "@/lib/context/AppContext";
 
-const employmentTypeOptions = [
-  { name: "Full-Time" },
-  { name: "Part-Time" },
-];
+const employmentTypeOptions = [{ name: "Full-Time" }, { name: "Part-Time" }];
 
 const workSetupOptions = [
   { name: "Fully Remote" },
@@ -20,17 +17,21 @@ const workSetupOptions = [
 interface CareerFormStep1Props {
   formData: any;
   updateFormData: (data: any) => void;
-  onNext: () => void;
+  onValidationChange?: (isValid: boolean) => void;
+  triggerValidation?: boolean;
 }
 
 export default function CareerFormStep1({
   formData,
   updateFormData,
-  onNext,
+  onValidationChange,
+  triggerValidation,
 }: CareerFormStep1Props) {
   const { user } = useAppContext();
   const [provinceList, setProvinceList] = useState([]);
   const [cityList, setCityList] = useState([]);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const parseProvinces = () => {
@@ -50,6 +51,121 @@ export default function CareerFormStep1({
     parseProvinces();
   }, []);
 
+  useEffect(() => {
+    // Mark all fields as touched when validation is triggered
+    if (triggerValidation) {
+      const allTouched: Record<string, boolean> = {};
+      [
+        "jobTitle",
+        "description",
+        "employmentType",
+        "workSetup",
+        "country",
+        "province",
+        "city",
+        "minimumSalary",
+        "maximumSalary",
+      ].forEach((field) => {
+        allTouched[field] = true;
+      });
+      setTouched(allTouched);
+    }
+  }, [triggerValidation]);
+
+  useEffect(() => {
+    // Only validate if fields have been touched
+    if (Object.keys(touched).length > 0) {
+      validateAllFields();
+    }
+    if (onValidationChange) {
+      onValidationChange(isStepValid());
+    }
+  }, [formData, touched]);
+
+  const validateField = (fieldName: string, value: any): string => {
+    switch (fieldName) {
+      case "jobTitle":
+        if (!value || value.trim().length === 0) {
+          return "Job title is required";
+        }
+        return "";
+      case "description":
+        if (!value || value.trim().length === 0) {
+          return "Description is required";
+        }
+        return "";
+      case "employmentType":
+        if (!value || value.trim().length === 0) {
+          return "Employment type is required";
+        }
+        return "";
+      case "workSetup":
+        if (!value || value.trim().length === 0) {
+          return "Work arrangement is required";
+        }
+        return "";
+      case "country":
+        if (!value || value.trim().length === 0) {
+          return "Country is required";
+        }
+        return "";
+      case "province":
+        if (!value || value.trim().length === 0) {
+          return "State/Province is required";
+        }
+        return "";
+      case "city":
+        if (!value || value.trim().length === 0) {
+          return "City is required";
+        }
+        return "";
+      case "minimumSalary":
+        if (
+          formData.minimumSalary &&
+          formData.maximumSalary &&
+          Number(formData.minimumSalary) > Number(formData.maximumSalary)
+        ) {
+          return "Minimum salary cannot be greater than maximum salary";
+        }
+        return "";
+      case "maximumSalary":
+        if (
+          formData.minimumSalary &&
+          formData.maximumSalary &&
+          Number(formData.minimumSalary) > Number(formData.maximumSalary)
+        ) {
+          return "Maximum salary cannot be less than minimum salary";
+        }
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  const validateAllFields = () => {
+    const newErrors: Record<string, string> = {};
+    const fieldsToValidate = [
+      "jobTitle",
+      "description",
+      "employmentType",
+      "workSetup",
+      "country",
+      "province",
+      "city",
+      "minimumSalary",
+      "maximumSalary",
+    ];
+
+    fieldsToValidate.forEach((field) => {
+      const error = validateField(field, formData[field]);
+      if (error && touched[field]) {
+        newErrors[field] = error;
+      }
+    });
+
+    setErrors(newErrors);
+  };
+
   const isStepValid = () => {
     return (
       formData.jobTitle?.trim().length > 0 &&
@@ -58,558 +174,805 @@ export default function CareerFormStep1({
       formData.workSetup?.trim().length > 0 &&
       formData.country?.trim().length > 0 &&
       formData.province?.trim().length > 0 &&
-      formData.city?.trim().length > 0
+      formData.city?.trim().length > 0 &&
+      !(
+        formData.minimumSalary &&
+        formData.maximumSalary &&
+        Number(formData.minimumSalary) > Number(formData.maximumSalary)
+      )
     );
   };
 
-  const validateSalary = () => {
-    if (
-      Number(formData.minimumSalary) &&
-      Number(formData.maximumSalary) &&
-      Number(formData.minimumSalary) > Number(formData.maximumSalary)
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  const handleNext = () => {
-    if (!validateSalary()) {
-      alert("Minimum salary cannot be greater than maximum salary");
-      return;
-    }
-    if (isStepValid()) {
-      onNext();
-    }
-  };
-
   return (
-    <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", gap: "24px" }}>
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        display: "flex",
+        gap: 24,
+      }}
+    >
       {/* Form Content */}
       <div style={{ flex: 1 }}>
-      <div className="layered-card-outer">
-        <div className="layered-card-middle">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
+        <div className="layered-card-outer">
+          <div className="layered-card-middle">
             <div
               style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
                 display: "flex",
+                flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
+                gap: 8,
+                marginLeft: 8,
+                padding: 4,
               }}
             >
-              <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}>
-                1
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: "#181D27",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
+                >
+                  1.
+                </span>
+              </div>
+              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+                Career Information
               </span>
             </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Career Information
-            </span>
-          </div>
 
-          <div className="layered-card-content">
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                Job Title
-              </label>
-              <input
-                value={formData.jobTitle || ""}
-                className="form-control"
-                placeholder="Enter job title"
-                onChange={(e) => {
-                  updateFormData({ jobTitle: e.target.value || "" });
-                }}
-              />
-            </div>
+            <div className="layered-card-content">
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
+                >
+                  Job Title
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    value={formData.jobTitle || ""}
+                    className="form-control"
+                    placeholder="Enter job title"
+                    style={{
+                      borderColor: errors.jobTitle ? "#F04438" : undefined,
+                      borderWidth: errors.jobTitle ? "2px" : undefined,
+                      paddingRight: errors.jobTitle ? "40px" : undefined,
+                    }}
+                    onChange={(e) => {
+                      updateFormData({ jobTitle: e.target.value || "" });
+                    }}
+                  />
+                  {errors.jobTitle && (
+                    <img
+                      src="/career-form/warning-step-icon.svg"
+                      alt="Warning"
+                      style={{
+                        position: "absolute",
+                        right: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  )}
+                </div>
+                {errors.jobTitle && (
+                  <p
+                    style={{
+                      color: "#F04438",
+                      fontSize: "14px",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    {errors.jobTitle}
+                  </p>
+                )}
+              </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                Description
-              </label>
-              <RichTextEditor
-                setText={(text: string) => updateFormData({ description: text })}
-                text={formData.description || ""}
-              />
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
+                >
+                  Description
+                </label>
+                <div
+                  style={{
+                    outline: errors.description
+                      ? "2px solid #F04438"
+                      : undefined,
+                    borderRadius: errors.description ? "8px" : undefined,
+                  }}
+                >
+                  <RichTextEditor
+                    setText={(text: string) =>
+                      updateFormData({ description: text })
+                    }
+                    text={formData.description || ""}
+                  />
+                </div>
+                {errors.description && (
+                  <p
+                    style={{
+                      color: "#F04438",
+                      fontSize: "14px",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    {errors.description}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div
-        className="layered-card-outer"
-        style={{ marginTop: 16 }}
-      >
-        <div className="layered-card-middle">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
+        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+          <div className="layered-card-middle">
             <div
               style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
                 display: "flex",
+                flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
+                gap: 8,
+                marginLeft: 8,
+                padding: 4,
               }}
             >
-              <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}>
-                2
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: "#181D27",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
+                >
+                  2
+                </span>
+              </div>
+              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+                Work Setting
               </span>
             </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Work Setting
-            </span>
-          </div>
 
-          <div className="layered-card-content">
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                Employment Type
-              </label>
-              <CustomDropdown
-                onSelectSetting={(employmentType: string) => {
-                  updateFormData({ employmentType });
-                }}
-                screeningSetting={formData.employmentType || ""}
-                settingList={employmentTypeOptions}
-                placeholder="Choose employment type"
-              />
-            </div>
+            <div className="layered-card-content">
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
+                >
+                  Employment Type
+                </label>
+                <CustomDropdown
+                  onSelectSetting={(employmentType: string) => {
+                    updateFormData({ employmentType });
+                  }}
+                  screeningSetting={formData.employmentType || ""}
+                  settingList={employmentTypeOptions}
+                  placeholder="Choose employment type"
+                  hasError={!!errors.employmentType}
+                />
+                {errors.employmentType && (
+                  <p
+                    style={{
+                      color: "#F04438",
+                      fontSize: "14px",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    {errors.employmentType}
+                  </p>
+                )}
+              </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                Arrangement
-              </label>
-              <CustomDropdown
-                onSelectSetting={(setting: string) => {
-                  updateFormData({ workSetup: setting });
-                }}
-                screeningSetting={formData.workSetup || ""}
-                settingList={workSetupOptions}
-                placeholder="Choose work arrangement"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="layered-card-outer"
-        style={{ marginTop: 16 }}
-      >
-        <div className="layered-card-middle">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}>
-                3
-              </span>
-            </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Location
-            </span>
-          </div>
-
-          <div className="layered-card-content">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
-              <div>
-                <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                  Country
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
+                >
+                  Arrangement
                 </label>
                 <CustomDropdown
                   onSelectSetting={(setting: string) => {
-                    updateFormData({ country: setting });
+                    updateFormData({ workSetup: setting });
                   }}
-                  screeningSetting={formData.country || "Philippines"}
-                  settingList={[{ name: "Philippines" }]}
-                  placeholder="Choose state / province"
+                  screeningSetting={formData.workSetup || ""}
+                  settingList={workSetupOptions}
+                  placeholder="Choose work arrangement"
+                  hasError={!!errors.workSetup}
                 />
-              </div>
-
-              <div>
-                <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                  State / Province
-                </label>
-                <CustomDropdown
-                  onSelectSetting={(province: string) => {
-                    updateFormData({ province });
-                    const provinceObj: any = provinceList.find(
-                      (p: any) => p.name === province
-                    );
-                    const cities = philippineCitiesAndProvinces.cities.filter(
-                      (city: any) => city.province === provinceObj.key
-                    );
-                    setCityList(cities);
-                    updateFormData({ city: cities[0].name });
-                  }}
-                  screeningSetting={formData.province || ""}
-                  settingList={provinceList}
-                  placeholder="Choose state / province"
-                />
-              </div>
-
-              <div>
-                <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                  City
-                </label>
-                <CustomDropdown
-                  onSelectSetting={(city: string) => {
-                    updateFormData({ city });
-                  }}
-                  screeningSetting={formData.city || ""}
-                  settingList={cityList}
-                  placeholder="Choose city"
-                />
+                {errors.workSetup && (
+                  <p
+                    style={{
+                      color: "#F04438",
+                      fontSize: "14px",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    {errors.workSetup}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div
-        className="layered-card-outer"
-        style={{ marginTop: 16 }}
-      >
-        <div className="layered-card-middle">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}>
-                4
-              </span>
-            </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Salary
-            </span>
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={formData.salaryNegotiable !== false}
-                  onChange={() =>
-                    updateFormData({ salaryNegotiable: !formData.salaryNegotiable })
-                  }
-                />
-                <span className="slider round"></span>
-              </label>
-              <span style={{ fontSize: 14, fontWeight: 500 }}>
-                {formData.salaryNegotiable !== false ? "Negotiable" : "Fixed"}
-              </span>
-            </div>
-          </div>
-
-          <div className="layered-card-content">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div>
-                <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                  Minimum Salary
-                </label>
-                <div style={{ position: "relative" }}>
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: "12px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#6c757d",
-                      fontSize: "16px",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    P
-                  </span>
-                  <input
-                    type="number"
-                    className="form-control"
-                    style={{ paddingLeft: "28px" }}
-                    placeholder="0"
-                    min={0}
-                    value={formData.minimumSalary || ""}
-                    onChange={(e) => {
-                      updateFormData({ minimumSalary: e.target.value || "" });
-                    }}
-                  />
-                  <span
-                    style={{
-                      position: "absolute",
-                      right: "30px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#6c757d",
-                      fontSize: "16px",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    PHP
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                  Maximum Salary
-                </label>
-                <div style={{ position: "relative" }}>
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: "12px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#6c757d",
-                      fontSize: "16px",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    P
-                  </span>
-                  <input
-                    type="number"
-                    className="form-control"
-                    style={{ paddingLeft: "28px" }}
-                    placeholder="0"
-                    min={0}
-                    value={formData.maximumSalary || ""}
-                    onChange={(e) => {
-                      updateFormData({ maximumSalary: e.target.value || "" });
-                    }}
-                  />
-                  <span
-                    style={{
-                      position: "absolute",
-                      right: "30px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#6c757d",
-                      fontSize: "16px",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    PHP
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="layered-card-outer"
-        style={{ marginTop: 16 }}
-      >
-        <div className="layered-card-middle">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}>
-                5
-              </span>
-            </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Team Access
-            </span>
-          </div>
-
-          <div className="layered-card-content">
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-                Add more members
-              </label>
-              <p style={{ fontSize: 14, color: "#6B7280", marginBottom: 12 }}>
-                You can add other members to collaborate on this career.
-              </p>
-              <CustomDropdown
-                onSelectSetting={(member: string) => {
-                  // This would require integrating with members API
-                  console.log("Add member:", member);
-                }}
-                screeningSetting=""
-                settingList={[]}
-                placeholder="Add member"
-              />
-            </div>
-
+        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+          <div className="layered-card-middle">
             <div
               style={{
                 display: "flex",
+                flexDirection: "row",
                 alignItems: "center",
-                gap: 12,
-                padding: "12px",
-                backgroundColor: "#F9FAFB",
-                borderRadius: "8px",
+                gap: 8,
+                marginLeft: 8,
+                padding: 4,
               }}
             >
-              <img
-                src={user?.image || "/profile-placeholder.png"}
-                alt={user?.name}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                }}
-              />
-              <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
-                  {user?.name} (You)
-                </p>
-                <p style={{ margin: 0, fontSize: 12, color: "#6B7280" }}>
-                  {user?.email}
-                </p>
-              </div>
               <div
                 style={{
-                  padding: "4px 12px",
-                  backgroundColor: "#FFFFFF",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "6px",
-                  fontSize: 14,
-                  fontWeight: 500,
+                  width: 32,
+                  height: 32,
+                  backgroundColor: "#181D27",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                Job Owner
+                <span
+                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
+                >
+                  3
+                </span>
+              </div>
+              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+                Location
+              </span>
+            </div>
+
+            <div className="layered-card-content">
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr",
+                  gap: 16,
+                }}
+              >
+                <div>
+                  <label
+                    style={{
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      display: "block",
+                    }}
+                  >
+                    Country
+                  </label>
+                  <CustomDropdown
+                    onSelectSetting={(setting: string) => {
+                      updateFormData({ country: setting });
+                    }}
+                    screeningSetting={formData.country || "Philippines"}
+                    settingList={[{ name: "Philippines" }]}
+                    placeholder="Choose state / province"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      display: "block",
+                    }}
+                  >
+                    State / Province
+                  </label>
+                  <CustomDropdown
+                    onSelectSetting={(province: string) => {
+                      updateFormData({ province });
+                      const provinceObj: any = provinceList.find(
+                        (p: any) => p.name === province
+                      );
+                      const cities = philippineCitiesAndProvinces.cities.filter(
+                        (city: any) => city.province === provinceObj.key
+                      );
+                      setCityList(cities);
+                      updateFormData({ city: cities[0].name });
+                    }}
+                    screeningSetting={formData.province || ""}
+                    settingList={provinceList}
+                    placeholder="Choose state / province"
+                    hasError={!!errors.province}
+                  />
+                  {errors.province && (
+                    <p
+                      style={{
+                        color: "#F04438",
+                        fontSize: "14px",
+                        marginTop: "6px",
+                        marginBottom: 0,
+                      }}
+                    >
+                      {errors.province}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      display: "block",
+                    }}
+                  >
+                    City
+                  </label>
+                  <CustomDropdown
+                    onSelectSetting={(city: string) => {
+                      updateFormData({ city });
+                    }}
+                    screeningSetting={formData.city || ""}
+                    settingList={cityList}
+                    placeholder="Choose city"
+                    hasError={!!errors.city}
+                  />
+                  {errors.city && (
+                    <p
+                      style={{
+                        color: "#F04438",
+                        fontSize: "14px",
+                        marginTop: "6px",
+                        marginBottom: 0,
+                      }}
+                    >
+                      {errors.city}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+          <div className="layered-card-middle">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+                marginLeft: 8,
+                padding: 4,
+              }}
+            >
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: "#181D27",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
+                >
+                  4
+                </span>
+              </div>
+              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+                Salary
+              </span>
+              <div
+                style={{
+                  marginLeft: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={formData.salaryNegotiable !== false}
+                    onChange={() =>
+                      updateFormData({
+                        salaryNegotiable: !formData.salaryNegotiable,
+                      })
+                    }
+                  />
+                  <span className="slider round"></span>
+                </label>
+                <span style={{ fontSize: 14, fontWeight: 500 }}>
+                  {formData.salaryNegotiable !== false ? "Negotiable" : "Fixed"}
+                </span>
               </div>
             </div>
 
-            <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 12, marginBottom: 0 }}>
-              *Admins can view all careers regardless of specific access settings.
-            </p>
+            <div className="layered-card-content">
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 16,
+                }}
+              >
+                <div>
+                  <label
+                    style={{
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      display: "block",
+                    }}
+                  >
+                    Minimum Salary
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#6c757d",
+                        fontSize: "16px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ₱
+                    </span>
+                    <input
+                      type="number"
+                      className="form-control"
+                      style={{
+                        paddingLeft: "28px",
+                        borderColor: errors.minimumSalary
+                          ? "#F04438"
+                          : undefined,
+                        borderWidth: errors.minimumSalary ? "2px" : undefined,
+                        paddingRight: errors.minimumSalary ? "100px" : "70px",
+                      }}
+                      placeholder="0"
+                      min={0}
+                      value={formData.minimumSalary || ""}
+                      onChange={(e) => {
+                        updateFormData({ minimumSalary: e.target.value || "" });
+                      }}
+                    />
+                    {errors.minimumSalary && (
+                      <img
+                        src="/career-form/warning-step-icon.svg"
+                        alt="Warning"
+                        style={{
+                          position: "absolute",
+                          right: "65px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    )}
+                    <span
+                      style={{
+                        position: "absolute",
+                        right: "30px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#6c757d",
+                        fontSize: "16px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      PHP
+                    </span>
+                  </div>
+                  {errors.minimumSalary && (
+                    <p
+                      style={{
+                        color: "#F04438",
+                        fontSize: "14px",
+                        marginTop: "6px",
+                        marginBottom: 0,
+                      }}
+                    >
+                      {errors.minimumSalary}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      display: "block",
+                    }}
+                  >
+                    Maximum Salary
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#6c757d",
+                        fontSize: "16px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ₱
+                    </span>
+                    <input
+                      type="number"
+                      className="form-control"
+                      style={{
+                        paddingLeft: "28px",
+                        borderColor: errors.maximumSalary
+                          ? "#F04438"
+                          : undefined,
+                        borderWidth: errors.maximumSalary ? "2px" : undefined,
+                        paddingRight: errors.maximumSalary ? "100px" : "70px",
+                      }}
+                      placeholder="0"
+                      min={0}
+                      value={formData.maximumSalary || ""}
+                      onChange={(e) => {
+                        updateFormData({ maximumSalary: e.target.value || "" });
+                      }}
+                    />
+                    {errors.maximumSalary && (
+                      <img
+                        src="/career-form/warning-step-icon.svg"
+                        alt="Warning"
+                        style={{
+                          position: "absolute",
+                          right: "65px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    )}
+                    <span
+                      style={{
+                        position: "absolute",
+                        right: "30px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#6c757d",
+                        fontSize: "16px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      PHP
+                    </span>
+                  </div>
+                  {errors.maximumSalary && (
+                    <p
+                      style={{
+                        color: "#F04438",
+                        fontSize: "14px",
+                        marginTop: "6px",
+                        marginBottom: 0,
+                      }}
+                    >
+                      {errors.maximumSalary}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginTop: 32,
-          gap: 12,
-        }}
-      >
-        <button
-          disabled={!isStepValid()}
-          onClick={handleNext}
-          style={{
-            padding: "10px 24px",
-            backgroundColor: isStepValid() ? "#181D27" : "#D5D7DA",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: "8px",
-            cursor: isStepValid() ? "pointer" : "not-allowed",
-            fontWeight: 600,
-            fontSize: 14,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          Continue
-          <i className="la la-arrow-right"></i>
-        </button>
-      </div>
+        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+          <div className="layered-card-middle">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+                marginLeft: 8,
+                padding: 4,
+              }}
+            >
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: "#181D27",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
+                >
+                  5
+                </span>
+              </div>
+              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+                Team Access
+              </span>
+            </div>
+
+            <div className="layered-card-content">
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
+                >
+                  Add more members
+                </label>
+                <p style={{ fontSize: 14, color: "#6B7280", marginBottom: 12 }}>
+                  You can add other members to collaborate on this career.
+                </p>
+                <CustomDropdown
+                  onSelectSetting={(member: string) => {
+                    // This would require integrating with members API
+                    console.log("Add member:", member);
+                  }}
+                  screeningSetting=""
+                  settingList={[]}
+                  placeholder="Add member"
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px",
+                  backgroundColor: "#F9FAFB",
+                  borderRadius: "8px",
+                }}
+              >
+                <img
+                  src={user?.image || "/profile-placeholder.png"}
+                  alt={user?.name}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
+                    {user?.name} (You)
+                  </p>
+                  <p style={{ margin: 0, fontSize: 12, color: "#6B7280" }}>
+                    {user?.email}
+                  </p>
+                </div>
+                <div
+                  style={{
+                    padding: "4px 12px",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: "6px",
+                    fontSize: 14,
+                    fontWeight: 500,
+                  }}
+                >
+                  Job Owner
+                </div>
+              </div>
+
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#9CA3AF",
+                  marginTop: 12,
+                  marginBottom: 0,
+                }}
+              >
+                *Admins can view all careers regardless of specific access
+                settings.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tips Section */}
       <div style={{ width: "300px", flexShrink: 0 }}>
-        <div style={{
-          padding: "20px",
-          backgroundColor: "#F9FAFB",
-          borderRadius: "12px",
-          border: "1px solid #E5E7EB",
-        }}>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            marginBottom: "16px",
-          }}>
-            <i className="la la-lightbulb" style={{ fontSize: "20px", color: "#181D27" }}></i>
-            <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 600, color: "#181D27" }}>
-              Tips
-            </h3>
-          </div>
+        <div className="layered-card-outer">
+          <div className="layered-card-middle">
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginLeft: 8,
+                padding: 4,
+              }}
+            >
+              <img src="/career-form/tips.svg" alt="Tips Icon" />
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: "16px",
+                  fontWeight: 600,
+                  color: "#181D27",
+                }}
+              >
+                Tips
+              </h3>
+            </div>
 
-          <div style={{ fontSize: "14px", lineHeight: "1.6", color: "#6B7280" }}>
-            <p style={{ marginBottom: "12px" }}>
-              <strong>Use clear, standard job titles</strong> for better searchability (e.g., "Software Engineer", "Marketing Manager" instead of "Tech Rockstar").
-            </p>
-            <p style={{ marginBottom: "12px" }}>
-              <strong>Avoid abbreviations</strong> of your role unless it's standard "aka" form (e.g., use "Quality Assurance" instead of "QA IT" or "QA LT").
-            </p>
-            <p style={{ marginBottom: "0" }}>
-              <strong>Keep job titles concise</strong> - try to use no more than a few words (2-4 max), avoiding fluff or marketing terms.
-            </p>
+            <div className="layered-card-content">
+              <div
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "1.6",
+                  color: "#717680",
+                }}
+              >
+                <p
+                  style={{
+                    fontWeight: 410,
+                    marginBottom: "12px",
+                  }}
+                >
+                  <strong style={{ color: "#181d27", fontWeight: 550 }}>
+                    Use clear, standard job titles
+                  </strong>{" "}
+                  for better searchability (e.g., "Software Engineer",
+                  "Marketing Manager" instead of "Tech Rockstar").
+                </p>
+                <p
+                  style={{
+                    fontWeight: 410,
+                    marginBottom: "12px",
+                  }}
+                >
+                  <strong style={{ color: "#181d27", fontWeight: 550 }}>
+                    Avoid abbreviations
+                  </strong>{" "}
+                  of your role unless it's standard "aka" form (e.g., use
+                  "Quality Assurance" instead of "QA IT" or "QA LT").
+                </p>
+                <p
+                  style={{
+                    fontWeight: 410,
+                    marginBottom: "0",
+                  }}
+                >
+                  <strong style={{ color: "#181d27", fontWeight: 550 }}>
+                    Keep job titles concise
+                  </strong>{" "}
+                  - try to use no more than a few words (2-4 max), avoiding
+                  fluff or marketing terms.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
