@@ -56,12 +56,12 @@ try {
         lastLogin: null,
         status: "invited",
     })));
-
+    //Commented out sending email for new members to prevent errors upon creating organization.
     // Send email to new members
-    await Promise.all(members.map((member: any) => sendEmail({
-        recipient: member.email,
-        html: getInvitationEmailTemplate(member.email, name, member.role),
-    })));
+    // await Promise.all(members.map((member: any) => sendEmail({
+    //     recipient: member.email,
+    //     html: getInvitationEmailTemplate(member.email, name, member.role),
+    // })));
     return NextResponse.json({ orgID: organization.insertedId.toString() });
 } catch (error) {
     console.error(error);
