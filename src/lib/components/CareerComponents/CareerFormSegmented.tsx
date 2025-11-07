@@ -198,8 +198,15 @@ export default function CareerFormSegmented({
         );
       case 2:
       case 3:
+        // Step 3: Require at least 5 interview questions total
+        const totalQuestions =
+          formData.questions?.reduce(
+            (acc: number, group: any) => acc + group.questions.length,
+            0
+          ) || 0;
+        return totalQuestions >= 5;
       case 4:
-        return true; // Other steps handle their own validation
+        return true;
       default:
         return false;
     }
@@ -210,14 +217,23 @@ export default function CareerFormSegmented({
       // On final step, save as draft
       confirmSaveCareer("inactive");
     } else {
-      // Trigger validation for step 1
-      if (currentStep === 1) {
+      // Trigger validation for step 1 and step 3
+      if (currentStep === 1 || currentStep === 3) {
         setTriggerValidation(true);
         // Check if current step is valid after triggering validation
         setTimeout(() => {
           if (isCurrentStepValid()) {
+            // Remove from invalid steps if valid
+            setInvalidSteps(
+              invalidSteps.filter((step) => step !== currentStep)
+            );
             handleNext();
             setTriggerValidation(false);
+          } else {
+            // Add to invalid steps if not valid
+            if (!invalidSteps.includes(currentStep)) {
+              setInvalidSteps([...invalidSteps, currentStep]);
+            }
           }
         }, 100);
       } else {
@@ -440,6 +456,7 @@ export default function CareerFormSegmented({
             updateFormData={updateFormData}
             onNext={handleNext}
             onPrevious={handlePrevious}
+            showValidation={triggerValidation}
           />
         );
       case 4:
