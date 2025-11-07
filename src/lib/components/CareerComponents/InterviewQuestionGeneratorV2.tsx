@@ -5,74 +5,66 @@ import { useEffect, useState } from "react";
 import {
   errorToast,
   interviewQuestionCategoryMap,
-  candidateActionToast
+  candidateActionToast,
 } from "@/lib/Utils";
-import InterviewQuestionModal from "./InterviewQuestionModal";
 import FullScreenLoadingAnimation from "./FullScreenLoadingAnimation";
 
 export default function (props) {
-  const { questions, setQuestions, jobTitle, description } = props;
+  const { questions, setQuestions, jobTitle, description, showValidation } = props;
   const [questionGenPrompt, setQuestionGenPrompt] = useState("");
   const questionCount = 5;
-  const [showQuestionModal, setShowQuestionModal] = useState("");
-  const [questionModalGroupId, setQuestionModalGroupId] = useState(0);
-  const [questionModalQuestion, setQuestionModalQuestion] = useState(null);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [tempQuestionText, setTempQuestionText] = useState("");
 
   function addQuestion(groupId: number, newQuestion: string) {
-        const categoryIndex = questions.findIndex((q) => q.id === groupId);
-        if (categoryIndex !== -1) {
-          const updatedQuestions = [...questions];
-          updatedQuestions[categoryIndex].questions = [
-            ...updatedQuestions[categoryIndex].questions,
-            {
-              id: guid(),
-              question: newQuestion,
-            },
-          ];
+    const categoryIndex = questions.findIndex((q) => q.id === groupId);
+    if (categoryIndex !== -1) {
+      const newQuestionId = guid();
+      const updatedQuestions = [...questions];
+      updatedQuestions[categoryIndex].questions = [
+        ...updatedQuestions[categoryIndex].questions,
+        {
+          id: newQuestionId,
+          question: newQuestion,
+        },
+      ];
 
-          setQuestions(updatedQuestions);
-        }
-
+      setQuestions(updatedQuestions);
+      return newQuestionId;
+    }
+    return null;
   }
 
   function editQuestion(groupId, updatedQuestion, questionId) {
-        const categoryIndex = questions.findIndex(
-          (q) => q.id === groupId
-        );
+    const categoryIndex = questions.findIndex((q) => q.id === groupId);
 
-        const updatedQuestions = [...questions];
-        if (categoryIndex !== -1) {
-          updatedQuestions[categoryIndex].questions = updatedQuestions[
-            categoryIndex
-          ].questions.map((q) =>
-            q.id === questionId ? { ...q, question: updatedQuestion } : q
-          );
-        }
+    const updatedQuestions = [...questions];
+    if (categoryIndex !== -1) {
+      updatedQuestions[categoryIndex].questions = updatedQuestions[
+        categoryIndex
+      ].questions.map((q) =>
+        q.id === questionId ? { ...q, question: updatedQuestion } : q
+      );
+    }
 
-        setQuestions(updatedQuestions);
+    setQuestions(updatedQuestions);
   }
 
   function deleteQuestion(groupId, questionId) {
-    const categoryIndex = questions.findIndex(
-      (q) => q.id === groupId
-    );
+    const categoryIndex = questions.findIndex((q) => q.id === groupId);
     const updatedQuestions = [...questions];
 
     if (categoryIndex !== -1) {
-      let categoryToUpdate =
-        updatedQuestions[categoryIndex];
-      categoryToUpdate.questions =
-        categoryToUpdate.questions.filter(
-          (q) => q.id !== questionId
-        );
+      let categoryToUpdate = updatedQuestions[categoryIndex];
+      categoryToUpdate.questions = categoryToUpdate.questions.filter(
+        (q) => q.id !== questionId
+      );
       if (
         categoryToUpdate.questionCountToAsk !== null &&
-        categoryToUpdate.questionCountToAsk >
-          categoryToUpdate.questions.length
+        categoryToUpdate.questionCountToAsk > categoryToUpdate.questions.length
       ) {
-        categoryToUpdate.questionCountToAsk =
-          categoryToUpdate.questions.length;
+        categoryToUpdate.questionCountToAsk = categoryToUpdate.questions.length;
       }
     }
     setQuestions(updatedQuestions);
@@ -86,29 +78,34 @@ export default function (props) {
       }
 
       setIsGeneratingQuestions(true);
-      
+
       const interviewCategories = Object.keys(interviewQuestionCategoryMap);
       const response = await axios.post("/api/llm-engine", {
-      systemPrompt:
-        "You are a helpful assistant that can answer questions and help with tasks.",
-      prompt: `Generate ${questionCount * interviewCategories.length} interview questions for the following Job opening: 
+        systemPrompt:
+          "You are a helpful assistant that can answer questions and help with tasks.",
+        prompt: `Generate ${
+          questionCount * interviewCategories.length
+        } interview questions for the following Job opening: 
         Job Title:
         ${jobTitle} 
         Job Description:
         ${description}
   
-        ${interviewCategories.map((category) => {
-          return `Category:
+        ${interviewCategories
+          .map((category) => {
+            return `Category:
           ${category}
           Category Description:
-          ${interviewQuestionCategoryMap[category].description}`
-        }).join("\n")}
+          ${interviewQuestionCategoryMap[category].description}`;
+          })
+          .join("\n")}
   
-        ${interviewCategories.map((category) => `${questionCount} questions for ${category}`).join(", ")}
+        ${interviewCategories
+          .map((category) => `${questionCount} questions for ${category}`)
+          .join(", ")}
 
         ${
-          questions.reduce((acc, group) => acc + group.questions.length, 0) >
-          0
+          questions.reduce((acc, group) => acc + group.questions.length, 0) > 0
             ? `Do not generate questions that are already covered in this list:\n${questions
                 .map((group) =>
                   group.questions
@@ -125,46 +122,55 @@ export default function (props) {
         return it in json format following this for each element {category: "category", questions: ["question1", "question2", "question3", "question4", "question5"]}
         return only the json array, nothing else, now markdown format just pure json code.
         `,
-    });
+      });
 
-    let finalGeneratedQuestions = response.data.result;
+      let finalGeneratedQuestions = response.data.result;
 
-    finalGeneratedQuestions = finalGeneratedQuestions.replace("```json", "");
-    finalGeneratedQuestions = finalGeneratedQuestions.replace("```", "");
+      finalGeneratedQuestions = finalGeneratedQuestions.replace("```json", "");
+      finalGeneratedQuestions = finalGeneratedQuestions.replace("```", "");
 
-    finalGeneratedQuestions = JSON.parse(finalGeneratedQuestions);
-    console.log(finalGeneratedQuestions);
+      finalGeneratedQuestions = JSON.parse(finalGeneratedQuestions);
+      console.log(finalGeneratedQuestions);
 
-    let newArray = [...questions];
+      let newArray = [...questions];
 
-    finalGeneratedQuestions.forEach((questionGroup) => {
-      const categoryIndex = newArray.findIndex(
-        (q) => q.category === questionGroup.category
+      finalGeneratedQuestions.forEach((questionGroup) => {
+        const categoryIndex = newArray.findIndex(
+          (q) => q.category === questionGroup.category
+        );
+
+        if (categoryIndex !== -1) {
+          const newQuestions = questionGroup.questions.map((q) => ({
+            id: guid(),
+            question: q,
+          }));
+          newArray[categoryIndex].questions = [
+            ...newArray[categoryIndex].questions,
+            ...newQuestions,
+          ];
+        }
+      });
+
+      setQuestions(newArray);
+
+      candidateActionToast(
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#181D27",
+            marginLeft: 8,
+          }}
+        >
+          Questions generated successfully
+        </span>,
+        1500,
+        <i
+          className="la la-check-circle"
+          style={{ color: "#039855", fontSize: 32 }}
+        ></i>
       );
-  
-      if (categoryIndex !== -1) {
-        const newQuestions = questionGroup.questions.map((q) => ({
-          id: guid(),
-          question: q,
-        }));
-        newArray[categoryIndex].questions = [
-          ...newArray[categoryIndex].questions,
-          ...newQuestions,
-        ];
-      }
-    })
-
-    setQuestions(newArray);
-
-
-    candidateActionToast(
-      <span style={{ fontSize: 14, fontWeight: 700, color: "#181D27", marginLeft: 8 }}>
-        Questions generated successfully
-      </span>, 
-      1500, 
-      <i className="la la-check-circle" style={{ color: "#039855", fontSize: 32 }}></i>);
-
-    } catch(err) {
+    } catch (err) {
       console.log(err);
       errorToast("Error generating questions, please try again", 1500);
     } finally {
@@ -249,11 +255,22 @@ export default function (props) {
       setQuestions(newArray);
 
       candidateActionToast(
-      <span style={{ fontSize: 14, fontWeight: 700, color: "#181D27", marginLeft: 8 }}>
-        Questions generated successfully
-      </span>, 
-      1500, 
-      <i className="la la-check-circle" style={{ color: "#039855", fontSize: 32 }}></i>);
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#181D27",
+            marginLeft: 8,
+          }}
+        >
+          Questions generated successfully
+        </span>,
+        1500,
+        <i
+          className="la la-check-circle"
+          style={{ color: "#039855", fontSize: 32 }}
+        ></i>
+      );
     } catch (err) {
       console.log(err);
       errorToast("Error generating questions, please try again", 1500);
@@ -333,94 +350,124 @@ export default function (props) {
       })
       .catch((err) => {
         console.log("[Question Generator Fetch Prompt Error]", err);
+        return null;
       });
 
-    setQuestionGenPrompt(configData.question_gen_prompt.prompt);
+    // Check if configData exists and has the expected structure before accessing
+    if (
+      configData &&
+      configData.question_gen_prompt &&
+      configData.question_gen_prompt.prompt
+    ) {
+      setQuestionGenPrompt(configData.question_gen_prompt.prompt);
+    }
   }
 
   useEffect(() => {
     fetchInstructionPrompt();
   }, []);
 
+  const totalQuestions = questions.reduce((acc, group) => acc + group.questions.length, 0);
+  const hasMinimumQuestions = totalQuestions >= 5;
+
   return (
-    <div className="layered-card-outer">
-        <div className="layered-card-middle">
-          <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <i className="la la-comment-alt" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
-                </div>
-                <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>
-                  Interview Questions 
-                </span>
-                <div style={{ borderRadius: "50%", width: 30, height: 22, border: "1px solid #D5D9EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, backgroundColor: "#F8F9FC", color: "#181D27", fontWeight: 700 }}>
-                  {questions.reduce((acc, group) => acc + group.questions.length, 0)}
-                </div>
-              </div>
-              <button style={{ width: "fit-content", background: "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px", cursor: "pointer", whiteSpace: "nowrap"}} onClick={() => {
-                generateAllQuestions();
-                  }}>
-                <i className="la la-bolt" style={{ fontSize: 20 }}></i> Generate All Questions
-              </button>
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginLeft: 8,
+          padding: 4,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              backgroundColor: "#181D27",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}>
+              2.
+            </span>
           </div>
-            <div className="layered-card-content">
-              <div className="questions-set">
+          <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+            AI Interview Questions
+          </span>
+          {totalQuestions > 0 && (
+            <div
+              style={{
+                borderRadius: "50%",
+                width: 30,
+                height: 22,
+                border: "1px solid #D5D9EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 14,
+                backgroundColor: "#F8F9FC",
+                color: "#181D27",
+                fontWeight: 700,
+              }}
+            >
+              {totalQuestions}
+            </div>
+          )}
+        </div>
+        <button
+          style={{
+            width: "fit-content",
+            background: "black",
+            color: "#fff",
+            border: "1px solid #E9EAEB",
+            padding: "8px 16px",
+            borderRadius: "60px",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+          onClick={() => {
+            generateAllQuestions();
+          }}
+        >
+          <i className="la la-bolt" style={{ fontSize: 20 }}></i> Generate All
+          Questions
+        </button>
+      </div>
+      {showValidation && !hasMinimumQuestions && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "12px 16px",
+            backgroundColor: "#FEF3F2",
+            border: "1px solid #FECDCA",
+            borderRadius: "8px",
+            margin: "16px 16px 0 16px",
+          }}
+        >
+          <i className="la la-exclamation-triangle" style={{ color: "#F04438", fontSize: 16 }}></i>
+          <span style={{ color: "#B42318", fontSize: 14, fontWeight: 500 }}>
+            Please add at least 5 interview questions.
+          </span>
+        </div>
+      )}
+      <div className="layered-card-content">
+        <div className="questions-set">
           {questions.map((group, index) => (
             <div
               className="question-group"
               key={index}
-              draggable={true}
-              onDragStart={(e) => {
-                e.dataTransfer.setData("categoryId", group.id.toString());
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                const target = e.currentTarget;
-                const bounding = target.getBoundingClientRect();
-                const offset = bounding.y + bounding.height / 2;
-
-                if (e.clientY - offset > 0) {
-                  target.style.borderBottom = "3px solid";
-                  target.style.borderImage = "linear-gradient(90deg, #9fcaed 0%, #ceb6da 33%, #ebacc9 66%, #fccec0 100%) 1";
-                  target.style.borderTop = "none";
-                } else {
-                  target.style.borderTop = "3px solid";
-                  target.style.borderImage = "linear-gradient(90deg, #9fcaed 0%, #ceb6da 33%, #ebacc9 66%, #fccec0 100%) 1";
-                  target.style.borderBottom = "none";
-                }
-              }}
-              onDragLeave={(e) => {
-                e.currentTarget.style.borderTop = "none";
-                e.currentTarget.style.borderBottom = "none";
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.currentTarget.style.borderTop = "none";
-                e.currentTarget.style.borderBottom = "none";
-
-                const bounding = e.currentTarget.getBoundingClientRect();
-                const offset = bounding.y + bounding.height / 2;
-                const insertIndex = e.clientY - offset > 0 ? index + 1 : index;
-
-                const categoryId = Number(e.dataTransfer.getData("categoryId"));
-                if (!isNaN(categoryId) && categoryId !== group.id) {
-                  // This is a category being dragged
-                  handleReorderCategories(categoryId, insertIndex);
-                }
-
-                const draggedQuestionId = e.dataTransfer.getData("questionId");
-                const fromCategoryId = Number(
-                  e.dataTransfer.getData("fromCategoryId")
-                );
-                if (draggedQuestionId && !isNaN(fromCategoryId)) {
-                  // This is a question being dragged
-                  handleReorderQuestions(
-                    draggedQuestionId,
-                    fromCategoryId,
-                    group.id
-                  );
-                }
-              }}
+              style={
+                group.category === "Others" ? { borderBottom: "none" } : {}
+              }
             >
               {/* Row of category */}
               <div>
@@ -435,52 +482,34 @@ export default function (props) {
                     {group.category}
                   </h3>
                 </div>
-                {/* Row of questions */}
-                {group.questions.map((question, index) => (
+                {/* Empty drop zone for categories with no questions */}
+                {group.questions.length === 0 && (
                   <div
-                    className="question-item"
-                    style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", height: "100%" }}
-                    key={index}
-                    draggable={true}
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData(
-                        "questionId",
-                        question.id.toString()
-                      );
-                      e.dataTransfer.setData(
-                        "fromCategoryId",
-                        group.id.toString()
-                      );
+                    style={{
+                      padding: "20px",
+                      border: "2px dashed #E5E7EB",
+                      borderRadius: "8px",
+                      backgroundColor: "#F9FAFB",
+                      textAlign: "center",
+                      color: "#9CA3AF",
+                      fontSize: 14,
+                      marginBottom: 12,
                     }}
                     onDragOver={(e) => {
                       e.preventDefault();
-                      const target = e.currentTarget;
-                      const bounding = target.getBoundingClientRect();
-                      const offset = bounding.y + bounding.height / 2;
-
-                      // Add visual indicator for drop position
-                      if (e.clientY - offset > 0) {
-                        target.style.borderBottom = "2px solid";
-                        target.style.borderImage = "linear-gradient(90deg, #9fcaed 0%, #ceb6da 33%, #ebacc9 66%, #fccec0 100%) 1";
-                        target.style.borderTop = "none";
-                      } else {
-                        target.style.borderTop = "2px solid";
-                        target.style.borderImage = "linear-gradient(90deg, #9fcaed 0%, #ceb6da 33%, #ebacc9 66%, #fccec0 100%) 1";
-                        target.style.borderBottom = "none";
-                      }
+                      e.stopPropagation();
+                      e.currentTarget.style.borderColor = "#9CA3AF";
+                      e.currentTarget.style.backgroundColor = "#F3F4F6";
                     }}
                     onDragLeave={(e) => {
-                      // Remove visual indicators
-                      e.currentTarget.style.borderTop = "none";
-                      e.currentTarget.style.borderBottom = "none";
+                      e.currentTarget.style.borderColor = "#E5E7EB";
+                      e.currentTarget.style.backgroundColor = "#F9FAFB";
                     }}
                     onDrop={(e) => {
                       e.preventDefault();
-                      e.stopPropagation(); // Prevent bubbling to question-group handler
-
-                      // Remove visual indicators
-                      e.currentTarget.style.borderTop = "none";
-                      e.currentTarget.style.borderBottom = "none";
+                      e.stopPropagation();
+                      e.currentTarget.style.borderColor = "#E5E7EB";
+                      e.currentTarget.style.backgroundColor = "#F9FAFB";
 
                       const draggedQuestionId =
                         e.dataTransfer.getData("questionId");
@@ -489,55 +518,209 @@ export default function (props) {
                       );
 
                       if (draggedQuestionId && !isNaN(fromCategoryId)) {
-                        const bounding =
-                          e.currentTarget.getBoundingClientRect();
-                        const offset = bounding.y + bounding.height / 2;
-                        const insertIndex =
-                          e.clientY - offset > 0 ? index + 1 : index;
-
                         handleReorderQuestions(
                           draggedQuestionId,
                           fromCategoryId,
                           group.id,
-                          insertIndex
+                          0 // Insert at beginning of empty category
                         );
                       }
                     }}
                   >
-
-                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8, height: "100%" }}>
-                      <i className="la la-grip-vertical" style={{ fontSize: 20, color: "#A4A7AE" }}></i>
-                      <span style={{ wordBreak: "break-word", whiteSpace: "pre-line" }}>
-                        {question.question}
-                      </span>
-                    </div>
-
-                    <div className="button-set" style={{ gap: 8, display: "flex", alignItems: "center", flexDirection: "row"}}>
-                      <button
-                        style={{ background: "#fff", border: "1px solid #E9EAEB", borderRadius: "60px", cursor: "pointer", width: "82px", height: "36px" }}
-                        onClick={() => {
-                          setShowQuestionModal("edit");
-                          setQuestionModalGroupId(group.id);
-                          setQuestionModalQuestion(question);
-                        }}
-                      >
-                        <i className="la la-pencil-alt"></i>
-                        <span>Edit</span>
-                      </button>
-
-                      <button
-                        style={{ color: "#B42318", background: "#fff", border: "1px solid #B42318", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
-                        onClick={() => {
-                          setShowQuestionModal("delete");
-                          setQuestionModalGroupId(group.id);
-                          setQuestionModalQuestion(question);
-                        }}
-                      >
-                        <i className="la la-trash text-red" style={{ fontSize: 20 }}></i>
-                      </button>
-                    </div>
+                    Drag questions here or use the buttons below to add
                   </div>
-                ))}
+                )}
+                {/* Row of questions */}
+                {group.questions.map((question, qIndex) => {
+                  const isEditing = editingQuestionId === question.id;
+
+                  return (
+                    <div
+                      className="question-item"
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 12,
+                        marginBottom: 12,
+                      }}
+                      key={question.id}
+                      draggable={!isEditing}
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData(
+                          "questionId",
+                          question.id.toString()
+                        );
+                        e.dataTransfer.setData(
+                          "fromCategoryId",
+                          group.id.toString()
+                        );
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const draggedQuestionId =
+                          e.dataTransfer.getData("questionId");
+                        const fromCategoryId = Number(
+                          e.dataTransfer.getData("fromCategoryId")
+                        );
+
+                        if (draggedQuestionId && !isNaN(fromCategoryId)) {
+                          handleReorderQuestions(
+                            draggedQuestionId,
+                            fromCategoryId,
+                            group.id,
+                            qIndex
+                          );
+                        }
+                      }}
+                    >
+                      {/* Drag handle */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: isEditing ? "default" : "grab",
+                          color: "#9CA3AF",
+                          fontSize: 16,
+                        }}
+                      >
+                        <i className="la la-braille"></i>
+                      </div>
+
+                      {/* Question content */}
+                      <div
+                        style={{
+                          flex: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "12px 16px",
+                          backgroundColor: "#FFFFFF",
+                          border: "1px solid #E5E7EB",
+                          borderRadius: "8px",
+                        }}
+                      >
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={tempQuestionText}
+                            onChange={(e) =>
+                              setTempQuestionText(e.target.value)
+                            }
+                            style={{
+                              flex: 1,
+                              padding: "8px 12px",
+                              border: "1px solid #E5E7EB",
+                              borderRadius: "6px",
+                              fontSize: 14,
+                              fontFamily: "inherit",
+                            }}
+                            autoFocus
+                          />
+                        ) : (
+                          <span
+                            style={{
+                              flex: 1,
+                              wordBreak: "break-word",
+                              whiteSpace: "pre-line",
+                              fontSize: 14,
+                            }}
+                          >
+                            {question.question}
+                          </span>
+                        )}
+
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          {isEditing ? (
+                            <button
+                              style={{
+                                background: "#fff",
+                                border: "1px solid #E9EAEB",
+                                borderRadius: "60px",
+                                cursor: "pointer",
+                                padding: "8px 16px",
+                                fontSize: 14,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                              }}
+                              onClick={() => {
+                                editQuestion(
+                                  group.id,
+                                  tempQuestionText,
+                                  question.id
+                                );
+                                setEditingQuestionId(null);
+                                setTempQuestionText("");
+                              }}
+                            >
+                              <i className="la la-check"></i>
+                              <span>Save</span>
+                            </button>
+                          ) : (
+                            <button
+                              style={{
+                                background: "#fff",
+                                border: "1px solid #E9EAEB",
+                                borderRadius: "60px",
+                                cursor: "pointer",
+                                padding: "8px 16px",
+                                fontSize: 14,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                              }}
+                              onClick={() => {
+                                setEditingQuestionId(question.id);
+                                setTempQuestionText(question.question);
+                              }}
+                            >
+                              <i className="la la-pencil-alt"></i>
+                              <span>Edit</span>
+                            </button>
+                          )}
+
+                          <button
+                            style={{
+                              color: "#B42318",
+                              background: "#fff",
+                              border: "1px solid #B42318",
+                              borderRadius: "50%",
+                              width: 32,
+                              height: 32,
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: 0,
+                            }}
+                            onClick={() => {
+                              deleteQuestion(group.id, question.id);
+                            }}
+                          >
+                            <i
+                              className="la la-trash"
+                              style={{ fontSize: 18 }}
+                            ></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
                 {/* Buttons to add or generate questions */}
                 <div
                   style={{
@@ -546,23 +729,52 @@ export default function (props) {
                     alignItems: "center",
                   }}
                 >
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <div
+                    style={{ display: "flex", gap: 8, alignItems: "center" }}
+                  >
                     <button
-                    style={{ width: "fit-content", background: "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px", cursor: "pointer", whiteSpace: "nowrap"}}
+                      style={{
+                        width: "fit-content",
+                        background: "black",
+                        color: "#fff",
+                        border: "1px solid #E9EAEB",
+                        padding: "8px 16px",
+                        borderRadius: "60px",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                      }}
                       onClick={() => {
                         generateQuestions(group.category);
                       }}
                     >
-                      <i className="la la-bolt" style={{ fontSize: 20 }}></i> Generate Questions
+                      <i className="la la-bolt" style={{ fontSize: 20 }}></i>{" "}
+                      Generate Questions
                     </button>
                     <button
-                    style={{ width: "fit-content", color: "#414651", background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px", cursor: "pointer", whiteSpace: "nowrap" }}
+                      style={{
+                        width: "fit-content",
+                        color: "#414651",
+                        background: "#fff",
+                        border: "1px solid #D5D7DA",
+                        padding: "8px 16px",
+                        borderRadius: "60px",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                      }}
                       onClick={() => {
-                        setShowQuestionModal("add");
-                        setQuestionModalGroupId(group.id);
+                        // Add a blank question and set it to editing mode
+                        const newQuestionId = addQuestion(group.id, "");
+                        if (newQuestionId) {
+                          setEditingQuestionId(newQuestionId);
+                          setTempQuestionText("");
+                        }
                       }}
                     >
-                      <i className="la la-plus-circle" style={{ fontSize: 20 }}></i> Manually Add
+                      <i
+                        className="la la-plus-circle"
+                        style={{ fontSize: 20 }}
+                      ></i>{" "}
+                      Manually add
                     </button>
                   </div>
                   {group.questions.length > 0 && (
@@ -570,21 +782,21 @@ export default function (props) {
                       style={{
                         display: "flex",
                         alignItems: "center",
+                        gap: 8,
                       }}
                     >
-                      <p
+                      <span
                         style={{
-                          marginRight: "10px",
-                          marginTop: "10px",
-                          paddingTop: "5px",
+                          fontSize: 14,
+                          color: "#6B7280",
+                          fontWeight: 400,
                         }}
                       >
-                        # of Questions to Ask:
-                      </p>
+                        # of questions to ask
+                      </span>
                       <input
                         type="number"
-                        id="questionCount"
-                        placeholder={questionCount.toString()}
+                        placeholder={group.questions.length.toString()}
                         value={
                           group.questionCountToAsk !== null
                             ? group.questionCountToAsk
@@ -593,8 +805,16 @@ export default function (props) {
                         max={group.questions.length}
                         min={0}
                         style={{
-                          maxWidth: "40px",
-                          maxHeight: "40px",
+                          width: "50px",
+                          height: "36px",
+                          padding: "8px",
+                          border: "1px solid #E5E7EB",
+                          borderRadius: "6px",
+                          fontSize: 14,
+                          textAlign: "center",
+                          appearance: "textfield",
+                          MozAppearance: "textfield",
+                          WebkitAppearance: "none",
                         }}
                         onChange={(e) => {
                           let value = parseInt(e.target.value);
@@ -606,10 +826,6 @@ export default function (props) {
                           if (value > group.questions.length) {
                             value = group.questions.length;
                           }
-
-                          // Update the input's displayed value to match the parsed number
-                          e.target.value =
-                            value === null ? "" : value.toString();
 
                           const updatedQuestions = [...questions];
                           updatedQuestions[index].questionCountToAsk = value;
@@ -632,35 +848,18 @@ export default function (props) {
                       />
                     </div>
                   )}
-                    </div>
-                  </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-        {showQuestionModal && (
-          <InterviewQuestionModal groupId={questionModalGroupId} questionToEdit={questionModalQuestion} action={showQuestionModal} onAction={(action, groupId, question, questionId) => {
-            setShowQuestionModal("");
-            setQuestionModalQuestion(null);
-            setQuestionModalGroupId(0);
-
-            if (action === "add" && groupId && question) {
-              addQuestion(groupId, question);
-            }
-
-            if (action === "edit" && groupId && question && questionId) {
-              editQuestion(groupId, question, questionId);
-            }
-
-            if (action === "delete" && groupId && questionId) {
-              deleteQuestion(groupId, questionId);
-            }
-          }} />
-        )}
-        {isGeneratingQuestions && (
-          <FullScreenLoadingAnimation title="Generating questions..." subtext="Please wait while Jia is generating the questions" />
-        )}
-    </div>
+      </div>
+      {isGeneratingQuestions && (
+        <FullScreenLoadingAnimation
+          title="Generating questions..."
+          subtext="Please wait while Jia is generating the questions"
+        />
+      )}
+    </>
   );
 }
