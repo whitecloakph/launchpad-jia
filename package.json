@@ -12,7 +12,7 @@
     "@react-pdf/renderer": "^4.3.0",
     "@upsetjs/venn.js": "1.4.2",
     "axios": "1.9.0",
-    "firebase": "11.6.1",
+    "firebase": "^11.6.1",
     "firebase-admin": "13.3.0",
     "form-data": "^4.0.2",
     "fuse.js": "^7.1.0",
