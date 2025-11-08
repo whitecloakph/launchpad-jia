@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   const careerModel = db.collection("careers");
   const matchConditions: any = [
     { status: "active" },
-    { "organization.tier": { $in: ["corporate", "enterprise"] } },
+    { "organization.tier": { $in: ["corporate", "enterprise", "startup"] } },
   ];
 
   if (jobID != "all") {
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       {
         $lookup: {
           from: "organizations",
-          let: { orgID: "$orgID" },
+          let: { orgID: { $toString: "$orgID" } },
           pipeline: [
             {
               $addFields: {
