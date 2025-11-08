@@ -12,8 +12,11 @@ export const COLOR_TEXT_SECONDARY = "#414650";
 export const COLOR_TEXT_TERTIARY = "#535861";
 export const COLOR_TEXT_TIPS = "#717680";
 
+export const COLOR_GENERAL_ICONS = "#71767f";
+
 // Border Colors
-export const COLOR_BORDER_LIGHT = "#e9eaeb";
+export const COLOR_BORDER_PRIMARY = "#e9eaeb";
+export const COLOR_BORDER_LIGHT = "#eaecf4";
 export const COLOR_BORDER_MEDIUM = "#d1d5db";
 export const COLOR_BORDER_DARK = "#d5d7da";
 
