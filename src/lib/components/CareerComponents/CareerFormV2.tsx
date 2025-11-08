@@ -137,26 +137,22 @@ export default function CareerForm({
     {
       id: 0,
       title: "Career Details & Team Access",
-      icon: "la-suitcase",
-      description: "Basic information and additional settings",
+      icon: "la-dot-circle",
     },
     {
       id: 1,
-      title: "Settings",
-      icon: "la-cog",
-      description: "Screening and video requirements",
+      title: "CV Review & Pre-screening",
+      icon: "la-dot-circle",
     },
     {
       id: 2,
-      title: "Interview Questions",
-      icon: "la-comments",
-      description: "Configure interview questions",
+      title: "AI Interview Setup",
+      icon: "la-dot-circle",
     },
     {
       id: 3,
-      title: "Review & Submit",
-      icon: "la-check-circle",
-      description: "Review all details before publishing",
+      title: "Review Career",
+      icon: "la-dot-circle",
     },
   ];
 
@@ -164,11 +160,7 @@ export default function CareerForm({
   const validateSegment = (segmentId: number) => {
     switch (segmentId) {
       case 0: // Career Details & Additional Info
-        return (
-          jobTitle.trim().length > 0 &&
-          description.trim().length > 0 &&
-          workSetup.trim().length > 0
-        );
+        return jobTitle.trim().length > 0 && workSetup.trim().length > 0;
       case 1: // Settings
         return screeningSetting.trim().length > 0;
       case 2: // Interview Questions
@@ -433,8 +425,8 @@ export default function CareerForm({
   const Segment1CareerDetailsAndAdditionalInfo = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Career Information Card */}
-      <div className="layered-card-outer">
-        <div className="layered-card-middle">
+      <div>
+        <div className="layered-card-middle bg-#F8F9FC">
           <div
             style={{
               display: "flex",
@@ -443,27 +435,22 @@ export default function CareerForm({
               gap: 8,
             }}
           >
-            <div
+            <span
               style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                fontSize: 16,
+                color: "#181D27",
+                fontWeight: 700,
+                marginLeft: 16,
+                paddingTop: 8,
               }}
             >
-              <i
-                className="la la-suitcase"
-                style={{ color: "#FFFFFF", fontSize: 20 }}
-              ></i>
-            </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Career Information
+              1. Career Information
             </span>
           </div>
-          <div className="layered-card-content">
+          <div className="layered-card-content" style={{ fontSize: 14 }}>
+            <span style={{ color: "#181D27", fontWeight: "700" }}>
+              Basic Information
+            </span>
             <span>
               Job Title <span style={{ color: "#EF4444" }}>*</span>
             </span>
@@ -473,47 +460,7 @@ export default function CareerForm({
               placeholder="Enter job title"
               onChange={(e) => setJobTitle(e.target.value || "")}
             />
-            <span>
-              Description <span style={{ color: "#EF4444" }}>*</span>
-            </span>
-            <RichTextEditor setText={setDescription} text={description} />
-          </div>
-        </div>
-      </div>
-
-      {/* Additional Information Card */}
-      <div className="layered-card-outer">
-        <div className="layered-card-middle">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <i
-                className="la la-ellipsis-h"
-                style={{ color: "#FFFFFF", fontSize: 20 }}
-              ></i>
-            </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Additional Information
-            </span>
-          </div>
-          <div className="layered-card-content">
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+            <span style={{ color: "#181D27", fontWeight: 700, marginTop: 16 }}>
               Work Setting
             </span>
             <span>Employment Type</span>
@@ -523,25 +470,17 @@ export default function CareerForm({
               }
               screeningSetting={employmentType}
               settingList={employmentTypeOptions}
-              placeholder="Select Employment Type"
+              placeholder="Choose employment type"
             />
 
             <span>
-              Work Setup Arrangement <span style={{ color: "#EF4444" }}>*</span>
+              Arrangement <span style={{ color: "#EF4444" }}>*</span>
             </span>
             <CustomDropdown
               onSelectSetting={(setting) => setWorkSetup(setting)}
               screeningSetting={workSetup}
               settingList={workSetupOptions}
-              placeholder="Select Work Setup"
-            />
-
-            <span>Work Setup Remarks</span>
-            <input
-              className="form-control"
-              placeholder="Additional remarks about work setup (optional)"
-              value={workSetupRemarks}
-              onChange={(e) => setWorkSetupRemarks(e.target.value || "")}
+              placeholder="Choose work arrangement"
             />
 
             <div
@@ -551,7 +490,9 @@ export default function CareerForm({
                 justifyContent: "space-between",
               }}
             >
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+              <span
+                style={{ color: "#181D27", fontWeight: 700, marginTop: 16 }}
+              >
                 Salary
               </span>
               <div
@@ -561,6 +502,7 @@ export default function CareerForm({
                   alignItems: "flex-start",
                   gap: 8,
                   minWidth: "130px",
+                  marginTop: 16,
                 }}
               >
                 <label className="switch">
@@ -655,7 +597,6 @@ export default function CareerForm({
 
             <span
               style={{
-                fontSize: 16,
                 color: "#181D27",
                 fontWeight: 700,
                 marginTop: 16,
@@ -697,6 +638,64 @@ export default function CareerForm({
               settingList={cityList}
               placeholder="Select City"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Job Description Card */}
+      <div>
+        <div className="layered-card-middle bg-#F8F9FC">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 16,
+                color: "#181D27",
+                fontWeight: 700,
+                marginLeft: 16,
+                paddingTop: 8,
+              }}
+            >
+              2. Job Description
+            </span>
+          </div>
+          <div className="layered-card-content">
+            <RichTextEditor setText={setDescription} text={description} />
+          </div>
+        </div>
+      </div>
+
+      {/* Team Access PlaceHolder */}
+      <div>
+        <div className="layered-card-middle">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 16,
+                color: "#181D27",
+                fontWeight: 700,
+                marginLeft: 16,
+                paddingTop: 8,
+              }}
+            >
+              3. Team Access
+            </span>
+          </div>
+          <div className="layered-card-content">
+            <span>Coming Soon</span>
           </div>
         </div>
       </div>
@@ -1299,10 +1298,10 @@ export default function CareerForm({
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          justifyContent: "center",
+          alignItems: "flex-start",
           marginBottom: "40px",
-          padding: "24px",
+          padding: "32px 24px",
           background: "#F9FAFB",
           borderRadius: "12px",
           border: "1px solid #E5E7EB",
@@ -1313,20 +1312,18 @@ export default function CareerForm({
         <div
           style={{
             position: "absolute",
-            top: "50%",
-            left: "80px",
-            right: "80px",
-            height: "3px",
+            top: "64px", // Adjusted to center with icons
+            left: "15%",
+            right: "15%",
+            height: "2px",
             background: "#E5E7EB",
             zIndex: 0,
-            transform: "translateY(-50%)",
           }}
         >
           <div
             style={{
               height: "100%",
-              background:
-                "linear-gradient(90deg, #9FCAED 0%, #CEB6DA 33%, #EBACC9 66%, #FCCEC0 100%)",
+              background: "#000000",
               width: `${(currentSegment / (segments.length - 1)) * 100}%`,
               transition: "width 0.3s ease",
             }}
@@ -1353,71 +1350,82 @@ export default function CareerForm({
                 opacity: isClickable ? 1 : 0.5,
                 position: "relative",
                 zIndex: 1,
+                maxWidth: "180px",
               }}
             >
-              {/* Step Circle */}
+              {/* White Background Container */}
               <div
                 style={{
-                  width: "48px",
-                  height: "48px",
+                  width: "60px",
+                  height: "60px",
                   borderRadius: "50%",
-                  background:
-                    isCompleted || isCurrent
-                      ? "linear-gradient(135deg, #9FCAED 0%, #CEB6DA 33%, #EBACC9 66%, #FCCEC0 100%)"
-                      : "#E5E7EB",
+                  background: "#FFFFFF",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginBottom: "12px",
-                  transition: "all 0.3s ease",
-                  border: isCurrent ? "4px solid #fff" : "none",
-                  boxShadow: isCurrent
-                    ? "0 0 0 4px rgba(159, 202, 237, 0.3)"
-                    : isCompleted || isCurrent
-                    ? "0 4px 12px rgba(159, 202, 237, 0.4)"
-                    : "none",
+                  marginBottom: "16px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                {isCompleted ? (
-                  <i
-                    className="la la-check"
-                    style={{ fontSize: 24, color: "#fff", fontWeight: 700 }}
-                  ></i>
-                ) : (
-                  <i
-                    className={`la ${segment.icon}`}
-                    style={{
-                      fontSize: 24,
-                      color: isCurrent ? "#fff" : "#9CA3AF",
-                    }}
-                  ></i>
-                )}
+                {/* Step Circle */}
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "50%",
+                    background:
+                      isCompleted || isCurrent ? "#000000" : "#E5E7EB",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {isCompleted ? (
+                    <div
+                      style={{
+                        width: "24px",
+                        height: "24px",
+                        borderRadius: "50%",
+                        background: "#FFFFFF",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <i
+                        className="la la-check"
+                        style={{
+                          fontSize: 14,
+                          color: "#000000",
+                          fontWeight: 900,
+                        }}
+                      ></i>
+                    </div>
+                  ) : (
+                    <i
+                      className={`la ${segment.icon}`}
+                      style={{
+                        fontSize: 20,
+                        color: isCurrent ? "#fff" : "#9CA3AF",
+                      }}
+                    ></i>
+                  )}
+                </div>
               </div>
 
               {/* Step Title */}
               <div
                 style={{
-                  fontSize: "14px",
-                  fontWeight: isCurrent ? 700 : 500,
+                  fontSize: "13px",
+                  fontWeight: isCurrent ? 700 : 600,
                   color: isCurrent ? "#181D27" : "#6B7280",
                   textAlign: "center",
-                  maxWidth: "150px",
+                  lineHeight: "1.4",
+                  marginBottom: "6px",
                 }}
               >
                 {segment.title}
-              </div>
-
-              {/* Step Description */}
-              <div
-                style={{
-                  fontSize: "11px",
-                  color: "#9CA3AF",
-                  marginTop: "4px",
-                  textAlign: "center",
-                  maxWidth: "150px",
-                }}
-              >
-                {segment.description}
               </div>
             </div>
           );
