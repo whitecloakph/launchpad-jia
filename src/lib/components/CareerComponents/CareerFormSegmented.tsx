@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAppContext } from "@/lib/context/AppContext";
-import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
 import CareerFormStepper from "./CareerFormStepper";
 import CareerFormStep1 from "./CareerFormStep1";
 import CareerFormStep2 from "./CareerFormStep2";
@@ -13,8 +12,6 @@ import CareerActionModal from "./CareerActionModal";
 import FullScreenLoadingAnimation from "./FullScreenLoadingAnimation";
 import axios from "axios";
 import { candidateActionToast, errorToast } from "@/lib/Utils";
-
-const DRAFT_KEY_PREFIX = "career-draft-";
 
 const getInitialFormData = () => ({
   jobTitle: "",
@@ -63,19 +60,17 @@ const getInitialFormData = () => ({
     },
   ],
   requireVideo: true,
-  isDraft: false,
+  isUnpublished: false,
 });
 
 interface CareerFormSegmentedProps {
   career?: any;
   formType: string;
-  setShowEditModal?: (show: boolean) => void;
 }
 
 export default function CareerFormSegmented({
   career,
   formType,
-  setShowEditModal,
 }: CareerFormSegmentedProps) {
   const { user, orgID } = useAppContext();
   const [currentStep, setCurrentStep] = useState(1);
@@ -85,16 +80,8 @@ export default function CareerFormSegmented({
   const [showSaveModal, setShowSaveModal] = useState("");
   const [triggerValidation, setTriggerValidation] = useState(false);
   const savingRef = useRef(false);
-  const draftSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const draftKey = career?._id
-    ? `${DRAFT_KEY_PREFIX}${career._id}`
-    : `${DRAFT_KEY_PREFIX}new-${orgID}`;
-
-  const [formData, setFormData] = useLocalStorage(
-    draftKey,
-    career || getInitialFormData()
-  );
+  const [formData, setFormData] = useState(career || getInitialFormData());
 
   useEffect(() => {
     if (career) {
@@ -105,7 +92,7 @@ export default function CareerFormSegmented({
       if (career.screeningSetting) completed.push(2);
       if (career.questions?.some((q: any) => q.questions.length > 0))
         completed.push(3);
-      completed.push(4); // Pipeline is always skippable
+      completed.push(4);
       setCompletedSteps(completed);
     }
   }, [career]);
@@ -113,40 +100,9 @@ export default function CareerFormSegmented({
   const updateFormData = useCallback(
     (updates: any) => {
       setFormData((prev: any) => ({ ...prev, ...updates }));
-      scheduleDraftSave();
     },
-    [setFormData]
+    []
   );
-
-  const scheduleDraftSave = () => {
-    if (draftSaveTimeoutRef.current) {
-      clearTimeout(draftSaveTimeoutRef.current);
-    }
-    draftSaveTimeoutRef.current = setTimeout(() => {
-      saveDraftToDatabase();
-    }, 5000); // Save to database 5 seconds after last change
-  };
-
-  const saveDraftToDatabase = async () => {
-    if (!orgID || savingRef.current) return;
-
-    try {
-      savingRef.current = true;
-      const draftData = {
-        ...formData,
-        isDraft: true,
-        currentStep,
-        orgID,
-        updatedAt: Date.now(),
-      };
-
-      await axios.post("/api/save-career-draft", draftData);
-    } catch (error) {
-      console.error("Failed to save draft:", error);
-    } finally {
-      savingRef.current = false;
-    }
-  };
 
   const handleStepChange = (step: number) => {
     if (!completedSteps.includes(currentStep)) {
@@ -197,6 +153,8 @@ export default function CareerFormSegmented({
           )
         );
       case 2:
+        // Step 2: No validation required
+        return true;
       case 3:
         // Step 3: Require at least 5 interview questions total
         const totalQuestions =
@@ -206,6 +164,7 @@ export default function CareerFormSegmented({
           ) || 0;
         return totalQuestions >= 5;
       case 4:
+        // Step 4: No validation required
         return true;
       default:
         return false;
@@ -296,7 +255,7 @@ export default function CareerFormSegmented({
       location: formData.city,
       status,
       employmentType: formData.employmentType,
-      isDraft: status === "inactive",
+      isUnpublished: status === "inactive",
       currentStep: 5,
     };
 
@@ -323,8 +282,6 @@ export default function CareerFormSegmented({
             style={{ color: "#039855", fontSize: 32 }}
           ></i>
         );
-        // Clear the draft from localStorage
-        localStorage.removeItem(draftKey);
         setTimeout(() => {
           window.location.href = `/recruiter-dashboard/careers`;
         }, 1300);
@@ -377,7 +334,7 @@ export default function CareerFormSegmented({
       province: formData.province,
       location: formData.city,
       employmentType: formData.employmentType,
-      isDraft: status === "inactive",
+      isUnpublished: status === "inactive",
     };
 
     try {
@@ -404,8 +361,6 @@ export default function CareerFormSegmented({
             style={{ color: "#039855", fontSize: 32 }}
           ></i>
         );
-        // Clear the draft from localStorage
-        localStorage.removeItem(draftKey);
         setTimeout(() => {
           window.location.href = `/recruiter-dashboard/careers/manage/${career._id}`;
         }, 1300);
@@ -446,7 +401,6 @@ export default function CareerFormSegmented({
             formData={formData}
             updateFormData={updateFormData}
             onNext={handleNext}
-            onPrevious={handlePrevious}
           />
         );
       case 3:
@@ -455,42 +409,19 @@ export default function CareerFormSegmented({
             formData={formData}
             updateFormData={updateFormData}
             onNext={handleNext}
-            onPrevious={handlePrevious}
             showValidation={triggerValidation}
           />
         );
       case 4:
-        return (
-          <CareerFormStep4
-            formData={formData}
-            updateFormData={updateFormData}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-          />
-        );
+        return <CareerFormStep4 />;
       case 5:
         return (
-          <CareerFormStep5
-            formData={formData}
-            onPrevious={handlePrevious}
-            onPublish={() => confirmSaveCareer("active")}
-            onSaveDraft={() => confirmSaveCareer("inactive")}
-            onEditStep={handleEditStep}
-            isSaving={isSaving}
-          />
+          <CareerFormStep5 formData={formData} onEditStep={handleEditStep} />
         );
       default:
         return null;
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (draftSaveTimeoutRef.current) {
-        clearTimeout(draftSaveTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="col">
@@ -558,23 +489,23 @@ export default function CareerFormSegmented({
         {currentStep === 5 && formType === "add" && (
           <div
             style={{
+              height: "40px",
               display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "10px",
+              gap: "1em",
             }}
           >
             <button
               disabled={!isFormValid() || isSaving}
               style={{
-                width: "fit-content",
+                border: "2px solid #d5d7da",
+                backgroundColor: "transparent",
+                boxShadow: "none",
                 color: "#414651",
-                background: "#fff",
-                border: "1px solid #D5D7DA",
-                padding: "8px 16px",
-                borderRadius: "60px",
+                borderRadius: "2em",
+                paddingLeft: "1em",
+                paddingRight: "1em",
+                fontWeight: "500",
                 cursor: !isFormValid() || isSaving ? "not-allowed" : "pointer",
-                whiteSpace: "nowrap",
               }}
               onClick={() => {
                 confirmSaveCareer("inactive");
@@ -585,14 +516,15 @@ export default function CareerFormSegmented({
             <button
               disabled={!isFormValid() || isSaving}
               style={{
-                width: "fit-content",
-                background: !isFormValid() || isSaving ? "#D5D7DA" : "black",
+                borderColor: "#181d27",
+                backgroundColor: "#181d27",
                 color: "#fff",
-                border: "1px solid #E9EAEB",
-                padding: "8px 16px",
-                borderRadius: "60px",
+                borderRadius: "2em",
+                paddingLeft: "1em",
+                paddingRight: "1em",
+                fontWeight: "450",
+                background: !isFormValid() || isSaving ? "#D5D7DA" : "black",
                 cursor: !isFormValid() || isSaving ? "not-allowed" : "pointer",
-                whiteSpace: "nowrap",
               }}
               onClick={() => {
                 confirmSaveCareer("active");
