@@ -49,6 +49,10 @@ export default function UploadCVWithPreScreening() {
   ];
   const stepStatus = ["Completed", "Pending", "In Progress"];
 
+  // ============================================
+  // HANDLERS - File Management
+  // ============================================
+  
   function handleDragOver(e) {
     e.preventDefault();
   }
@@ -58,23 +62,8 @@ export default function UploadCVWithPreScreening() {
     handleFile(e.dataTransfer.files);
   }
 
-  function handleEditCV(section) {
-    setEditingCV(section);
-
-    if (section != null) {
-      setTimeout(() => {
-        const sectionDetails = document.getElementById(section);
-
-        if (sectionDetails) {
-          sectionDetails.focus();
-        }
-      }, 100);
-    }
-  }
-
   function handleFile(files) {
     const file = checkFile(files);
-
     if (file) {
       setFile(file);
       handleFileSubmit(file);
@@ -83,24 +72,8 @@ export default function UploadCVWithPreScreening() {
 
   function handleFileChange(e) {
     const files = e.target.files;
-
     if (files.length > 0) {
       handleFile(files);
-    }
-  }
-
-  function handleModal() {
-    setModalType("jobDescription");
-  }
-
-  function handleRedirection(type) {
-    if (type == "dashboard") {
-      window.location.href = pathConstants.dashboard;
-    }
-
-    if (type == "interview") {
-      sessionStorage.setItem("interviewRedirection", pathConstants.dashboard);
-      window.location.href = `/interview/${interview.interviewID}`;
     }
   }
 
@@ -113,11 +86,78 @@ export default function UploadCVWithPreScreening() {
     setUserCV(null);
 
     const storedCV = localStorage.getItem("userCV");
-
     if (storedCV != "null") {
       setDigitalCV(storedCV);
     } else {
       setDigitalCV(null);
+    }
+  }
+
+  function handleUploadCV() {
+    fileInputRef.current.click();
+  }
+
+  function handleFileSubmit(file) {
+    setBuildingCV(true);
+    setHasChanges(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("fName", file.name);
+    formData.append("userEmail", user.email);
+
+    axios({
+      method: "POST",
+      url: `${CORE_API_URL}/upload-cv`,
+      data: formData,
+    })
+      .then((res) => {
+        axios({
+          method: "POST",
+          url: `/api/whitecloak/digitalize-cv`,
+          data: { chunks: res.data.cvChunks },
+        })
+          .then((res) => {
+            const result = res.data.result;
+            const parsedUserCV = JSON.parse(result);
+            const formattedCV = {};
+
+            cvSections.forEach((section, index) => {
+              formattedCV[section] = parsedUserCV.digitalCV[index].content.trim();
+            });
+
+            setDigitalCV(result);
+            setUserCV(formattedCV);
+          })
+          .catch((err) => {
+            alert("Error building CV. Please try again.");
+            console.log(err);
+          })
+          .finally(() => {
+            setBuildingCV(false);
+          });
+      })
+      .catch((err) => {
+        alert("Error building CV. Please try again.");
+        setBuildingCV(false);
+        console.log(err);
+      });
+  }
+
+  // ============================================
+  // HANDLERS - CV Management
+  // ============================================
+
+  function handleEditCV(section) {
+    setEditingCV(section);
+
+    if (section != null) {
+      setTimeout(() => {
+        const sectionDetails = document.getElementById(section);
+        if (sectionDetails) {
+          sectionDetails.focus();
+        }
+      }, 100);
     }
   }
 
@@ -133,11 +173,10 @@ export default function UploadCVWithPreScreening() {
     setUserCV(formattedCV);
   }
 
-  function handleUploadCV() {
-    fileInputRef.current.click();
-  }
+  // ============================================
+  // HANDLERS - Pre-Screening Questions
+  // ============================================
 
-  // Pre-screening answer handlers
   function handlePreScreeningAnswer(questionId, value) {
     setPreScreeningAnswers(prev => ({
       ...prev,
@@ -157,74 +196,28 @@ export default function UploadCVWithPreScreening() {
     }));
   }
 
-  function processState(index, isAdvance = false) {
-    const currentStepIndex = step.indexOf(currentStep);
+  // ============================================
+  // HANDLERS - Navigation & UI
+  // ============================================
 
-    if (currentStepIndex == index) {
-      if (index == stepStatus.length - 1) {
-        return stepStatus[0];
-      }
-
-      return isAdvance || userCV || buildingCV ? stepStatus[2] : stepStatus[1];
-    }
-
-    if (currentStepIndex > index) {
-      return stepStatus[0];
-    }
-
-    return stepStatus[1];
+  function handleModal() {
+    setModalType("jobDescription");
   }
 
-  useEffect(() => {
-    const storedSelectedCareer = sessionStorage.getItem("selectedCareer");
-    const storedCV = localStorage.getItem("userCV");
-
-    if (storedCV && storedCV != "null") {
-      setDigitalCV(storedCV);
-    }
-
-    if (storedSelectedCareer) {
-      const parseStoredSelectedCareer = JSON.parse(storedSelectedCareer);
-      fetchInterview(parseStoredSelectedCareer.id);
-    } else {
-      alert("No application is currently being managed.");
+  function handleRedirection(type) {
+    if (type == "dashboard") {
       window.location.href = pathConstants.dashboard;
     }
-  }, []);
 
-  useEffect(() => {
-    sessionStorage.setItem("hasChanges", JSON.stringify(hasChanges));
-  }, [hasChanges]);
-
-  function fetchInterview(interviewID) {
-    axios({
-      method: "POST",
-      url: "/api/job-portal/fetch-interviews",
-      data: { email: user.email, interviewID },
-    })
-      .then((res) => {
-        const result = res.data;
-
-        if (result.error) {
-          alert(result.error);
-          window.location.href = pathConstants.dashboard;
-        } else {
-          if (result[0].cvStatus) {
-            alert("This application has already been processed.");
-            window.location.href = pathConstants.dashboard;
-          } else {
-            setCurrentStep(step[0]);
-            setInterview(result[0]);
-            setLoading(false);
-          }
-        }
-      })
-      .catch((err) => {
-        alert("Error fetching existing applied jobs.");
-        window.location.href = pathConstants.dashboard;
-        console.log(err);
-      });
+    if (type == "interview") {
+      sessionStorage.setItem("interviewRedirection", pathConstants.dashboard);
+      window.location.href = `/interview/${interview.interviewID}`;
+    }
   }
+
+  // ============================================
+  // API CALLS - Screening & Submission
+  // ============================================
 
   async function handleCVScreen() {
     if (editingCV != null) {
@@ -381,52 +374,25 @@ export default function UploadCVWithPreScreening() {
     }
   }
 
-  function handleFileSubmit(file) {
-    setBuildingCV(true);
-    setHasChanges(true);
+  // ============================================
+  // UTILITY FUNCTIONS
+  // ============================================
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("fName", file.name);
-    formData.append("userEmail", user.email);
+  function processState(index, isAdvance = false) {
+    const currentStepIndex = step.indexOf(currentStep);
 
-    axios({
-      method: "POST",
-      url: `${CORE_API_URL}/upload-cv`,
-      data: formData,
-    })
-      .then((res) => {
-        axios({
-          method: "POST",
-          url: `/api/whitecloak/digitalize-cv`,
-          data: { chunks: res.data.cvChunks },
-        })
-          .then((res) => {
-            const result = res.data.result;
-            const parsedUserCV = JSON.parse(result);
-            const formattedCV = {};
+    if (currentStepIndex == index) {
+      if (index == stepStatus.length - 1) {
+        return stepStatus[0];
+      }
+      return isAdvance || userCV || buildingCV ? stepStatus[2] : stepStatus[1];
+    }
 
-            cvSections.forEach((section, index) => {
-              formattedCV[section] =
-                parsedUserCV.digitalCV[index].content.trim();
-            });
+    if (currentStepIndex > index) {
+      return stepStatus[0];
+    }
 
-            setDigitalCV(result);
-            setUserCV(formattedCV);
-          })
-          .catch((err) => {
-            alert("Error building CV. Please try again.");
-            console.log(err);
-          })
-          .finally(() => {
-            setBuildingCV(false);
-          });
-      })
-      .catch((err) => {
-        alert("Error building CV. Please try again.");
-        setBuildingCV(false);
-        console.log(err);
-      });
+    return stepStatus[1];
   }
 
   function renderPreScreeningQuestion(question) {
@@ -554,12 +520,72 @@ export default function UploadCVWithPreScreening() {
     }
   }
 
+  // ============================================
+  // EFFECTS
+  // ============================================
+
+  useEffect(() => {
+    const storedSelectedCareer = sessionStorage.getItem("selectedCareer");
+    const storedCV = localStorage.getItem("userCV");
+
+    if (storedCV && storedCV != "null") {
+      setDigitalCV(storedCV);
+    }
+
+    if (storedSelectedCareer) {
+      const parseStoredSelectedCareer = JSON.parse(storedSelectedCareer);
+      fetchInterview(parseStoredSelectedCareer.id);
+    } else {
+      alert("No application is currently being managed.");
+      window.location.href = pathConstants.dashboard;
+    }
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem("hasChanges", JSON.stringify(hasChanges));
+  }, [hasChanges]);
+
+  function fetchInterview(interviewID) {
+    axios({
+      method: "POST",
+      url: "/api/job-portal/fetch-interviews",
+      data: { email: user.email, interviewID },
+    })
+      .then((res) => {
+        const result = res.data;
+
+        if (result.error) {
+          alert(result.error);
+          window.location.href = pathConstants.dashboard;
+        } else {
+          if (result[0].cvStatus) {
+            alert("This application has already been processed.");
+            window.location.href = pathConstants.dashboard;
+          } else {
+            setCurrentStep(step[0]);
+            setInterview(result[0]);
+            setLoading(false);
+          }
+        }
+      })
+      .catch((err) => {
+        alert("Error fetching existing applied jobs.");
+        window.location.href = pathConstants.dashboard;
+        console.log(err);
+      });
+  }
+
+  // ============================================
+  // RENDER
+  // ============================================
+
   return (
     <>
       {loading && <Loader loaderData={""} loaderType={""} />}
 
       {interview && (
         <div className={styles.uploadCVContainer}>
+          {/* Header */}
           <div className={styles.uploadCVHeader}>
             {interview.organization && interview.organization.image && (
               <img alt="" src={interview.organization.image} />
@@ -578,6 +604,7 @@ export default function UploadCVWithPreScreening() {
             </div>
           </div>
 
+          {/* Step Progress Indicator */}
           <div className={styles.stepContainer}>
             <div className={styles.step}>
               {step.map((_, index) => (
@@ -881,7 +908,10 @@ export default function UploadCVWithPreScreening() {
           {/* STEP 5: Review Next Steps */}
           {currentStep == step[4] && (
             <div className={styles.cvResultContainer}>
-              {aiScreeningResult && aiScreeningResult.status == "For Human Interview" ? (
+  
+
+              {aiScreeningResult?.status === "For Human Interview" && 
+               aiScreeningResult?.aiSettingResult === "Passed" ? (
                 <>
                   <img alt="" src={assetConstants.checkV3} />
                   <span className={styles.title}>
@@ -895,12 +925,9 @@ export default function UploadCVWithPreScreening() {
                     Ready to take the next step?
                   </span>
                   <span className={styles.description}>
-                    Proceed to the human interview stage.
+                    Proceed to the AI interview to continue your application.
                   </span>
                   <div className={styles.buttonContainer}>
-                    <button onClick={() => handleRedirection("interview")}>
-                      Continue to Interview
-                    </button>
                     <button
                       className="secondaryBtn"
                       onClick={() => handleRedirection("dashboard")}
@@ -909,7 +936,9 @@ export default function UploadCVWithPreScreening() {
                     </button>
                   </div>
                 </>
-              ) : screeningResult && screeningResult.applicationStatus == "Dropped" ? (
+              ) : 
+              
+              aiScreeningResult?.aiSettingResult === "Failed" ? (
                 <>
                   <img alt="" src={assetConstants.userRejected} />
                   <span className={styles.title}>
@@ -921,8 +950,7 @@ export default function UploadCVWithPreScreening() {
                   </span>
                   <br />
                   <span className={styles.description}>
-                    Review your screening results and see recommended next
-                    steps.
+                    Review your screening results and see recommended next steps.
                   </span>
                   <div className={styles.buttonContainer}>
                     <button onClick={() => handleRedirection("dashboard")}>
@@ -930,7 +958,9 @@ export default function UploadCVWithPreScreening() {
                     </button>
                   </div>
                 </>
-              ) : (
+              ) : 
+              
+              (
                 <>
                   <img alt="" src={assetConstants.userCheck} />
                   <span className={styles.title}>
@@ -948,8 +978,8 @@ export default function UploadCVWithPreScreening() {
               )}
             </div>
           )}
-              </div>
-            )}
-          </>
-        );
-      }
+        </div>
+      )}
+    </>
+  );
+}

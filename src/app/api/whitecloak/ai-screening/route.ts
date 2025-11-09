@@ -1,4 +1,5 @@
 // app/api/whitecloak/ai-screening/route.ts
+// THREE FLOWS: Strong Fit → Human Interview | Good Fit → AI Interview | Others → Review/Fail
 import { NextResponse } from "next/server";
 import connectMongoDB from "@/lib/mongoDB/mongoDB";
 import OpenAI from "openai";
@@ -170,15 +171,12 @@ export async function POST(request: Request) {
   };
 
   const newDate = new Date();
-
-  // Determine next step based on AI screening result
-  const forReviewResult = ["Maybe Fit", "Insufficient Data", "Good Fit", "Bad Fit", "No Fit"];
-  const forHumanInterviewResult = ["Strong Fit"];
-
   let interviewTransaction: any = null;
 
-  if (forHumanInterviewResult.includes(result.result)) {
-    // Strong Fit - Move to Human Interview
+  // THREE DISTINCT FLOWS BASED ON AI SCREENING RESULT
+  
+  // FLOW 1: STRONG FIT → Skip AI Interview → Go to Human Interview
+  if (result.result === "Strong Fit") {
     screeningData.currentStep = "Human Interview";
     screeningData.status = "For Human Interview";
     screeningData.statusDate = {
@@ -191,8 +189,8 @@ export async function POST(request: Request) {
     interviewTransaction = {
       interviewUID: interviewData._id.toString(),
       fromStage: "AI Screening",
-      toStage: "Human Interview",
-      action: "Auto-Promoted",
+      toStage: "For Human Interview",
+      action: "Auto-Promoted (Strong Fit - Skipped AI Interview)",
       updatedBy: {
         name: "Jia",
       },
@@ -203,11 +201,41 @@ export async function POST(request: Request) {
       updatedBy: {
         name: "Jia",
       },
-      action: "Endorsed to Human Interview",
+      action: "Proceed to Human Interview",
     };
-  } else {
-    // Other results - For Review
-    screeningData.currentStep = "AI Screening";
+  }
+  // FLOW 2: GOOD FIT → Must do AI Interview
+  else if (result.result === "Good Fit") {
+    screeningData.currentStep = "CV Screening";
+    screeningData.status = "For AI Interview";
+    screeningData.statusDate = {
+      ...interviewData.statusDate,
+      "AI Interview": newDate,
+    };
+    screeningData.stateClass = "state-accepted";
+    screeningData.aiSettingResult = "Passed";
+
+    interviewTransaction = {
+      interviewUID: interviewData._id.toString(),
+      fromStage: "AI Screening",
+      toStage: "Pending AI Interview",
+      action: "Proceed to AI Interview (Good Fit)",
+      updatedBy: {
+        name: "Jia",
+      },
+    };
+
+    screeningData.applicationMetadata = {
+      updatedAt: Date.now(),
+      updatedBy: {
+        name: "Jia",
+      },
+      action: "Proceed to AI Interview",
+    };
+  }
+  // FLOW 3: BELOW GOOD FIT → Failed or For Review
+  else {
+    screeningData.currentStep = "CV Screening";
     screeningData.status = "For AI Screening Review";
     screeningData.stateClass = result.result === "No Fit" || result.result === "Bad Fit" 
       ? "state-rejected" 
@@ -219,7 +247,7 @@ export async function POST(request: Request) {
     interviewTransaction = {
       interviewUID: interviewData._id.toString(),
       fromStage: "AI Screening",
-      action: "Pending Review",
+      action: `Screening Result: ${result.result}`,
       updatedBy: {
         name: "Jia",
       },
@@ -232,33 +260,6 @@ export async function POST(request: Request) {
       },
       action: "Pending Review",
     };
-  }
-
-  // Check AI screening setting from career if it exists
-  if (interviewData.AIscreeningSetting) {
-    if (interviewData.AIscreeningSetting === "Only Strong Fit") {
-      if (result.result === "Strong Fit") {
-        screeningData.currentStep = "Human Interview";
-        screeningData.status = "For Human Interview";
-        screeningData.stateClass = "state-accepted";
-        screeningData.aiSettingResult = "Passed";
-      } else {
-        screeningData.status = "For AI Screening Review";
-        screeningData.stateClass = "state-rejected";
-        screeningData.aiSettingResult = "Failed";
-      }
-    } else if (interviewData.AIscreeningSetting === "Good Fit and above") {
-      if (result.result === "Good Fit" || result.result === "Strong Fit") {
-        screeningData.currentStep = "Human Interview";
-        screeningData.status = "For Human Interview";
-        screeningData.stateClass = "state-accepted";
-        screeningData.aiSettingResult = "Passed";
-      } else {
-        screeningData.status = "For AI Screening Review";
-        screeningData.stateClass = "state-rejected";
-        screeningData.aiSettingResult = "Failed";
-      }
-    }
   }
 
   // Update interview document
@@ -287,3 +288,41 @@ export async function POST(request: Request) {
     aiStatus: result.result,
   });
 }
+
+/*
+  THREE DISTINCT FLOWS:
+
+  ===== FLOW 1: STRONG FIT =====
+  Result: "Strong Fit"
+  → currentStep: "Human Interview"
+  → status: "For Human Interview"
+  → aiSettingResult: "Passed"
+  → Skips AI Interview entirely
+  → Goes directly to Human Interview stage
+  → Recruiter sees them in "For Human Interview" column
+  → Applicant sees: "Waiting for human interview to be scheduled"
+
+  ===== FLOW 2: GOOD FIT =====
+  Result: "Good Fit"
+  → currentStep: "CV Screening"
+  → status: "For AI Interview"
+  → aiSettingResult: "Passed"
+  → Must complete AI Interview
+  → Goes to "Pending AI Interview" stage
+  → Recruiter sees them in "Pending AI Interview" column
+  → Applicant sees: "Start AI Interview" button
+
+  ===== FLOW 3: BELOW GOOD FIT =====
+  Result: "Bad Fit", "No Fit", "Insufficient Data", "Maybe Fit"
+  → currentStep: "CV Screening"
+  → status: "For AI Screening Review"
+  → aiSettingResult: "Failed" (if Bad/No Fit) or "For Review" (others)
+  → Needs human reviewer decision
+  → Recruiter sees them in "CV Review" column with pending status
+  → Applicant sees: "Under review by hiring team"
+
+  TEST CASES:
+  1. Strong Fit candidate → Should appear in "For Human Interview" in recruiter dashboard
+  2. Good Fit candidate → Should see "Start AI Interview" button in applicant dashboard
+  3. Bad Fit candidate → Should be marked as failed/review
+*/

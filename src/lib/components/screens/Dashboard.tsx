@@ -219,47 +219,77 @@ export default function () {
   }
 
   function processCurrentStep(interview) {
-    if (interview.currentStep == "Applied") {
-      return applicationStep[0];
-    }
-
-    if (applicationStep.includes(interview.currentStep)) {
-      if (interview.currentStep == applicationStep[0]) {
-        return interview.status == applicationPhase[1]
-          ? applicationStep[1]
-          : applicationStep[0];
-      }
-
-      if (interview.currentStep == applicationStep[1]) {
-        return interview.status.toLowerCase().includes("review")
-          ? `${applicationStep[1]} Review`
-          : applicationStep[2];
-      }
-
-      if (interview.currentStep == applicationStep[2]) {
-        return interview.status.toLowerCase().includes("review")
-          ? `${applicationStep[2]} Review`
-          : `Pending ${applicationStep[3]}`;
-      }
-    }
-
-    if (
-      interview.currentStep &&
-      !applicationStep.includes(interview.currentStep)
-    ) {
-      return `Final ${applicationStep[3]}`;
-    }
-
-    if (!interview.currentStep) {
-      if (interview.summary) {
-        return applicationStep[1];
-      }
-
-      return applicationStep[0];
-    }
-
-    return interview.currentStep;
+  // Handle "Applied" status
+  if (interview.currentStep == "Applied") {
+    return applicationStep[0]; // "CV Screening"
   }
+
+  // Handle Job Offer related statuses
+  if (interview.currentStep == "Job Offered" || interview.currentStep == "Job Offer") {
+    if (interview.status === "Accepted") {
+      return `Final ${applicationStep[3]}`; // "Final Job Offer"
+    }
+    return `Pending ${applicationStep[3]}`; // "Pending Job Offer"
+  }
+
+  // Handle Job Interview status (from recruiter dashboard)
+  if (interview.currentStep == "Job Interview") {
+    // "For Interview" means waiting for interview to be scheduled
+    // This is AFTER passing human interview screening
+    if (interview.status === "For Interview") {
+      return `Pending ${applicationStep[3]}`; // "Pending Job Offer"
+    }
+    return interview.status.toLowerCase().includes("review")
+      ? `${applicationStep[2]} Review`
+      : applicationStep[2];
+  }
+
+  // Handle standard application steps
+  if (applicationStep.includes(interview.currentStep)) {
+    if (interview.currentStep == applicationStep[0]) { // "CV Screening"
+      return interview.status == applicationPhase[1]
+        ? applicationStep[1]
+        : applicationStep[0];
+    }
+
+    if (interview.currentStep == applicationStep[1]) { // "AI Interview"
+      return interview.status.toLowerCase().includes("review")
+        ? `${applicationStep[1]} Review`
+        : applicationStep[2];
+    }
+
+    if (interview.currentStep == applicationStep[2]) { // "Human Interview"
+      // Check if actively in Human Interview stage
+      if (interview.status === "For Human Interview") {
+        return applicationStep[2]; // "Human Interview"
+      }
+      
+      return interview.status.toLowerCase().includes("review")
+        ? `${applicationStep[2]} Review`
+        : `Pending ${applicationStep[3]}`;
+    }
+  }
+
+  // Handle non-standard currentStep values
+  if (
+    interview.currentStep &&
+    !applicationStep.includes(interview.currentStep) &&
+    interview.currentStep != "Job Offered" &&
+    interview.currentStep != "Job Interview"
+  ) {
+    return `Final ${applicationStep[3]}`;
+  }
+
+  // Fallback based on summary
+  if (!interview.currentStep) {
+    if (interview.summary) {
+      return applicationStep[1];
+    }
+    return applicationStep[0];
+  }
+
+  return interview.currentStep;
+}
 
   // function processDate(date) {
   //   const newDate = new Date(date);
@@ -286,54 +316,100 @@ export default function () {
     }
   }
 
-  function processState(interview, step, isAdvance: boolean = false) {
-    const stepIndex = applicationStep.indexOf(step);
-    let currentStepIndex = applicationStep.indexOf(interview.currentStep);
+  // Fixed processState function to handle skipped AI Interview for Strong Fit candidates
 
-    if (interview.currentStep == "Applied") {
-      if (stepIndex == 0) {
-        return isAdvance ? stepStatus[2] : stepStatus[1];
+  function processState(interview, step, isAdvance: boolean = false) {
+  const stepIndex = applicationStep.indexOf(step);
+  let currentStepIndex = applicationStep.indexOf(interview.currentStep);
+
+  // Handle special currentStep values from recruiter dashboard
+  if (interview.currentStep == "Job Interview") {
+    // "For Interview" status means they're past Human Interview
+    // and waiting for interview scheduling / job offer
+    if (interview.status === "For Interview") {
+      currentStepIndex = 3; // Treat as "Job Offer" (pending interview)
+    } else {
+      currentStepIndex = 2; // Still in "Human Interview"
+    }
+  }
+  
+  if (interview.currentStep == "Job Offered" || interview.currentStep == "Job Offer") {
+    currentStepIndex = 3; // Treat as "Job Offer"
+  }
+
+  // Handle "Applied" status
+  if (interview.currentStep == "Applied") {
+    if (stepIndex == 0) {
+      return isAdvance ? stepStatus[2] : stepStatus[1];
+    }
+  }
+
+  if (currentStepIndex != -1) {
+    // Current step logic
+    if (stepIndex == currentStepIndex) {
+      // For Job Interview status with "For Interview" 
+      // (waiting for interview scheduling - at Job Offer stage)
+      if (
+        interview.currentStep == "Job Interview" && 
+        interview.status === "For Interview" &&
+        stepIndex === 3 // Job Offer step
+      ) {
+        return stepStatus[2]; // "In Progress"
       }
+      
+      // For Job Offered status
+      if (
+        (interview.currentStep == "Job Offered" || interview.currentStep == "Job Offer") &&
+        interview.status !== "Accepted"
+      ) {
+        return stepStatus[2]; // "In Progress"
+      }
+      
+      return [
+        applicationPhase[0],
+        applicationPhase[2],
+        applicationPhase[4],
+        "For Human Interview", // Add this for Strong Fit candidates
+      ].includes(interview.status)
+        ? stepStatus[2]  // "In Progress"
+        : stepStatus[0]; // "Completed"
     }
 
-    if (currentStepIndex != -1) {
-      if (stepIndex == currentStepIndex) {
-        return [
+    // Future step logic
+    if (stepIndex > currentStepIndex) {
+      // Only show "In Progress" for the immediate next step when isAdvance is true
+      // and status is not in review phases
+      if (
+        stepIndex == currentStepIndex + 1 &&
+        isAdvance &&
+        ![
           applicationPhase[0],
           applicationPhase[2],
           applicationPhase[4],
         ].includes(interview.status)
-          ? stepStatus[2]
-          : stepStatus[0];
+      ) {
+        return stepStatus[2]; // "In Progress"
       }
-
-      if (stepIndex > currentStepIndex) {
-        return stepIndex == currentStepIndex + 1 &&
-          isAdvance &&
-          ![
-            applicationPhase[0],
-            applicationPhase[2],
-            applicationPhase[4],
-          ].includes(interview.status)
-          ? stepStatus[2]
-          : stepStatus[1];
-      }
-
-      if (currentStepIndex > stepIndex) {
-        return stepStatus[0];
-      }
+      return stepStatus[1]; // "Pending"
     }
 
-    if (
-      interview.currentStep &&
-      currentStepIndex == -1 &&
-      interview.currentStep != "Applied"
-    ) {
-      return stepStatus[0];
+    // Past step logic - Mark completed
+    if (currentStepIndex > stepIndex) {
+      return stepStatus[0]; // "Completed"
     }
-
-    return stepStatus[1];
   }
+
+  // Handle non-standard currentStep
+  if (
+    interview.currentStep &&
+    currentStepIndex == -1 &&
+    interview.currentStep != "Applied"
+  ) {
+    return stepStatus[0];
+  }
+
+  return stepStatus[1];
+}
 
   useEffect(() => {
     fetchInterviews();
