@@ -25,6 +25,7 @@ export default function () {
   const [interview, setInterview] = useState(null);
   const [screeningResult, setScreeningResult] = useState(null);
   const [userCV, setUserCV] = useState(null);
+  const [preScreeningAnswers, setPreScreeningAnswers] = useState({});
   const cvSections = [
     "Introduction",
     "Current Position",
@@ -36,8 +37,35 @@ export default function () {
     "Certifications",
     "Awards",
   ];
-  const step = ["Submit CV", "CV Screening", "Review Next Steps"];
+  const step = ["Submit CV", "Pre-screening Questions", "Review"];
   const stepStatus = ["Completed", "Pending", "In Progress"];
+
+  // Helper function to flatten pre-screening questions from interview object
+  function getFlattenedQuestions() {
+    if (!interview?.prescreeningQuestions) return [];
+    return interview.prescreeningQuestions;
+  }
+
+  // Helper function to check if all pre-screening questions are answered
+  function arePreScreeningQuestionsValid() {
+    const questions = getFlattenedQuestions();
+    if (questions.length === 0) return false;
+
+    for (const question of questions) {
+      const answer = preScreeningAnswers[question.id];
+
+      if (question.type === "checkboxes") {
+        if (!answer || answer.length === 0) return false;
+      } else if (question.type === "range") {
+        if (!answer || !answer.min || !answer.max) return false;
+      } else {
+        if (!answer || (typeof answer === "string" && !answer.trim())) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
   function handleDragOver(e) {
     e.preventDefault();
@@ -81,6 +109,35 @@ export default function () {
 
   function handleModal() {
     setModalType("jobDescription");
+  }
+
+  function handlePreScreeningContinue() {
+    const questions = getFlattenedQuestions();
+
+    // Validate all questions are answered
+    for (const question of questions) {
+      const answer = preScreeningAnswers[question.id];
+
+      if (question.type === "checkboxes") {
+        if (!answer || answer.length === 0) {
+          alert("Please answer all pre-screening questions.");
+          return;
+        }
+      } else if (question.type === "range") {
+        if (!answer || !answer.min || !answer.max) {
+          alert("Please answer all pre-screening questions.");
+          return;
+        }
+      } else {
+        if (!answer || (typeof answer === "string" && !answer.trim())) {
+          alert("Please answer all pre-screening questions.");
+          return;
+        }
+      }
+    }
+
+    // Auto-proceed to CV screening
+    handleCVScreen();
   }
 
   function handleRedirection(type) {
@@ -127,22 +184,40 @@ export default function () {
     fileInputRef.current.click();
   }
 
-  function processState(index, isAdvance = false) {
+  function processState(index, forSeparator = false) {
     const currentStepIndex = step.indexOf(currentStep);
 
+    // For completed steps
+    if (currentStepIndex > index) {
+      return stepStatus[0]; // "Completed"
+    }
+
+    // For current step
     if (currentStepIndex == index) {
-      if (index == stepStatus.length - 1) {
-        return stepStatus[0];
+      // For separators (progress bars between steps)
+      if (forSeparator) {
+        // Separator 1 (Submit CV → Pre-screening)
+        if (index === 0) {
+          // 50% when CV is being shown/edited, 0% otherwise
+          return userCV || buildingCV ? "In Progress Half" : stepStatus[1];
+        }
+
+        // Separator 2 (Pre-screening → Review)
+        if (index === 1) {
+          // 50% if questions are validated, 0% otherwise
+          return arePreScreeningQuestionsValid() ? "In Progress Half" : stepStatus[1];
+        }
+
+        // Default for other separators
+        return stepStatus[1]; // "Pending"
       }
 
-      return isAdvance || userCV || buildingCV ? stepStatus[2] : stepStatus[1];
+      // For step icons - always show in progress
+      return stepStatus[2]; // "In Progress"
     }
 
-    if (currentStepIndex > index) {
-      return stepStatus[0];
-    }
-
-    return stepStatus[1];
+    // For future steps
+    return stepStatus[1]; // "Pending"
   }
 
   useEffect(() => {
@@ -165,6 +240,16 @@ export default function () {
   useEffect(() => {
     sessionStorage.setItem("hasChanges", JSON.stringify(hasChanges));
   }, [hasChanges]);
+
+  // Update interview status when CV screening passes
+  useEffect(() => {
+    if (screeningResult && screeningResult.status === "For AI Interview") {
+      setInterview({
+        ...interview,
+        status: "For AI Interview",
+      });
+    }
+  }, [screeningResult]);
 
   function fetchInterview(interviewID) {
     axios({
@@ -228,7 +313,7 @@ export default function () {
       }
     }
 
-    setCurrentStep(step[1]);
+    setCurrentStep(step[2]);
 
     if (hasChanges) {
       const formattedUserCV = cvSections.map((section) => ({
@@ -273,6 +358,21 @@ export default function () {
 
     setHasChanges(true);
 
+    // Mock CV screening with simulated API delay
+    // setTimeout(() => {
+    //   const mockScreeningResult = {
+    //     status: "For AI Interview",
+    //     applicationStatus: "In Review",
+    //     // Alternative outcomes for testing:
+    //     // applicationStatus: "Dropped", // For rejection
+    //     // status: "For Manual Review", // For manual review
+    //   };
+
+    //   setScreeningResult(mockScreeningResult);
+    //   setHasChanges(false);
+    // }, 3000); // 3 second delay to simulate processing
+
+    // Original API call (commented out for testing)
     axios({
       url: "/api/whitecloak/screen-cv",
       method: "POST",
@@ -300,12 +400,50 @@ export default function () {
       .finally(() => {
         setHasChanges(false);
       });
+    
   }
 
   function handleFileSubmit(file) {
     setBuildingCV(true);
     setHasChanges(true);
 
+    // Mock data for testing
+    // const mockDigitalCV = {
+    //   errorRemarks: null,
+    //   digitalCV: [
+    //     { name: "Introduction", content: "Michelle Cruz is a seasoned administrative and operations professional with over 8 years of experience supporting senior executives, coordinating complex projects, and delivering training across diverse industries. She combines strong interpersonal communication skills with a proactive approach to problem-solving and a keen attention to detail." },
+    //     { name: "Current Position", content: "**Chief of Staff, White Cloak Technologies, Inc.** (Oct 2023 - Present)\n- Serves as the CEO's trusted advisor, managing calendar, finances, and key client relationships.\n- Drives execution of strategic initiatives, overseeing project timelines, stakeholder communications, and deliverables.\n- Designs executive presentations and leads the company's graphic designer for the Information Security team.\n- Researches and recommends industry events and conferences for the executive team.\n- Takes on special projects as required." },
+    //     { name: "Contact Info", content: "- **Name:** Michelle Cruz\n- **Email:** m*********3@gmail.com\n- **Phone:** *********98\n- **Address:** Tanza, Cavite\n- **LinkedIn:** Michelle Cruz\n- **GitHub:** N/A\n- **Twitter:** N/A" },
+    //     { name: "Skills", content: "- Microsoft Office (Outlook, Word, Excel, PowerPoint)\n- Google Workspace (Gmail, Docs, Sheets, Forms)\n- Adobe Creative Suite (Photoshop, InDesign, Illustrator)\n- Canva\n- Graphic design\n- Project coordination\n- Interpersonal communication\n- Attention to detail\n- Proactive problem identification\n- Independent decision-making" },
+    //     { name: "Experience", content: "**Chief of Staff, White Cloak Technologies, Inc. (Oct 2023 - Present)**\n- Serves as the CEO's trusted advisor, managing calendar, finances, and key client relationships.\n- Drives execution of strategic initiatives, overseeing project timelines, stakeholder communications, and\n- deliverables.\n- Designs executive presentations and leads the company's graphic designer for the Information Security team.\n- Researches and recommends industry events and conferences for the executive team.\n- Takes on special projects as required.\n\n**Executive Assistant, Ernst & Young Global Services Philippines, Inc.** (Apr 2020 - Oct 2023)\n- Provided comprehensive administrative support to senior executives (Partners and Directors) in Australia,\n- including calendar management, expense processing, travel booking, and client relationship management.\n- Acted as the point of contact for the Training Core Team, improving training materials and presentations.\n- Facilitated technical and soft-skill training sessions and one-on-one coaching for new hires.\n- Served as a subject matter resource for calendar and email management and as team POC in the absence of team leads.\n- Received multiple Extra Miler (SPOT) Awards; nominated for Rising Star (2021) and GDS EA of the Year (2023).\n\n**Client and Concierge Analyst, White & Case Global Operations Center Manila LLP** (Nov 2018 - Apr 2020)\n- Operated as the global firm switchboard operator, providing exceptional call handling.\n- Processed room booking requests for the UK, US, and Germany within the Room Reservation System (RRS) team.\n- Collaborated with London Room Bookings and Reception teams as the sole Manila analyst.\n- Assisted with mailbox management and reservation coverage for other locations as needed.\n- Trained new hires on RRS processes, with a focus on the London procedure.\n\n **Technical Assistant, Department of Education - Central Office** (Oct 2015 - Nov 2018)\n- Processed Senior High School (SHS) applications for educational institutions nationwide.\n- Coordinated the online inspection process for Philippine Schools Overseas offering the SHS Program.\n- Organized and executed national trainings, conferences, and competitions hosted by the Department." },
+    //     { name: "Education", content: "Bachelor of Arts in Political Science, University of the Philippines Manila" },
+    //     { name: "Projects", content: "**E-Commerce Platform** (2022)\n- Built full-stack e-commerce application with React and Node.js\n- Integrated payment processing with Stripe API\n- Deployed on AWS with auto-scaling capabilities\n\n**Task Management App** (2021)\n- Developed real-time collaboration features using Socket.io\n- Implemented authentication and authorization with JWT" },
+    //     { name: "Certifications", content: "- EY Business - Basics of Business (Learning Badge), Ernst & Young (Jul 2022)\n- EY Innovation - Design Thinking (Learning Badge), Ernst & Young (Jun 2021)\n- Certified Six Sigma White Belt, AIGPE (Oct 2022)\n- Data Privacy Essentials for All Industries, AmCham Philippines (Sep 2024)" },
+    //     { name: "Awards", content: "- Extra Miler (SPOT) Award (multiple times), Ernst & Young Global Services Philippines, Inc.\n- Nominated for Rising Star Award (2021), Ernst & Young Global Services Philippines, Inc.\n- Nominated for GDS EA of the Year Award (2023), Ernst & Young Global Services Philippines, Inc.\n- Finalist, Best Seminar Paper in Political Science, University of the Philippines Manila (A.Y. 2014 - 2015)" }
+    //   ],
+    //   fileInfo: {
+    //     name: file.name,
+    //     size: file.size,
+    //     type: file.type
+    //   }
+    // };
+
+    // Simulate API delay
+    // setTimeout(() => {
+    //   const result = JSON.stringify(mockDigitalCV);
+    //   const parsedUserCV = JSON.parse(result);
+    //   const formattedCV = {};
+
+    //   cvSections.forEach((section, index) => {
+    //     formattedCV[section] = parsedUserCV.digitalCV[index].content.trim();
+    //   });
+
+    //   setDigitalCV(result);
+    //   setUserCV(formattedCV);
+    //   setBuildingCV(false);
+    // }, 2000);
+
+    // Original API call (commented out for testing)
     const formData = new FormData();
     formData.append("file", file);
     formData.append("fName", file.name);
@@ -382,7 +520,7 @@ export default function () {
                     alt=""
                     src={
                       assetConstants[
-                        processState(index, true)
+                        processState(index, false)
                           .toLowerCase()
                           .replace(" ", "_")
                       ]
@@ -392,7 +530,9 @@ export default function () {
                     <hr
                       className={
                         styles[
-                          processState(index).toLowerCase().replace(" ", "_")
+                          processState(index, true)
+                            .toLowerCase()
+                            .replace(/ /g, "_")
                         ]
                       }
                     />
@@ -406,7 +546,9 @@ export default function () {
                 <span
                   className={`${styles.stepDetails} ${
                     styles[
-                      processState(index, true).toLowerCase().replace(" ", "_")
+                      processState(index, false)
+                        .toLowerCase()
+                        .replace(" ", "_")
                     ]
                   }`}
                   key={index}
@@ -602,13 +744,183 @@ export default function () {
                       </div>
                     </div>
                   ))}
-                  <button onClick={handleCVScreen}>Submit CV</button>
+                  <button onClick={() => setCurrentStep(step[1])}>Continue</button>
                 </div>
               )}
             </>
           )}
 
           {currentStep == step[1] && (
+            <div className={styles.preScreeningContainer}>
+              <div className={styles.preScreeningHeader}>
+                <h2>Quick Pre-screening</h2>
+                <p>
+                  Just a few short questions to help your recruiters assess you
+                  faster. Takes less than a minute.
+                </p>
+              </div>
+
+              <div className={styles.questionsWrapper}>
+                {getFlattenedQuestions().map((question, index) => (
+                  <div key={question.id} className="prescreening-question-card">
+                    <div className="prescreening-question-middle">
+                      <div className="prescreening-question-inner">
+                        <label>{question.question}</label>
+
+                        {/* Dropdown */}
+                        {question.type === "dropdown" && (
+                          <select
+                            value={preScreeningAnswers[question.id] || ""}
+                            onChange={(e) =>
+                              setPreScreeningAnswers({
+                                ...preScreeningAnswers,
+                                [question.id]: e.target.value,
+                              })
+                            }
+                          >
+                            <option value="">Select an option</option>
+                            {question.options?.map((option, i) => (
+                              <option key={i} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+
+                        {/* Checkboxes */}
+                        {question.type === "checkboxes" && (
+                          <div className="checkbox-group">
+                            {question.options?.map((option, i) => (
+                              <label key={i}>
+                                <input
+                                  type="checkbox"
+                                  checked={
+                                    preScreeningAnswers[question.id]?.includes(
+                                      option
+                                    ) || false
+                                  }
+                                  onChange={(e) => {
+                                    const current =
+                                      preScreeningAnswers[question.id] || [];
+                                    const updated = e.target.checked
+                                      ? [...current, option]
+                                      : current.filter((item) => item !== option);
+                                    setPreScreeningAnswers({
+                                      ...preScreeningAnswers,
+                                      [question.id]: updated,
+                                    });
+                                  }}
+                                />
+                                <span>{option}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Range (Salary) */}
+                        {question.type === "range" && (
+                          <div className="range-input-group">
+                            <div className="range-input-field">
+                              <label>Minimum Salary</label>
+                              <div className="salary-input-wrapper">
+                                <span className="currency-symbol">
+                                  {question.currency === "USD" ? "$" : "₱"}
+                                </span>
+                                <input
+                                  type="number"
+                                  placeholder={
+                                    question.rangeMin?.toLocaleString() || "40,000"
+                                  }
+                                  value={
+                                    preScreeningAnswers[question.id]?.min || ""
+                                  }
+                                  onChange={(e) =>
+                                    setPreScreeningAnswers({
+                                      ...preScreeningAnswers,
+                                      [question.id]: {
+                                        ...(preScreeningAnswers[question.id] || {}),
+                                        min: e.target.value,
+                                      },
+                                    })
+                                  }
+                                />
+                              </div>
+                            </div>
+                            <div className="range-input-field">
+                              <label>Maximum Salary</label>
+                              <div className="salary-input-wrapper">
+                                <span className="currency-symbol">
+                                  {question.currency === "USD" ? "$" : "₱"}
+                                </span>
+                                <input
+                                  type="number"
+                                  placeholder={
+                                    question.rangeMax?.toLocaleString() || "55,000"
+                                  }
+                                  value={
+                                    preScreeningAnswers[question.id]?.max || ""
+                                  }
+                                  onChange={(e) =>
+                                    setPreScreeningAnswers({
+                                      ...preScreeningAnswers,
+                                      [question.id]: {
+                                        ...(preScreeningAnswers[question.id] || {}),
+                                        max: e.target.value,
+                                      },
+                                    })
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Short Answer */}
+                        {question.type === "short-answer" && (
+                          <input
+                            type="text"
+                            placeholder="Your answer"
+                            value={preScreeningAnswers[question.id] || ""}
+                            onChange={(e) =>
+                              setPreScreeningAnswers({
+                                ...preScreeningAnswers,
+                                [question.id]: e.target.value,
+                              })
+                            }
+                          />
+                        )}
+
+                        {/* Long Answer */}
+                        {question.type === "long-answer" && (
+                          <textarea
+                            placeholder="Your answer"
+                            rows={4}
+                            value={preScreeningAnswers[question.id] || ""}
+                            onChange={(e) =>
+                              setPreScreeningAnswers({
+                                ...preScreeningAnswers,
+                                [question.id]: e.target.value,
+                              })
+                            }
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                className={styles.continueButton}
+                onClick={handlePreScreeningContinue}
+              >
+                Continue
+                <i className="la la-arrow-right"></i>
+              </button>
+            </div>
+          )}
+
+          {currentStep == step[2] && !screeningResult && (
             <div className={styles.cvScreeningContainer}>
               <img alt="" src={assetConstants.loading} />
               <span className={styles.title}>Sit tight!</span>

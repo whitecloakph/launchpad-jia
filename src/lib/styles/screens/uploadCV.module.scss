@@ -6,6 +6,7 @@
   flex-direction: column;
   gap: 40px;
   justify-self: center;
+  margin: auto;
   padding: 48px 16px 40px 16px;
   .uploadCVHeader {
     display: flex;
@@ -91,6 +92,15 @@
           }
           &.in_progress {
             background: linear-gradient(
+              90deg,
+              #fccec0 0%,
+              #ebacc9 33%,
+              #ceb6da 66%,
+              #9fcaed 100%
+            );
+          }
+          &.in_progress_half {
+            background: linear-gradient(
                   90deg,
                   #fccec0 0%,
                   #ebacc9 33%,
@@ -122,24 +132,435 @@
   }
   .cvManageContainer {
     display: flex;
-    gap: 55px;
+    gap: 32px;
     .cvContainer {
       border: 1px solid var(--Border-primary, #e9eaeb);
-      border-radius: 12px;
+      border-radius: 16px;
       box-sizing: border-box;
       display: flex;
       flex: 1;
       flex-direction: column;
-      padding: 40px;
+      padding: 56px 40px;
+      img {
+        $size: 56px;
+        height: $size;
+        width: $size;
+        margin-bottom: 8px;
+      }
       button {
         margin: 24px 0 16px 0;
-        padding: 10px 0;
+        padding: 10px 28px;
+        width: 180px;
+        &.disabled {
+          background: var(--Button-bg-disabled, #f3f4f6);
+          color: var(--Text-text-disabled, #d5d7da);
+          cursor: not-allowed;
+        }
       }
       span {
         font-weight: 500;
         font-size: 14px;
         line-height: 20px;
         color: var(--Text-text-tertiary, #717680);
+      }
+    }
+  }
+  .preScreeningContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    .preScreeningHeader {
+      h2 {
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 28px;
+        color: var(--Text-text-primary, #181d27);
+        margin: 0 0 8px 0;
+      }
+      p {
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--Text-text-tertiary, #717680);
+        margin: 0;
+      }
+    }
+    .questionsWrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      :global(.prescreening-question-card) {
+        background: linear-gradient(
+          90deg,
+          rgba(162, 201, 235, 1) 0%,
+          rgba(205, 181, 216, 1) 37%,
+          rgba(232, 171, 200, 1) 67%,
+          rgba(250, 206, 193, 1) 100%
+        );
+        border-radius: 20px;
+        padding-top: 10px;
+
+        :global(.prescreening-question-middle) {
+          background: #f8f9fc;
+          border-radius: 16px;
+          padding: 8px;
+
+          :global(.prescreening-question-inner) {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0px 0px 2px 0px rgba(0, 16, 53, 0.16) inset;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            label {
+              font-weight: 600;
+              font-size: 16px;
+              line-height: 24px;
+              color: #181d27;
+              margin: 0;
+            }
+
+            select,
+            input[type="text"],
+            textarea {
+              width: 100%;
+              padding: 10px 16px;
+              border: 1px solid #d5d7da;
+              border-radius: 8px;
+              font-size: 14px;
+              font-family: inherit;
+              color: #414650;
+              background-color: #fff;
+              box-sizing: border-box;
+
+              &:focus {
+                outline: none;
+                border-color: #9fcaed;
+              }
+
+              &::placeholder {
+                color: #71767f;
+              }
+            }
+
+            select {
+              appearance: none;
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2380858d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+              background-repeat: no-repeat;
+              background-position: right 16px center;
+              padding-right: 40px;
+              cursor: pointer;
+
+              option {
+                padding: 12px 16px;
+                font-size: 14px;
+                font-weight: 500;
+                color: #181d27;
+                background-color: #fff;
+                border-radius: 0;
+
+                &:hover {
+                  background-color: #f8f9fc;
+                }
+
+                &:checked {
+                  background-color: #f8f9fc;
+                  font-weight: 600;
+                }
+              }
+            }
+
+            textarea {
+              resize: vertical;
+              min-height: 100px;
+            }
+
+            :global(.checkbox-group) {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+
+              label {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                font-weight: 400;
+                padding: 8px 0;
+
+                input[type="checkbox"] {
+                  width: 20px;
+                  height: 20px;
+                  cursor: pointer;
+                  border: 1.5px solid #d5d7da;
+                  border-radius: 4px;
+                  appearance: none;
+                  -webkit-appearance: none;
+                  -moz-appearance: none;
+                  background-color: #fff;
+                  position: relative;
+                  flex-shrink: 0;
+
+                  &:hover {
+                    border-color: #9fcaed;
+                  }
+
+                  &:checked {
+                    background-color: #181d27;
+                    border-color: #181d27;
+
+                    &::after {
+                      content: "";
+                      position: absolute;
+                      left: 6px;
+                      top: 2px;
+                      width: 5px;
+                      height: 10px;
+                      border: solid white;
+                      border-width: 0 2px 2px 0;
+                      transform: rotate(45deg);
+                    }
+                  }
+
+                  &:focus {
+                    outline: none;
+                    border-color: #9fcaed;
+                  }
+                }
+
+                span {
+                  font-size: 14px;
+                  font-weight: 400;
+                  color: #181d27;
+                  line-height: 20px;
+                }
+
+                &:hover span {
+                  color: #181d27;
+                }
+              }
+            }
+
+            :global(.range-input-group) {
+              display: flex;
+              gap: 16px;
+
+              :global(.range-input-field) {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+
+                label {
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #71767f;
+                }
+
+                :global(.salary-input-wrapper) {
+                  display: flex;
+                  align-items: center;
+                  border: 1px solid #d5d7da;
+                  border-radius: 8px;
+                  overflow: hidden;
+                  background-color: #fff;
+
+                  &:focus-within {
+                    border-color: #9fcaed;
+                  }
+
+                  :global(.currency-symbol) {
+                    padding: 10px 0 10px 16px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #414651;
+                    background: #fff;
+                  }
+
+                  input {
+                    flex: 1;
+                    padding: 10px 16px;
+                    border: none;
+                    font-size: 14px;
+                    font-family: inherit;
+                    color: #414650;
+                    background: transparent;
+
+                    &:focus {
+                      outline: none;
+                    }
+
+                    &::placeholder {
+                      color: #71767f;
+                    }
+
+                    // Remove number input spinner arrows
+                    &[type="number"] {
+                      -moz-appearance: textfield;
+                      appearance: textfield;
+
+                      &::-webkit-outer-spin-button,
+                      &::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .gradient {
+      background: linear-gradient(
+        90deg,
+        rgba(162, 201, 235, 1) 0%,
+        rgba(205, 181, 216, 1) 37%,
+        rgba(232, 171, 200, 1) 67%,
+        rgba(250, 206, 193, 1) 100%
+      );
+      border-radius: 20px;
+      padding: 10px;
+    }
+    .cvDetailsCard {
+      background: var(--Surface-dashboard-bg_light, #f8f9fc);
+      border-radius: 16px;
+      padding: 8px;
+    }
+    .detailsContainer {
+      background: var(--Surface-white, #ffffff);
+      border-radius: 12px;
+      box-shadow: 0px 0px 2px 0px rgba(0, 16, 53, 0.16) inset;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .questionLabel {
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 24px;
+      color: var(--Text-text-primary, #181d27);
+      margin: 0;
+    }
+    .questionInput,
+    .questionTextarea {
+      width: 100%;
+      padding: 10px 16px;
+      border: 1px solid var(--Border-primary, #d5d7da);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--Text-text-primary, #414650);
+      background-color: #fff;
+      box-sizing: border-box;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2380858d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+      cursor: pointer;
+
+      &:focus {
+        outline: none;
+        border-color: var(--Border-focus, #9fcaed);
+      }
+      &::placeholder {
+        color: var(--Text-text-placeholder, #71767f);
+      }
+    }
+    .questionTextarea {
+      resize: vertical;
+      min-height: 100px;
+      background-image: none !important;
+      padding-right: 16px !important;
+    }
+    .checkboxGroup {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      .checkboxLabel {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+        }
+        span {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--Text-text-secondary, #414651);
+        }
+      }
+    }
+    .rangeInputGroup {
+      display: flex;
+      gap: 16px;
+      .rangeInput {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        label {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--Text-text-secondary, #71767f);
+        }
+        .salaryInput {
+          display: flex;
+          align-items: center;
+          border: 1px solid var(--Border-primary, #d5d7da);
+          border-radius: 8px;
+          overflow: hidden;
+          background-color: #fff;
+          &:focus-within {
+            border-color: var(--Border-focus, #9fcaed);
+          }
+          .currency {
+            padding: 10px 0 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--Text-text-secondary, #414651);
+            background: var(--Surface-white, #ffffff);
+          }
+          input {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--Text-text-primary, #414650);
+            background: transparent;
+            &:focus {
+              outline: none;
+            }
+            &::placeholder {
+              color: var(--Text-text-placeholder, #71767f);
+            }
+          }
+        }
+      }
+    }
+    .continueButton {
+      align-self: flex-end;
+      padding: 10px 32px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      i {
+        font-size: 16px;
       }
     }
   }
@@ -162,7 +583,6 @@
       .cvDetailsCard {
         background: var(--Surface-dashboard-bg_light, #f8f9fc);
         border-radius: 24px;
-        box-shadow: 0px 4px 6px -2px #0a0d1208, 0px 12px 16px -4px #0a0d1214;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
@@ -194,7 +614,6 @@
         .detailsContainer {
           background: var(--Surface-white, #ffffff);
           border-radius: 16px;
-          box-shadow: 0px 0px 2px 0px #00103529 inset;
           box-sizing: border-box;
           padding: 24px;
           .fileTitle {
@@ -379,6 +798,18 @@
         width: 100%;
         align-self: unset;
         padding: 10px 0;
+      }
+    }
+    .preScreeningContainer {
+      .rangeInputGroup {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .continueButton {
+        width: 100%;
+        align-self: unset;
+        padding: 10px 0;
+        justify-content: center;
       }
     }
     .cvResultContainer {
