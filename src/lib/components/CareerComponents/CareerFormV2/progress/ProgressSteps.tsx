@@ -20,10 +20,10 @@ export default function ProgressSteps({
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
-        marginBottom: "24px",
+        marginBottom: "25px",
         background: "transparent",
         position: "relative",
-        borderBottom: "1px solid #E5E7EB",
+        borderBottom: "1px solid #EAECF5",
         padding: "0 10px",
       }}
     >
@@ -58,9 +58,9 @@ export default function ProgressSteps({
                   width: "20px",
                   height: "20px",
                   display: "flex",
+                  marginBottom: "12px",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginBottom: "12px",
                   transition: "all 0.2s ease",
                 }}
               >
@@ -112,8 +112,7 @@ export default function ProgressSteps({
                   lineHeight: "1.5",
                   textAlign: "left",
                   whiteSpace: "nowrap",
-                  paddingBottom: "20px",
-                  height: "60px",
+                  marginBottom: "25px",
                 }}
               >
                 {segment.title}
@@ -126,8 +125,13 @@ export default function ProgressSteps({
                 style={{
                   flex: 1,
                   height: "4px",
-                  background: isLineActive ? "#9FCAED" : "#D1D5DB",
-                  margin: "8px 8px 0",
+                  background: isLineActive
+                    ? "linear-gradient(90deg, #9FCAED 0%, #CEB6DA 33%, #EBACC9 66%, #FCCEC0 100%)"
+                    : "#D1D5DB",
+                  marginTop: "10px", // Aligns with center of icon
+                  marginLeft: "-50px",
+                  marginRight: "10px",
+                  borderRadius: "2px",
                   transition: "background 0.3s ease",
                 }}
               />
