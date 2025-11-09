@@ -10,7 +10,7 @@ import { useAppContext } from "@/lib/context/AppContext";
 import axios from "axios";
 import CareerActionModal from "./CareerActionModal";
 import FullScreenLoadingAnimation from "./FullScreenLoadingAnimation";
-import ProgressSteps from "@/lib/components/ProgressComponents/ProgressSteps";
+import ProgressSteps from "@/lib/components/CareerComponents/CareerFormV2/progress/ProgressSteps";
 
 // Setting List icons
 const screeningSettingList = [
