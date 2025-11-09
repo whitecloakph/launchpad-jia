@@ -10,6 +10,7 @@ import { useAppContext } from "@/lib/context/AppContext";
 import axios from "axios";
 import CareerActionModal from "./CareerActionModal";
 import FullScreenLoadingAnimation from "./FullScreenLoadingAnimation";
+import ProgressSteps from "@/lib/components/ProgressComponents/ProgressSteps";
 
 // Setting List icons
 const screeningSettingList = [
@@ -1263,6 +1264,7 @@ export default function CareerForm({
   return (
     <div className="col">
       {/* HEADER SECTION */}
+      {/* HEADER SECTION WITH ORIGINAL BUTTONS */}
       <div
         style={{
           marginBottom: "35px",
@@ -1276,161 +1278,65 @@ export default function CareerForm({
         <h1 style={{ fontSize: "24px", fontWeight: 550, color: "#111827" }}>
           {formType === "add" ? "Add new career" : "Edit Career Details"}
         </h1>
-
-        {/* Last Saved Indicator */}
-        {lastSaved && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              color: "#6B7280",
-              fontSize: "14px",
-            }}
-          >
-            <i className="la la-clock"></i>
-            <span>Last saved: {formatRelativeTime(lastSaved)}</span>
-          </div>
-        )}
-      </div>
-
-      {/* PROGRESS STEPS */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "flex-start",
-          marginBottom: "40px",
-          padding: "32px 24px",
-          background: "#F9FAFB",
-          borderRadius: "12px",
-          border: "1px solid #E5E7EB",
-          position: "relative",
-        }}
-      >
-        {/* Progress Line */}
         <div
           style={{
-            position: "absolute",
-            top: "64px", // Adjusted to center with icons
-            left: "15%",
-            right: "15%",
-            height: "2px",
-            background: "#E5E7EB",
-            zIndex: 0,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "10px",
           }}
         >
-          <div
+          <button
+            disabled={!isFormValid() || isSavingCareer}
             style={{
-              height: "100%",
-              background: "#000000",
-              width: `${(currentSegment / (segments.length - 1)) * 100}%`,
-              transition: "width 0.3s ease",
+              width: "fit-content",
+              color: "#414651",
+              background: "#fff",
+              border: "1px solid #D5D7DA",
+              padding: "8px 16px",
+              borderRadius: "60px",
+              cursor:
+                !isFormValid() || isSavingCareer ? "not-allowed" : "pointer",
+              whiteSpace: "nowrap",
             }}
-          />
+            onClick={() => {
+              formType === "add"
+                ? confirmSaveCareer("inactive")
+                : updateCareer("inactive");
+            }}
+          >
+            Save as Unpublished
+          </button>
+          <button
+            disabled={!isFormValid() || isSavingCareer}
+            style={{
+              width: "fit-content",
+              background:
+                !isFormValid() || isSavingCareer ? "#D5D7DA" : "black",
+              color: "#fff",
+              border: "1px solid #E9EAEB",
+              padding: "8px 16px",
+              borderRadius: "60px",
+              cursor:
+                !isFormValid() || isSavingCareer ? "not-allowed" : "pointer",
+              whiteSpace: "nowrap",
+            }}
+            onClick={() => {
+              formType === "add"
+                ? confirmSaveCareer("active")
+                : updateCareer("active");
+            }}
+          >
+            Save and Continue
+          </button>
         </div>
-
-        {segments.map((segment, index) => {
-          const isCompleted = completedSegments.includes(segment.id);
-          const isCurrent = currentSegment === segment.id;
-          const isClickable =
-            segment.id <= currentSegment ||
-            completedSegments.includes(segment.id);
-
-          return (
-            <div
-              key={segment.id}
-              onClick={() => handleSegmentClick(segment.id)}
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                cursor: isClickable ? "pointer" : "not-allowed",
-                opacity: isClickable ? 1 : 0.5,
-                position: "relative",
-                zIndex: 1,
-                maxWidth: "180px",
-              }}
-            >
-              {/* White Background Container */}
-              <div
-                style={{
-                  width: "60px",
-                  height: "60px",
-                  borderRadius: "50%",
-                  background: "#FFFFFF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: "16px",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                {/* Step Circle */}
-                <div
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "50%",
-                    background:
-                      isCompleted || isCurrent ? "#000000" : "#E5E7EB",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  {isCompleted ? (
-                    <div
-                      style={{
-                        width: "24px",
-                        height: "24px",
-                        borderRadius: "50%",
-                        background: "#FFFFFF",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <i
-                        className="la la-check"
-                        style={{
-                          fontSize: 14,
-                          color: "#000000",
-                          fontWeight: 900,
-                        }}
-                      ></i>
-                    </div>
-                  ) : (
-                    <i
-                      className={`la ${segment.icon}`}
-                      style={{
-                        fontSize: 20,
-                        color: isCurrent ? "#fff" : "#9CA3AF",
-                      }}
-                    ></i>
-                  )}
-                </div>
-              </div>
-
-              {/* Step Title */}
-              <div
-                style={{
-                  fontSize: "13px",
-                  fontWeight: isCurrent ? 700 : 600,
-                  color: isCurrent ? "#181D27" : "#6B7280",
-                  textAlign: "center",
-                  lineHeight: "1.4",
-                  marginBottom: "6px",
-                }}
-              >
-                {segment.title}
-              </div>
-            </div>
-          );
-        })}
       </div>
+      <ProgressSteps
+        segments={segments}
+        currentSegment={currentSegment}
+        completedSegments={completedSegments}
+        onSegmentClick={handleSegmentClick}
+      />
 
       {/* FORM CONTENT - Conditionally Rendered Segments */}
       <div
@@ -1442,129 +1348,6 @@ export default function CareerForm({
         }}
       >
         {renderSegmentContent()}
-      </div>
-
-      {/* NAVIGATION BUTTONS */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "32px",
-          padding: "24px",
-          background: "#F9FAFB",
-          borderRadius: "12px",
-          border: "1px solid #E5E7EB",
-        }}
-      >
-        <button
-          onClick={handlePrevious}
-          disabled={currentSegment === 0}
-          style={{
-            width: "fit-content",
-            color: currentSegment === 0 ? "#9CA3AF" : "#414651",
-            background: "#fff",
-            border: "1px solid #D5D7DA",
-            padding: "12px 24px",
-            borderRadius: "60px",
-            cursor: currentSegment === 0 ? "not-allowed" : "pointer",
-            opacity: currentSegment === 0 ? 0.5 : 1,
-            whiteSpace: "nowrap",
-            fontSize: "16px",
-            fontWeight: 600,
-          }}
-        >
-          <i className="la la-arrow-left" style={{ marginRight: 8 }}></i>
-          Previous
-        </button>
-
-        <div style={{ display: "flex", gap: 12 }}>
-          {currentSegment === segments.length - 1 ? (
-            // Final segment - show save buttons
-            <>
-              <button
-                disabled={!isFormValid() || isSavingCareer}
-                style={{
-                  width: "fit-content",
-                  color: "#414651",
-                  background: "#fff",
-                  border: "1px solid #D5D7DA",
-                  padding: "12px 24px",
-                  borderRadius: "60px",
-                  cursor:
-                    !isFormValid() || isSavingCareer
-                      ? "not-allowed"
-                      : "pointer",
-                  whiteSpace: "nowrap",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                }}
-                onClick={() => {
-                  formType === "add"
-                    ? confirmSaveCareer("inactive")
-                    : updateCareer("inactive");
-                }}
-              >
-                Save as Unpublished
-              </button>
-              <button
-                disabled={!isFormValid() || isSavingCareer}
-                style={{
-                  width: "fit-content",
-                  background:
-                    !isFormValid() || isSavingCareer ? "#D5D7DA" : "black",
-                  color: "#fff",
-                  border: "1px solid #E9EAEB",
-                  padding: "12px 24px",
-                  borderRadius: "60px",
-                  cursor:
-                    !isFormValid() || isSavingCareer
-                      ? "not-allowed"
-                      : "pointer",
-                  whiteSpace: "nowrap",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                }}
-                onClick={() => {
-                  formType === "add"
-                    ? confirmSaveCareer("active")
-                    : updateCareer("active");
-                }}
-              >
-                <i
-                  className="la la-check-circle"
-                  style={{ color: "#fff", fontSize: 20, marginRight: 8 }}
-                ></i>
-                Save as Published
-              </button>
-            </>
-          ) : (
-            // Not final segment - show continue button
-            <button
-              onClick={handleNext}
-              disabled={!validateSegment(currentSegment)}
-              style={{
-                width: "fit-content",
-                background: !validateSegment(currentSegment)
-                  ? "#D5D7DA"
-                  : "black",
-                color: "#fff",
-                border: "1px solid #E9EAEB",
-                padding: "12px 32px",
-                borderRadius: "60px",
-                cursor: !validateSegment(currentSegment)
-                  ? "not-allowed"
-                  : "pointer",
-                whiteSpace: "nowrap",
-                fontSize: "16px",
-                fontWeight: 600,
-              }}
-            >
-              Save & Continue
-              <i className="la la-arrow-right" style={{ marginLeft: 8 }}></i>
-            </button>
-          )}
-        </div>
       </div>
 
       {/* MODALS */}
