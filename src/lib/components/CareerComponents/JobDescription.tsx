@@ -133,6 +133,8 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
         });
       }
 
+    const totalInterviewQuestions = formData.questions?.reduce((acc, group) => acc + group.questions.length, 0) || 0;
+
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 16 }}>
           <button style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px", cursor: "pointer", whiteSpace: "nowrap" }} onClick={handleEdit}>
@@ -155,34 +157,164 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
                         </div>
                         </div>
                     </div>
+                    
+                    {/* CV Review & Pre-Screening Section */}
+                    {!isEditing && (
+                    <div className="layered-card-outer">
+                        <div className="layered-card-middle">
+                            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
+                                <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
+                                    <i className="la la-file-alt" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
+                                </div>
+                                <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>CV Review Settings</span>
+                            </div>
+                            
+                            <div className="layered-card-content">
+                                <div style={{ marginBottom: 16 }}>
+                                    <span style={{ fontSize: 14, color: "#6c757d", display: "block", marginBottom: 4 }}>CV Screening</span>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                        <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>
+                                            Automatically endorse candidates who are
+                                        </span>
+                                        <span style={{
+                                            padding: "4px 12px",
+                                            backgroundColor: "#039855",
+                                            color: "#fff",
+                                            borderRadius: 6,
+                                            fontSize: 13,
+                                            fontWeight: 600
+                                        }}>
+                                            {formData.screeningSetting || "Good Fit and above"}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {formData.secretPrompt && (
+                                    <>
+                                        <div style={{ height: "1px", width: "100%", background: "#E9EAEB", margin: "16px 0" }}></div>
+                                        <div>
+                                            <span style={{ fontSize: 14, color: "#6c757d", display: "block", marginBottom: 8 }}>CV Secret Prompt</span>
+                                            <div style={{ 
+                                                padding: "12px",
+                                                backgroundColor: "#F8F9FA",
+                                                borderRadius: 8,
+                                                fontSize: 13,
+                                                color: "#181D27",
+                                                whiteSpace: "pre-wrap",
+                                                border: "1px solid #E9EAEB"
+                                            }}>
+                                                {formData.secretPrompt}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    )}
+
+                    {/* AI Interview Questions Section */}
                     {!isEditing ? 
                     <div className="layered-card-outer">
                         <div className="layered-card-middle">
                         <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
                           <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
-                          <i className="la la-comment-alt" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
+                          <i className="la la-microphone" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
                           </div>
                           <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>
-                            Interview Questions 
+                            AI Interview Setup
                           </span>
                           <div style={{ borderRadius: "50%", width: 30, height: 22, border: "1px solid #D5D9EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, backgroundColor: "#F8F9FC", color: "#181D27", fontWeight: 700 }}>
-                            {formData.questions.reduce((acc, group) => acc + group.questions.length, 0)}
+                            {totalInterviewQuestions}
                           </div>
                         </div>
                     
-                    <div className="layered-card-content">
-                        {formData.questions?.length > 0 && formData.questions?.map((questionGroup, index) => (
-                            <div key={index}>
-                                <h4>{questionGroup.category}</h4>
-                                {questionGroup?.questions?.length > 0 && questionGroup?.questions?.map((question, index) => (
-                                    <ul key={index}>
-                                        <li>{question.question}</li>
-                                    </ul>
-                                ))}
+                        <div className="layered-card-content">
+                            {/* AI Interview Screening Setting */}
+                            <div style={{ marginBottom: 16 }}>
+                                <span style={{ fontSize: 14, color: "#6c757d", display: "block", marginBottom: 4 }}>AI Interview Screening</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                    <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>
+                                        Automatically endorse candidates who are
+                                    </span>
+                                    <span style={{
+                                        padding: "4px 12px",
+                                        backgroundColor: "#039855",
+                                        color: "#fff",
+                                        borderRadius: 6,
+                                        fontSize: 13,
+                                        fontWeight: 600
+                                    }}>
+                                        {formData.AIscreeningSetting || formData.screeningSetting || "Good Fit and above"}
+                                    </span>
+                                </div>
                             </div>
-                        ))}
-                    </div>
-                    </div>
+
+                            <div style={{ height: "1px", width: "100%", background: "#E9EAEB", margin: "16px 0" }}></div>
+
+                            {/* Require Video Setting */}
+                            <div style={{ marginBottom: 16 }}>
+                                <span style={{ fontSize: 14, color: "#6c757d", display: "block", marginBottom: 4 }}>Require Video on Interview</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className="la la-video" style={{ color: "#181D27", fontSize: 18 }}></i>
+                                    <span style={{ fontSize: 14, color: "#181D27", fontWeight: 600 }}>
+                                        {formData.requireVideo ? "Yes - Video recording required" : "No - Video recording not required"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style={{ height: "1px", width: "100%", background: "#E9EAEB", margin: "16px 0" }}></div>
+
+                            {/* Interview Questions by Category */}
+                            {formData.questions?.length > 0 && formData.questions?.map((questionGroup, index) => (
+                                questionGroup?.questions?.length > 0 && (
+                                    <div key={index} style={{ marginBottom: 16 }}>
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#181D27" }}>
+                                                    {questionGroup.category}
+                                                </h4>
+                                                <div style={{
+                                                    backgroundColor: "#181D27",
+                                                    color: "#fff",
+                                                    borderRadius: "50%",
+                                                    width: 22,
+                                                    height: 22,
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    fontSize: 11,
+                                                    fontWeight: 600
+                                                }}>
+                                                    {questionGroup.questions.length}
+                                                </div>
+                                            </div>
+                                            {questionGroup.questionCountToAsk && (
+                                                <span style={{
+                                                    fontSize: 12,
+                                                    color: "#6c757d",
+                                                    padding: "3px 8px",
+                                                    backgroundColor: "#F8F9FA",
+                                                    borderRadius: 6,
+                                                    border: "1px solid #E9EAEB"
+                                                }}>
+                                                    <i className="la la-random" style={{ marginRight: 4 }}></i>
+                                                    Ask {questionGroup.questionCountToAsk} of {questionGroup.questions.length}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <ul style={{ margin: "8px 0", paddingLeft: 20 }}>
+                                            {questionGroup?.questions?.map((question, qIndex) => (
+                                                <li key={qIndex} style={{ marginBottom: 6, fontSize: 14, color: "#181D27", lineHeight: "1.5" }}>
+                                                    {question.question}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )
+                            ))}
+                        </div>
+                        </div>
                     </div> : <InterviewQuestionGeneratorV2 questions={formData.questions} setQuestions={(questions) => setFormData({ ...formData, questions: questions })} jobTitle={formData.jobTitle} description={formData.description} />}
                 </div>
 
