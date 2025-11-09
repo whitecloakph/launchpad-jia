@@ -22,8 +22,7 @@ export default function ProgressSteps({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "40px",
-        padding: "24px 48px",
+        marginBottom: "24px",
         background: "transparent",
         position: "relative",
         borderBottom: "1px solid #E5E7EB",
@@ -33,10 +32,12 @@ export default function ProgressSteps({
       <div
         style={{
           position: "absolute",
-          top: "16px",
-          left: "48px",
-          right: "48px",
-          height: "1px",
+          width: "210px",
+          top: "10px",
+          left: "30px",
+          right: "auto",
+          height: "4px",
+          borderRadius: "2px",
           background: "#D1D5DB",
           zIndex: 0,
         }}
@@ -77,14 +78,8 @@ export default function ProgressSteps({
             {/* Step Circle */}
             <div
               style={{
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                background: "#FFFFFF",
-                border:
-                  isCompleted || isCurrent
-                    ? "2px solid #000000"
-                    : "2px solid #D1D5DB",
+                width: "20px",
+                height: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -96,25 +91,35 @@ export default function ProgressSteps({
                 <i
                   className="la la-check"
                   style={{
-                    fontSize: 16,
-                    color: "#000000",
+                    width: "20px",
+                    height: "20px",
+                    fontSize: "14px", // smaller than container
+                    color: "#ffffff",
+                    backgroundColor: "#000000",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     fontWeight: 900,
                   }}
                 />
               ) : isCurrent ? (
                 <div
+                  className="la la-dot-circle"
                   style={{
-                    width: "12px",
-                    height: "12px",
-                    borderRadius: "50%",
-                    background: "#000000",
+                    width: "20px",
+                    height: "20px",
+                    fontSize: 24,
+                    color: "#181D27",
                   }}
                 />
               ) : (
                 <i
                   className="la la-dot-circle"
                   style={{
-                    fontSize: 16,
+                    width: "20px",
+                    height: "20px",
+                    fontSize: 24,
                     color: "#D1D5DB",
                   }}
                 />
@@ -125,10 +130,12 @@ export default function ProgressSteps({
             <div
               style={{
                 fontSize: "14px",
-                fontWeight: 400,
+                fontWeight: 700,
                 color: "#1F2937",
                 lineHeight: "1.5",
                 maxWidth: "180px",
+                whiteSpace: "nowrap", // prevents line breaks
+                paddingBottom: "20px",
               }}
             >
               {segment.title}

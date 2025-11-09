@@ -97,22 +97,27 @@ export default function CareerFormV2({
   const segments = [
     {
       id: 0,
-      title: "Career Details",
+      title: "Career Details & Team Access",
       icon: "la-dot-circle",
     },
     {
       id: 1,
-      title: "Settings",
+      title: "CV Review & Pre-screening",
       icon: "la-dot-circle",
     },
     {
       id: 2,
-      title: "Interview Questions",
+      title: "AI Interview Setup",
       icon: "la-dot-circle",
     },
     {
       id: 3,
-      title: "Review & Submit",
+      title: "Pipeline Stages",
+      icon: "la-dot-circle",
+    },
+    {
+      id: 4,
+      title: "Review Career",
       icon: "la-dot-circle",
     },
   ];
@@ -404,6 +409,8 @@ export default function CareerFormV2({
           />
         );
       case 3:
+        return <div>Pipeline Stages Setup - Coming Soon!</div>;
+      case 4:
         return (
           <SegmentReview
             jobTitle={jobTitle}
@@ -472,27 +479,64 @@ export default function CareerFormV2({
           >
             Save as Unpublished
           </button>
+
           <button
-            disabled={!isFormValid() || isSavingCareer}
+            disabled={
+              currentSegment === segments.length - 1
+                ? !isFormValid() || isSavingCareer
+                : !validateSegment(currentSegment)
+            }
             style={{
               width: "fit-content",
-              background:
-                !isFormValid() || isSavingCareer ? "#D5D7DA" : "black",
+              background: (
+                currentSegment === segments.length - 1
+                  ? !isFormValid() || isSavingCareer
+                  : !validateSegment(currentSegment)
+              )
+                ? "#D5D7DA"
+                : "black",
               color: "#fff",
               border: "1px solid #E9EAEB",
               padding: "8px 16px",
               borderRadius: "60px",
-              cursor:
-                !isFormValid() || isSavingCareer ? "not-allowed" : "pointer",
+              cursor: (
+                currentSegment === segments.length - 1
+                  ? !isFormValid() || isSavingCareer
+                  : !validateSegment(currentSegment)
+              )
+                ? "not-allowed"
+                : "pointer",
               whiteSpace: "nowrap",
             }}
             onClick={() => {
-              formType === "add"
-                ? confirmSaveCareer("active")
-                : updateCareer("active");
+              if (currentSegment === segments.length - 1) {
+                // On Review & Submit segment - Save as Published
+                formType === "add"
+                  ? confirmSaveCareer("active")
+                  : updateCareer("active");
+              } else {
+                // On other segments - Continue to next
+                handleNext();
+              }
             }}
           >
-            Save and Continue
+            {currentSegment === segments.length - 1 ? (
+              <>
+                <i
+                  className="la la-check-circle"
+                  style={{ color: "#fff", fontSize: 20, marginRight: 8 }}
+                ></i>
+                Publish
+              </>
+            ) : (
+              <>
+                Save and Continue
+                <i
+                  className="la la-arrow-right"
+                  style={{ fontSize: 20, marginLeft: 8 }}
+                ></i>
+              </>
+            )}
           </button>
         </div>
       </div>
