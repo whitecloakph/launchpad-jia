@@ -5,10 +5,12 @@ import Swal from "sweetalert2";
 import InterviewQuestionGeneratorV2 from "./InterviewQuestionGeneratorV2";
 import { useAppContext } from "../../context/AppContext";
 import DirectInterviewLinkV2 from "./DirectInterviewLinkV2";
-import CareerForm from "./CareerForm";
 import CareerLink from "./CareerLink";
+import CareerDetailsForm from '@/app/recruiter-dashboard/careers/new-career/forms/CareerDetailsForm';
+import PreScreeningForm from '@/app/recruiter-dashboard/careers/new-career/forms/PreScreeningForm';
+import AIInterviewSetupForm from '@/app/recruiter-dashboard/careers/new-career/forms/AIInterviewForm';
 
-export default function JobDescription({ formData, setFormData, editModal, isEditing, setIsEditing, handleCancelEdit }: { formData: any, setFormData: (formData: any) => void, editModal: boolean, isEditing: boolean, setIsEditing: (isEditing: boolean) => void, handleCancelEdit: () => void }) {
+export default function JobDescription({ formData, setFormData, editModal, isEditing, setIsEditing, handleCancelEdit }) {
     const { user } = useAppContext();
     const [showEditModal, setShowEditModal] = useState(false);
 
@@ -22,18 +24,19 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
         setShowEditModal(true);
     }
 
-    async function updateCareer() {
-      const userInfoSlice = {
-        image: user.image,
-        name: user.name,
-        email: user.email,
-      };
+    async function updateCareer(status?: "active" | "inactive") {
+        const userInfoSlice = {
+            image: user.image,
+            name: user.name,
+            email: user.email,
+        };
+        
         const input = {
             _id: formData._id,
             jobTitle: formData.jobTitle,
             updatedAt: Date.now(),
             questions: formData.questions,
-            status: formData.status,
+            status: status || formData.status,
             screeningSetting: formData.screeningSetting,
             requireVideo: formData.requireVideo,
             description: formData.description,
@@ -41,10 +44,15 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
             createdBy: userInfoSlice,
         };
 
+        const statusText = status === "active" ? "Publishing" : status === "inactive" ? "Saving as unpublished" : "Updating";
+
         Swal.fire({
-            title: "Updating career...",
+            title: `${statusText} career...`,
             text: "Please wait while we update the career...",
             allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
         });
 
         try {
@@ -53,7 +61,7 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
             if (response.status === 200) {
                 Swal.fire({
                     title: "Success",
-                    text: "Career updated successfully",
+                    text: status === "active" ? "Career published successfully" : status === "inactive" ? "Career saved as unpublished" : "Career updated successfully",
                     icon: "success",
                     allowOutsideClick: false,
                 }).then(() => {
@@ -163,10 +171,10 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
                         </div>
                     
                     <div className="layered-card-content">
-                        {formData.questions?.length > 0 && formData.questions?.map((questionGroup: any, index: number) => (
+                        {formData.questions?.length > 0 && formData.questions?.map((questionGroup, index) => (
                             <div key={index}>
                                 <h4>{questionGroup.category}</h4>
-                                {questionGroup?.questions?.length > 0 && questionGroup?.questions?.map((question: any, index: number) => (
+                                {questionGroup?.questions?.length > 0 && questionGroup?.questions?.map((question, index) => (
                                     <ul key={index}>
                                         <li>{question.question}</li>
                                     </ul>
@@ -282,7 +290,7 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
                     {isEditing && 
                     <div style={{ display: "flex", justifyContent: "center", gap: 16, alignItems: "center", marginBottom: "16px", width: "100%" }}>
                          <button className="button-primary" style={{ width: "50%" }} onClick={handleCancelEdit}>Cancel</button>
-                        <button className="button-primary" style={{ width: "50%" }} onClick={updateCareer}>Save Changes</button>
+                        <button className="button-primary" style={{ width: "50%" }} onClick={() => updateCareer()}>Save Changes</button>
                     </div>}
                     <div className="layered-card-outer">
                       <div className="layered-card-middle">
@@ -309,36 +317,481 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
                 </div>
             </div>
             {showEditModal && (
-                <div
-                className="modal show fade-in-bottom"
-                style={{
-                  display: "block",
-                  background: "rgba(0,0,0,0.45)",
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  width: "100vw",
-                  height: "100vh",
-                  zIndex: 1050,
-                }}
-                >
-                    <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100vh",
-                        width: "100vw",
-                    }}>
-                   
-                    <div className="modal-content" style={{ overflowY: "scroll", height: "100vh", width: "90vw", background: "#fff", border: `1.5px solid #E9EAEB`, borderRadius: 14, boxShadow: "0 8px 32px rgba(30,32,60,0.18)", padding: "24px" }}>
-                      <CareerForm career={formData} formType="edit" setShowEditModal={setShowEditModal} />
-                    </div>
-                  </div>
-                </div>
+                <EditCareerModal 
+                    career={formData} 
+                    setShowEditModal={setShowEditModal}
+                    user={user}
+                    key={formData._id} // Force re-mount when formData changes
+                />
             )}
         </div>
     )
+}
+
+// New Modal Component for Editing Career
+function EditCareerModal({ career, setShowEditModal, user }) {
+    const [activeEditTab, setActiveEditTab] = useState("career-details");
+    const [isSaving, setIsSaving] = useState(false);
+
+    // State for Career Details
+    const [jobTitle, setJobTitle] = useState(career?.jobTitle || "");
+    const [description, setDescription] = useState(career?.description || "");
+    const [employmentType, setEmploymentType] = useState(career?.employmentType || "Full-Time");
+    const [workSetup, setWorkSetup] = useState(career?.workSetup || "");
+    const [workSetupRemarks, setWorkSetupRemarks] = useState(career?.workSetupRemarks || "");
+    const [country, setCountry] = useState(career?.country || "Philippines");
+    const [province, setProvince] = useState(career?.province || "Metro Manila");
+    const [city, setCity] = useState(career?.location || "");
+    const [salaryNegotiable, setSalaryNegotiable] = useState(career?.salaryNegotiable || false);
+    const [minimumSalary, setMinimumSalary] = useState(career?.minimumSalary?.toString() || "");
+    const [maximumSalary, setMaximumSalary] = useState(career?.maximumSalary?.toString() || "");
+
+    // State for CV Review
+    const [screeningSetting, setScreeningSetting] = useState(career?.screeningSetting || "Good Fit and above");
+    const [secretPrompt, setSecretPrompt] = useState(career?.secretPrompt || "");
+    const [preScreeningQuestions, setPreScreeningQuestions] = useState(() => {
+        // Transform from API format to form format
+        if (career?.preScreeningQuestions && Array.isArray(career.preScreeningQuestions)) {
+        return career.preScreeningQuestions.map((q) => {
+            const baseQuestion = {
+            id: parseInt(q.id) || Date.now(),
+            title: q.questionType,
+            question: q.question,
+            type: q.questionFormat,
+            required: true
+            };
+
+            if (q.questionFormat === "Dropdown" || q.questionFormat === "Multiple Choice") {
+            baseQuestion.options = q.answers ? q.answers.map(a => a.value) : [];
+            }
+
+            if (q.questionFormat === "Range") {
+            baseQuestion.minValue = q.minValue || "0";
+            baseQuestion.maxValue = q.maxValue || "100";
+            baseQuestion.rangeUnit = q.rangeUnit || "";
+            }
+
+            return baseQuestion;
+        });
+        }
+        return [];
+    });
+
+    // State for AI Interview
+    const [interviewScreeningSetting, setInterviewScreeningSetting] = useState(career?.AIscreeningSetting || "Good Fit and above");
+    const [requireVideo, setRequireVideo] = useState(career?.requireVideo ?? true);
+    const [questions, setQuestions] = useState(career?.questions || [
+        { id: 1, category: "CV Validation / Experience", questionCountToAsk: null, questions: [] },
+        { id: 2, category: "Technical", questionCountToAsk: null, questions: [] },
+        { id: 3, category: "Behavioral", questionCountToAsk: null, questions: [] },
+        { id: 4, category: "Analytical", questionCountToAsk: null, questions: [] },
+        { id: 5, category: "Others", questionCountToAsk: null, questions: [] },
+    ]);
+
+    const editTabs = [
+        { label: "Career Details", value: "career-details", icon: "suitcase" },
+        { label: "CV Review", value: "cv-review", icon: "file-alt" },
+        { label: "AI Interview", value: "ai-interview", icon: "microphone" },
+    ];
+
+    // Validation function to check if all required fields are filled
+    const isFormValid = () => {
+        // Career Details validation
+        const hasJobTitle = jobTitle.trim().length > 0;
+        const hasDescription = description.trim().length > 0;
+        const hasWorkSetup = workSetup.trim().length > 0;
+        const hasCity = city.trim().length > 0;
+        
+        // Salary validation
+        const hasSalary = !minimumSalary || !maximumSalary || 
+            (Number(minimumSalary) > 0 && Number(maximumSalary) > 0 && Number(minimumSalary) <= Number(maximumSalary));
+        
+        // AI Interview validation - at least one question in any category
+        const hasQuestions = questions.some(q => q.questions && q.questions.length > 0);
+        
+        return hasJobTitle && hasDescription && hasWorkSetup && hasCity && hasSalary && hasQuestions;
+    };
+
+    const handleSaveChanges = async (saveAsStatus?: "active" | "inactive") => {
+        // If trying to publish, validate all fields
+        if (saveAsStatus === "active" && !isFormValid()) {
+            Swal.fire({
+                icon: "warning",
+                title: "Incomplete Form",
+                text: "Please fill in all required fields before publishing. Required: Job Title, Description, Work Setup, City, and at least one interview question.",
+            });
+            return;
+        }
+        if (Number(minimumSalary) && Number(maximumSalary) && Number(minimumSalary) > Number(maximumSalary)) {
+        Swal.fire({
+            icon: "warning",
+            title: "Invalid Salary Range",
+            text: "Minimum salary cannot be greater than maximum salary",
+        });
+        return;
+        }
+
+        setIsSaving(true);
+        const statusText = saveAsStatus === "active" ? "Publishing" : saveAsStatus === "inactive" ? "Saving as unpublished" : "Updating";
+        
+        Swal.fire({
+        title: `${statusText} career...`,
+        text: "Please wait while we update the career...",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        });
+
+        try {
+        // Transform pre-screening questions to match expected format
+        const transformedPreScreeningQuestions = preScreeningQuestions.map((q, index) => {
+            const baseQuestion = {
+            id: String(index + 1),
+            questionType: q.title || "Custom",
+            question: q.question,
+            questionFormat: q.type,
+            };
+
+            if (q.type === "Dropdown" || q.type === "Multiple Choice") {
+            baseQuestion.answers = q.options ? q.options.map((opt, optIndex) => ({
+                id: String(optIndex + 1),
+                value: opt,
+                type: q.type
+            })) : [];
+            }
+
+            if (q.type === "Range") {
+            baseQuestion.minValue = q.minValue || "0";
+            baseQuestion.maxValue = q.maxValue || "100";
+            baseQuestion.rangeUnit = q.rangeUnit || "";
+            }
+
+            return baseQuestion;
+        });
+
+        const userInfoSlice = {
+            image: user.image,
+            name: user.name,
+            email: user.email,
+        };
+
+        const updatedData = {
+            _id: career._id,
+            jobTitle,
+            description,
+            workSetup,
+            workSetupRemarks,
+            questions,
+            location: city,
+            country,
+            province,
+            employmentType,
+            salaryNegotiable,
+            minimumSalary: minimumSalary ? Number(minimumSalary) : 0,
+            maximumSalary: maximumSalary ? Number(maximumSalary) : 0,
+            screeningSetting,
+            AIscreeningSetting: interviewScreeningSetting,
+            secretPrompt: secretPrompt || "",
+            preScreeningQuestions: transformedPreScreeningQuestions,
+            requireVideo,
+            orgID: career.orgID,
+            status: saveAsStatus || career.status,
+            lastEditedBy: userInfoSlice,
+            updatedAt: new Date().toISOString(),
+        };
+
+        const response = await axios.post("/api/update-career", updatedData);
+
+        if (response.status === 200) {
+            Swal.fire({
+            title: "Success",
+            text: saveAsStatus === "active" ? "Career published successfully" : saveAsStatus === "inactive" ? "Career saved as unpublished" : "Career updated successfully",
+            icon: "success",
+            allowOutsideClick: false,
+            }).then(() => {
+            setShowEditModal(false);
+            window.location.reload();
+            });
+        }
+        } catch (error) {
+        console.error("Error updating career:", error);
+        Swal.fire({
+            title: "Error",
+            text: error.response?.data?.error || "Failed to update career",
+            icon: "error",
+            allowOutsideClick: false,
+        });
+        } finally {
+        setIsSaving(false);
+        }
+    };
+
+    const handleCancel = () => {
+        setShowEditModal(false);
+    };
+
+    return (
+        <div
+            className="modal show fade-in-bottom"
+            style={{
+                display: "block",
+                background: "rgba(0,0,0,0.45)",
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                zIndex: 1050,
+            }}
+        >
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100vh",
+                    width: "100vw",
+                }}
+            >
+                <div 
+                    className="modal-content" 
+                    style={{ 
+                        overflowY: "scroll", 
+                        height: "100vh", 
+                        width: "90vw", 
+                        background: "#fff", 
+                        border: `1.5px solid #E9EAEB`, 
+                        borderRadius: 14, 
+                        boxShadow: "0 8px 32px rgba(30,32,60,0.18)", 
+                        padding: "24px",
+                        display: "flex",
+                        flexDirection: "column"
+                    }}
+                >
+                    {/* Header */}
+                    <div
+                        style={{
+                            padding: "0 0 20px 0",
+                            borderBottom: "1px solid #E9EAEB",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Edit Career</h3>
+                        <button
+                            onClick={handleCancel}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                fontSize: 28,
+                                cursor: "pointer",
+                                color: "#6c757d",
+                                padding: 0,
+                                lineHeight: 1,
+                            }}
+                        >
+                            ×
+                        </button>
+                    </div>
+
+                    {/* Tabs */}
+                    <div style={{ borderBottom: "1px solid #E9EAEB", padding: "16px 0 0 0" }}>
+                        <div style={{ display: "flex", gap: 24 }}>
+                            {editTabs.map((tab) => (
+                                <div
+                                    key={tab.value}
+                                    style={{
+                                        padding: "12px 0",
+                                        cursor: "pointer",
+                                        borderBottom: activeEditTab === tab.value ? "2px solid #5E72E4" : "2px solid transparent",
+                                        color: activeEditTab === tab.value ? "#5E72E4" : "#6c757d",
+                                        fontWeight: activeEditTab === tab.value ? 600 : 400,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 8,
+                                    }}
+                                    onClick={() => setActiveEditTab(tab.value)}
+                                >
+                                    <i className={`la la-${tab.icon}`} style={{ fontSize: 18 }}></i>
+                                    {tab.label}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div style={{ flex: 1, overflow: "auto", padding: "24px 0" }}>
+                        {activeEditTab === "career-details" && (
+                            <CareerDetailsForm
+                                jobTitle={jobTitle}
+                                setJobTitle={setJobTitle}
+                                description={description}
+                                setDescription={setDescription}
+                                employmentType={employmentType}
+                                setEmploymentType={setEmploymentType}
+                                workSetup={workSetup}
+                                setWorkSetup={setWorkSetup}
+                                workSetupRemarks={workSetupRemarks}
+                                setWorkSetupRemarks={setWorkSetupRemarks}
+                                country={country}
+                                setCountry={setCountry}
+                                province={province}
+                                setProvince={setProvince}
+                                city={city}
+                                setCity={setCity}
+                                salaryNegotiable={salaryNegotiable}
+                                setSalaryNegotiable={setSalaryNegotiable}
+                                minimumSalary={minimumSalary}
+                                setMinimumSalary={setMinimumSalary}
+                                maximumSalary={maximumSalary}
+                                setMaximumSalary={setMaximumSalary}
+                            />
+                        )}
+                        {activeEditTab === "cv-review" && (
+                            <PreScreeningForm
+                                screeningSetting={screeningSetting}
+                                setScreeningSetting={setScreeningSetting}
+                                secretPrompt={secretPrompt}
+                                setSecretPrompt={setSecretPrompt}
+                                preScreeningQuestions={preScreeningQuestions}
+                                setPreScreeningQuestions={setPreScreeningQuestions}
+                            />
+                        )}
+                        {activeEditTab === "ai-interview" && (
+                            <AIInterviewSetupForm
+                                jobTitle={jobTitle}
+                                description={description}
+                                screeningSetting={interviewScreeningSetting}
+                                setScreeningSetting={setInterviewScreeningSetting}
+                                requireVideo={requireVideo}
+                                setRequireVideo={setRequireVideo}
+                                questions={questions}
+                                setQuestions={setQuestions}
+                            />
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <div
+                        style={{
+                            padding: "16px 0 0 0",
+                            borderTop: "1px solid #E9EAEB",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <button
+                            onClick={handleCancel}
+                            disabled={isSaving}
+                            style={{
+                                padding: "8px 24px",
+                                backgroundColor: "#fff",
+                                color: "#414651",
+                                border: "1px solid #D5D7DA",
+                                borderRadius: 8,
+                                cursor: isSaving ? "not-allowed" : "pointer",
+                                opacity: isSaving ? 0.6 : 1,
+                                fontWeight: 600,
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        
+                        <div style={{ display: "flex", gap: 12 }}>
+                            {/* Save as Unpublished Button */}
+                            <button
+                                onClick={() => handleSaveChanges("inactive")}
+                                disabled={isSaving}
+                                style={{
+                                    padding: "8px 24px",
+                                    backgroundColor: "#fff",
+                                    color: "#414651",
+                                    border: "1px solid #D5D7DA",
+                                    borderRadius: 8,
+                                    cursor: isSaving ? "not-allowed" : "pointer",
+                                    opacity: isSaving ? 0.6 : 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                {isSaving ? (
+                                    <>
+                                        <div
+                                            style={{
+                                                width: 16,
+                                                height: 16,
+                                                border: "2px solid #414651",
+                                                borderTop: "2px solid transparent",
+                                                borderRadius: "50%",
+                                                animation: "spin 1s linear infinite",
+                                            }}
+                                        />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="la la-save" style={{ fontSize: 18 }}></i>
+                                        Save as Unpublished
+                                    </>
+                                )}
+                            </button>
+
+                            {/* Publish Button */}
+                            <button
+                                onClick={() => handleSaveChanges("active")}
+                                disabled={isSaving || !isFormValid()}
+                                style={{
+                                    padding: "8px 24px",
+                                    backgroundColor: isSaving || !isFormValid() ? "#D5D7DA" : "#5E72E4",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: 8,
+                                    cursor: isSaving || !isFormValid() ? "not-allowed" : "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                {isSaving ? (
+                                    <>
+                                        <div
+                                            style={{
+                                                width: 16,
+                                                height: 16,
+                                                border: "2px solid #fff",
+                                                borderTop: "2px solid transparent",
+                                                borderRadius: "50%",
+                                                animation: "spin 1s linear infinite",
+                                            }}
+                                        />
+                                        Publishing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="la la-check-circle" style={{ fontSize: 18 }}></i>
+                                        Publish Career
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                    <style jsx>{`
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `}</style>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 function ScreeningSettingButton(props) {

@@ -253,62 +253,66 @@ export default function ManageCareerPage() {
       }, [career?.id]);
 
     useEffect(() => {
-        const fetchCareer = async () => {
-            if (!slug && !orgID) return;
-            try {
-                const response = await axios.post("/api/career-data", {
-                    id: slug,
-                    orgID,
-                  });
-                  
-                setCareer(response.data);
-                const deepCopy = JSON.parse(JSON.stringify(response.data?.questions ?? []));
-                setFormData({
-                    _id: response.data?._id || "",
-                    jobTitle: response.data?.jobTitle || "",
-                    description: response.data?.description || "",
-                    questions: deepCopy,
-                    status: response.data?.status || "",
-                    screeningSetting: response.data?.screeningSetting || "",
-                    requireVideo: response.data?.requireVideo === null || response.data?.requireVideo === undefined ? true : response.data?.requireVideo,
-                    directInterviewLink: response.data?.directInterviewLink || "",
-                    createdBy: response.data?.createdBy || {},
-                    minimumSalary: response.data?.minimumSalary || "",
-                    maximumSalary: response.data?.maximumSalary || "",
-                    province: response.data?.province || "",
-                    location: response.data?.location || "",
-                    salaryNegotiable: response.data?.salaryNegotiable || false,
-                    workSetup: response.data?.workSetup || "",
-                    workSetupRemarks: response.data?.workSetupRemarks || "",
-                    createdAt: response.data?.createdAt || "",
-                    updatedAt: response.data?.updatedAt || "",
-                    lastEditedBy: response.data?.lastEditedBy || {},
-                    employmentType: response.data?.employmentType || "Full-time",
-                    orgID: response.data?.orgID || "",
-                });
-                if (tab === "edit") {
-                    setActiveTab("job-description");
-                }
-            } catch (error) {
-                if (error.response.status === 404) {
-                    Swal.fire({
-                        title: "Career not found",
-                        text: "Redirecting back to careers page...",
-                        timer: 1500,
-                    }).then(() => {
-                        window.location.href = "/recruiter-dashboard/careers";
-                    });
-                    return;
-                }
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong! Please try again.",
-                });
+    const fetchCareer = async () => {
+        if (!slug && !orgID) return;
+        try {
+            const response = await axios.post("/api/career-data", {
+                id: slug,
+                orgID,
+            });
+              
+            setCareer(response.data);
+            const deepCopy = JSON.parse(JSON.stringify(response.data?.questions ?? []));
+            setFormData({
+                _id: response.data?._id || "",
+                jobTitle: response.data?.jobTitle || "",
+                description: response.data?.description || "",
+                questions: deepCopy,
+                status: response.data?.status || "",
+                screeningSetting: response.data?.screeningSetting || "",
+                requireVideo: response.data?.requireVideo === null || response.data?.requireVideo === undefined ? true : response.data?.requireVideo,
+                directInterviewLink: response.data?.directInterviewLink || "",
+                createdBy: response.data?.createdBy || {},
+                minimumSalary: response.data?.minimumSalary || "",
+                maximumSalary: response.data?.maximumSalary || "",
+                province: response.data?.province || "",
+                location: response.data?.location || "",
+                salaryNegotiable: response.data?.salaryNegotiable || false,
+                workSetup: response.data?.workSetup || "",
+                workSetupRemarks: response.data?.workSetupRemarks || "",
+                createdAt: response.data?.createdAt || "",
+                updatedAt: response.data?.updatedAt || "",
+                lastEditedBy: response.data?.lastEditedBy || {},
+                employmentType: response.data?.employmentType || "Full-time",
+                orgID: response.data?.orgID || "",
+                // ADD THESE TWO LINES:
+                secretPrompt: response.data?.secretPrompt || "",
+                preScreeningQuestions: response.data?.preScreeningQuestions || [],
+                AIscreeningSetting: response.data?.AIscreeningSetting || "Good Fit and above",
+            });
+            if (tab === "edit") {
+                setActiveTab("job-description");
             }
+        } catch (error) {
+            if (error.response.status === 404) {
+                Swal.fire({
+                    title: "Career not found",
+                    text: "Redirecting back to careers page...",
+                    timer: 1500,
+                }).then(() => {
+                    window.location.href = "/recruiter-dashboard/careers";
+                });
+                return;
+            }
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong! Please try again.",
+            });
         }
-        fetchCareer();
-    }, [slug, orgID, tab]);
+    }
+    fetchCareer();
+}, [slug, orgID, tab]);
 
     const handleCandidateMenuOpen = (candidate: any) => {
         setCandidateMenuOpen(prev => !prev);
