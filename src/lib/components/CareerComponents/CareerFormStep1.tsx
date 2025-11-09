@@ -5,6 +5,7 @@ import RichTextEditor from "@/lib/components/CareerComponents/RichTextEditor";
 import CustomDropdown from "@/lib/components/CareerComponents/CustomDropdown";
 import philippineCitiesAndProvinces from "@/../public/philippines-locations.json";
 import { useAppContext } from "@/lib/context/AppContext";
+import styles from "@/lib/styles/screens/careerFormStep1.module.scss";
 
 const employmentTypeOptions = [{ name: "Full-Time" }, { name: "Part-Time" }];
 
@@ -76,9 +77,9 @@ export default function CareerFormStep1({
     // Only validate if fields have been touched
     if (Object.keys(touched).length > 0) {
       validateAllFields();
-    }
-    if (onValidationChange) {
-      onValidationChange(isStepValid());
+      if (onValidationChange) {
+        onValidationChange(isStepValid());
+      }
     }
   }, [formData, touched]);
 
@@ -184,68 +185,26 @@ export default function CareerFormStep1({
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        display: "flex",
-        gap: 24,
-      }}
-    >
+    <div className={styles.container}>
       {/* Form Content */}
-      <div style={{ flex: 1 }}>
+      <div className={styles.formContent}>
         <div className="layered-card-outer">
           <div className="layered-card-middle">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                marginLeft: 8,
-                padding: 4,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span
-                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
-                >
-                  1.
-                </span>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionBadge}>
+                <span className={styles.sectionBadgeText}>1.</span>
               </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-                Career Information
-              </span>
+              <span className={styles.sectionTitle}>Career Information</span>
             </div>
 
             <div className="layered-card-content">
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
-                >
-                  Job Title
-                </label>
-                <div style={{ position: "relative" }}>
+              <div className={styles.fieldWrapper}>
+                <label className={styles.label}>Job Title</label>
+                <div className={styles.inputWrapper}>
                   <input
                     value={formData.jobTitle || ""}
-                    className="form-control"
+                    className={`form-control ${errors.jobTitle ? styles.inputError : ''}`}
                     placeholder="Enter job title"
-                    style={{
-                      borderColor: errors.jobTitle ? "#F04438" : undefined,
-                      borderWidth: errors.jobTitle ? "2px" : undefined,
-                      paddingRight: errors.jobTitle ? "40px" : undefined,
-                    }}
                     onChange={(e) => {
                       updateFormData({ jobTitle: e.target.value || "" });
                     }}
@@ -254,44 +213,22 @@ export default function CareerFormStep1({
                     <img
                       src="/career-form/warning-step-icon.svg"
                       alt="Warning"
-                      style={{
-                        position: "absolute",
-                        right: "12px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        pointerEvents: "none",
-                      }}
+                      className={styles.warningIcon}
                     />
                   )}
                 </div>
                 {errors.jobTitle && (
-                  <p
-                    style={{
-                      color: "#F04438",
-                      fontSize: "14px",
-                      marginTop: "6px",
-                      marginBottom: 0,
-                    }}
-                  >
+                  <p className={styles.errorText}>
                     {errors.jobTitle}
                   </p>
                 )}
               </div>
 
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
-                >
+              <div className={styles.fieldWrapper}>
+                <label className={styles.label}>
                   Description
                 </label>
-                <div
-                  style={{
-                    outline: errors.description
-                      ? "2px solid #F04438"
-                      : undefined,
-                    borderRadius: errors.description ? "8px" : undefined,
-                  }}
-                >
+                <div className={errors.description ? styles.editorError : ''}>
                   <RichTextEditor
                     setText={(text: string) =>
                       updateFormData({ description: text })
@@ -300,14 +237,7 @@ export default function CareerFormStep1({
                   />
                 </div>
                 {errors.description && (
-                  <p
-                    style={{
-                      color: "#F04438",
-                      fontSize: "14px",
-                      marginTop: "6px",
-                      marginBottom: 0,
-                    }}
-                  >
+                  <p className={styles.errorText}>
                     {errors.description}
                   </p>
                 )}
@@ -316,45 +246,22 @@ export default function CareerFormStep1({
           </div>
         </div>
 
-        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+        <div className={`layered-card-outer ${styles.cardSpacing}`}>
           <div className="layered-card-middle">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                marginLeft: 8,
-                padding: 4,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span
-                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
-                >
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionBadge}>
+                <span className={styles.sectionBadgeText}>
                   2
                 </span>
               </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+              <span className={styles.sectionTitle}>
                 Work Setting
               </span>
             </div>
 
             <div className="layered-card-content">
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
-                >
+              <div className={styles.fieldWrapper}>
+                <label className={styles.label}>
                   Employment Type
                 </label>
                 <CustomDropdown
@@ -367,23 +274,14 @@ export default function CareerFormStep1({
                   hasError={!!errors.employmentType}
                 />
                 {errors.employmentType && (
-                  <p
-                    style={{
-                      color: "#F04438",
-                      fontSize: "14px",
-                      marginTop: "6px",
-                      marginBottom: 0,
-                    }}
-                  >
+                  <p className={styles.errorText}>
                     {errors.employmentType}
                   </p>
                 )}
               </div>
 
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
-                >
+              <div className={styles.fieldWrapper}>
+                <label className={styles.label}>
                   Arrangement
                 </label>
                 <CustomDropdown
@@ -396,14 +294,7 @@ export default function CareerFormStep1({
                   hasError={!!errors.workSetup}
                 />
                 {errors.workSetup && (
-                  <p
-                    style={{
-                      color: "#F04438",
-                      fontSize: "14px",
-                      marginTop: "6px",
-                      marginBottom: 0,
-                    }}
-                  >
+                  <p className={styles.errorText}>
                     {errors.workSetup}
                   </p>
                 )}
@@ -412,56 +303,23 @@ export default function CareerFormStep1({
           </div>
         </div>
 
-        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+        <div className={`layered-card-outer ${styles.cardSpacing}`}>
           <div className="layered-card-middle">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                marginLeft: 8,
-                padding: 4,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span
-                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
-                >
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionBadge}>
+                <span className={styles.sectionBadgeText}>
                   3
                 </span>
               </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+              <span className={styles.sectionTitle}>
                 Location
               </span>
             </div>
 
             <div className="layered-card-content">
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr 1fr",
-                  gap: 16,
-                }}
-              >
+              <div className={styles.gridThreeColumn}>
                 <div>
-                  <label
-                    style={{
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      display: "block",
-                    }}
-                  >
+                  <label className={styles.label}>
                     Country
                   </label>
                   <CustomDropdown
@@ -475,13 +333,7 @@ export default function CareerFormStep1({
                 </div>
 
                 <div>
-                  <label
-                    style={{
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      display: "block",
-                    }}
-                  >
+                  <label className={styles.label}>
                     State / Province
                   </label>
                   <CustomDropdown
@@ -502,27 +354,14 @@ export default function CareerFormStep1({
                     hasError={!!errors.province}
                   />
                   {errors.province && (
-                    <p
-                      style={{
-                        color: "#F04438",
-                        fontSize: "14px",
-                        marginTop: "6px",
-                        marginBottom: 0,
-                      }}
-                    >
+                    <p className={styles.errorText}>
                       {errors.province}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label
-                    style={{
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      display: "block",
-                    }}
-                  >
+                  <label className={styles.label}>
                     City
                   </label>
                   <CustomDropdown
@@ -535,14 +374,7 @@ export default function CareerFormStep1({
                     hasError={!!errors.city}
                   />
                   {errors.city && (
-                    <p
-                      style={{
-                        color: "#F04438",
-                        fontSize: "14px",
-                        marginTop: "6px",
-                        marginBottom: 0,
-                      }}
-                    >
+                    <p className={styles.errorText}>
                       {errors.city}
                     </p>
                   )}
@@ -552,46 +384,18 @@ export default function CareerFormStep1({
           </div>
         </div>
 
-        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+        <div className={`layered-card-outer ${styles.cardSpacing}`}>
           <div className="layered-card-middle">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                marginLeft: 8,
-                padding: 4,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span
-                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
-                >
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionBadge}>
+                <span className={styles.sectionBadgeText}>
                   4
                 </span>
               </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+              <span className={styles.sectionTitle}>
                 Salary
               </span>
-              <div
-                style={{
-                  marginLeft: "auto",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
+              <div className={styles.toggleContainer}>
                 <label className="switch">
                   <input
                     type="checkbox"
@@ -604,55 +408,25 @@ export default function CareerFormStep1({
                   />
                   <span className="slider round"></span>
                 </label>
-                <span style={{ fontSize: 14, fontWeight: 500 }}>
+                <span className={styles.toggleLabel}>
                   {formData.salaryNegotiable !== false ? "Negotiable" : "Fixed"}
                 </span>
               </div>
             </div>
 
             <div className="layered-card-content">
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 16,
-                }}
-              >
+              <div className={styles.gridTwoColumn}>
                 <div>
-                  <label
-                    style={{
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      display: "block",
-                    }}
-                  >
+                  <label className={styles.label}>
                     Minimum Salary
                   </label>
-                  <div style={{ position: "relative" }}>
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: "12px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
+                  <div className={styles.inputWrapper}>
+                    <span className={styles.currencySymbol}>
                       ₱
                     </span>
                     <input
                       type="number"
-                      className="form-control"
-                      style={{
-                        paddingLeft: "28px",
-                        borderColor: errors.minimumSalary
-                          ? "#F04438"
-                          : undefined,
-                        borderWidth: errors.minimumSalary ? "2px" : undefined,
-                        paddingRight: errors.minimumSalary ? "100px" : "70px",
-                      }}
+                      className={`form-control ${styles.salaryInput} ${errors.minimumSalary ? styles.salaryInputError : styles.salaryInputNoError}`}
                       placeholder="0"
                       min={0}
                       value={formData.minimumSalary || ""}
@@ -664,78 +438,31 @@ export default function CareerFormStep1({
                       <img
                         src="/career-form/warning-step-icon.svg"
                         alt="Warning"
-                        style={{
-                          position: "absolute",
-                          right: "65px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          pointerEvents: "none",
-                        }}
+                        className={styles.warningIconSalary}
                       />
                     )}
-                    <span
-                      style={{
-                        position: "absolute",
-                        right: "30px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
+                    <span className={styles.currencyCode}>
                       PHP
                     </span>
                   </div>
                   {errors.minimumSalary && (
-                    <p
-                      style={{
-                        color: "#F04438",
-                        fontSize: "14px",
-                        marginTop: "6px",
-                        marginBottom: 0,
-                      }}
-                    >
+                    <p className={styles.errorText}>
                       {errors.minimumSalary}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label
-                    style={{
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      display: "block",
-                    }}
-                  >
+                  <label className={styles.label}>
                     Maximum Salary
                   </label>
-                  <div style={{ position: "relative" }}>
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: "12px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
+                  <div className={styles.inputWrapper}>
+                    <span className={styles.currencySymbol}>
                       ₱
                     </span>
                     <input
                       type="number"
-                      className="form-control"
-                      style={{
-                        paddingLeft: "28px",
-                        borderColor: errors.maximumSalary
-                          ? "#F04438"
-                          : undefined,
-                        borderWidth: errors.maximumSalary ? "2px" : undefined,
-                        paddingRight: errors.maximumSalary ? "100px" : "70px",
-                      }}
+                      className={`form-control ${styles.salaryInput} ${errors.maximumSalary ? styles.salaryInputError : styles.salaryInputNoError}`}
                       placeholder="0"
                       min={0}
                       value={formData.maximumSalary || ""}
@@ -747,38 +474,15 @@ export default function CareerFormStep1({
                       <img
                         src="/career-form/warning-step-icon.svg"
                         alt="Warning"
-                        style={{
-                          position: "absolute",
-                          right: "65px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          pointerEvents: "none",
-                        }}
+                        className={styles.warningIconSalary}
                       />
                     )}
-                    <span
-                      style={{
-                        position: "absolute",
-                        right: "30px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
+                    <span className={styles.currencyCode}>
                       PHP
                     </span>
                   </div>
                   {errors.maximumSalary && (
-                    <p
-                      style={{
-                        color: "#F04438",
-                        fontSize: "14px",
-                        marginTop: "6px",
-                        marginBottom: 0,
-                      }}
-                    >
+                    <p className={styles.errorText}>
                       {errors.maximumSalary}
                     </p>
                   )}
@@ -788,48 +492,25 @@ export default function CareerFormStep1({
           </div>
         </div>
 
-        <div className="layered-card-outer" style={{ marginTop: 16 }}>
+        <div className={`layered-card-outer ${styles.cardSpacing}`}>
           <div className="layered-card-middle">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                marginLeft: 8,
-                padding: 4,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span
-                  style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}
-                >
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionBadge}>
+                <span className={styles.sectionBadgeText}>
                   5
                 </span>
               </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
+              <span className={styles.sectionTitle}>
                 Team Access
               </span>
             </div>
 
             <div className="layered-card-content">
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ fontWeight: 500, marginBottom: 8, display: "block" }}
-                >
+              <div className={styles.fieldWrapper}>
+                <label className={styles.label}>
                   Add more members
                 </label>
-                <p style={{ fontSize: 14, color: "#6B7280", marginBottom: 12 }}>
+                <p className={styles.description}>
                   You can add other members to collaborate on this career.
                 </p>
                 <CustomDropdown
@@ -843,56 +524,26 @@ export default function CareerFormStep1({
                 />
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "12px",
-                  backgroundColor: "#F9FAFB",
-                  borderRadius: "8px",
-                }}
-              >
+              <div className={styles.memberCard}>
                 <img
-                  src={user?.image || "/profile-placeholder.png"}
+                  src={user?.image}
                   alt={user?.name}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
+                  className={styles.memberAvatar}
                 />
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
+                <div className={styles.memberInfo}>
+                  <p className={styles.memberName}>
                     {user?.name} (You)
                   </p>
-                  <p style={{ margin: 0, fontSize: 12, color: "#6B7280" }}>
+                  <p className={styles.memberEmail}>
                     {user?.email}
                   </p>
                 </div>
-                <div
-                  style={{
-                    padding: "4px 12px",
-                    backgroundColor: "#FFFFFF",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: "6px",
-                    fontSize: 14,
-                    fontWeight: 500,
-                  }}
-                >
+                <div className={styles.roleBadge}>
                   Job Owner
                 </div>
               </div>
 
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "#9CA3AF",
-                  marginTop: 12,
-                  marginBottom: 0,
-                }}
-              >
+              <p className={styles.disclaimer}>
                 *Admins can view all careers regardless of specific access
                 settings.
               </p>
@@ -902,70 +553,34 @@ export default function CareerFormStep1({
       </div>
 
       {/* Tips Section */}
-      <div style={{ width: "300px", flexShrink: 0 }}>
+      <div className={styles.sidebarTips}>
         <div className="layered-card-outer">
           <div className="layered-card-middle">
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                marginLeft: 8,
-                padding: 4,
-              }}
-            >
+            <div className={styles.tipsHeader}>
               <img src="/career-form/tips.svg" alt="Tips Icon" />
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  color: "#181D27",
-                }}
-              >
+              <h3 className={styles.tipsTitle}>
                 Tips
               </h3>
             </div>
 
             <div className="layered-card-content">
-              <div
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "1.6",
-                  color: "#717680",
-                }}
-              >
-                <p
-                  style={{
-                    fontWeight: 410,
-                    marginBottom: "12px",
-                  }}
-                >
-                  <strong style={{ color: "#181d27", fontWeight: 550 }}>
+              <div className={styles.tipsContent}>
+                <p className={styles.tipsParagraph}>
+                  <strong className={styles.tipsStrong}>
                     Use clear, standard job titles
                   </strong>{" "}
                   for better searchability (e.g., "Software Engineer",
                   "Marketing Manager" instead of "Tech Rockstar").
                 </p>
-                <p
-                  style={{
-                    fontWeight: 410,
-                    marginBottom: "12px",
-                  }}
-                >
-                  <strong style={{ color: "#181d27", fontWeight: 550 }}>
+                <p className={styles.tipsParagraph}>
+                  <strong className={styles.tipsStrong}>
                     Avoid abbreviations
                   </strong>{" "}
                   of your role unless it's standard "aka" form (e.g., use
                   "Quality Assurance" instead of "QA IT" or "QA LT").
                 </p>
-                <p
-                  style={{
-                    fontWeight: 410,
-                    marginBottom: "0",
-                  }}
-                >
-                  <strong style={{ color: "#181d27", fontWeight: 550 }}>
+                <p className={styles.tipsParagraph}>
+                  <strong className={styles.tipsStrong}>
                     Keep job titles concise
                   </strong>{" "}
                   - try to use no more than a few words (2-4 max), avoiding

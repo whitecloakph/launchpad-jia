@@ -1,0 +1,92 @@
+// CareerFormStepper Component Styles
+@import "../variables";
+
+.stepperContainer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1em;
+  margin: 0 auto 32px auto;
+  width: 100%;
+  max-width: 1200px;
+}
+
+// Step Icons
+.warningIcon {
+  font-size: 24px;
+  color: $color-error;
+}
+
+.completedIcon {
+  font-size: 24px;
+  color: $color-primary-dark;
+}
+
+.currentIcon {
+  font-size: 24px;
+  color: $color-primary-dark;
+}
+
+.upcomingIcon {
+  font-size: 24px;
+  color: $color-border-medium;
+}
+
+.stepWrapper {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 12px;
+  flex: 1;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+}
+
+.stepSeparator {
+  height: 6px;
+  border-radius: 1em;
+  flex: 1;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+
+  &.completed {
+    background: linear-gradient(
+      90deg,
+      $color-gradient-stop-blue 0%,
+      $color-gradient-stop-purple 34%,
+      $color-gradient-stop-pink 67%,
+      $color-gradient-stop-yellow 100%
+    );
+  }
+
+  &.current {
+    background: linear-gradient(
+      90deg,
+      $color-gradient-stop-blue 0%,
+      $color-gradient-stop-purple 17%,
+      $color-gradient-stop-pink 33.5%,
+      $color-gradient-stop-yellow 50%,
+      $color-primary-neutral-200 50%
+    );
+  }
+
+  &.upcoming {
+    background: $color-border-primary;
+  }
+}
+
+.stepName {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+
+  &.active {
+    color: $color-primary-dark;
+  }
+
+  &.inactive {
+    color: $color-button-disabled;
+  }
+}

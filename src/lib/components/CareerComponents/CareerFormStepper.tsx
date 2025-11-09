@@ -1,9 +1,10 @@
-import React from "react";
+import styles from "@/lib/styles/screens/careerFormStepper.module.scss";
 
 interface CareerFormStepperProps {
   currentStep: number;
   completedSteps: number[];
   invalidSteps?: number[];
+  validatedSteps?: number[];
 }
 
 const steps = [
@@ -18,30 +19,13 @@ export default function CareerFormStepper({
   currentStep,
   completedSteps,
   invalidSteps = [],
+  validatedSteps = [],
 }: CareerFormStepperProps) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: "1em",
-        margin: "0 auto 32px auto",
-        width: "100%",
-        maxWidth: "1200px",
-      }}
-    >
+    <div className={styles.stepperContainer}>
       {steps.map((step, index) => (
-        <div
-          key={step.id}
-          style={{
-            display: "grid",
-            gridTemplateRows: "auto auto",
-            gap: "12px",
-            flex: 1,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
+        <div key={step.id} className={styles.stepWrapper}>
+          <div className={styles.stepHeader}>
             {/* Step Icons */}
             {invalidSteps.includes(step.id) && currentStep === step.id ? (
               <img
@@ -62,29 +46,21 @@ export default function CareerFormStepper({
             {/* Step Separator */}
             {index < steps.length - 1 && (
               <div
-                style={{
-                  height: "6px",
-                  borderRadius: "1em",
-                  flex: 1,
-                  background: completedSteps.includes(step.id)
-                    ? "linear-gradient(90deg, rgba(159, 202, 237, 1) 0%, rgba(206, 182, 218, 1) 34%, rgba(235, 172, 201, 1) 67%, rgba(252, 206, 192, 1) 100%)"
-                    : currentStep === step.id
-                    ? "linear-gradient(90deg, rgba(159, 202, 237, 1) 0%, rgba(206, 182, 218, 1) 17%, rgba(235, 172, 201, 1) 33.5%, rgba(252, 206, 192, 1) 50%, #e9eaeb 50%)"
-                    : "#e9eaeb",
-                  marginLeft: "8px",
-                  transition: "all 0.3s ease",
-                }}
+                className={`${styles.stepSeparator} ${
+                  completedSteps.includes(step.id)
+                    ? styles.completed
+                    : currentStep === step.id && validatedSteps.includes(step.id)
+                    ? styles.current
+                    : styles.upcoming
+                }`}
               />
             )}
           </div>
           {/* Step Name */}
           <span
-            style={{
-              fontSize: "12px",
-              fontWeight: 500,
-              color: currentStep === step.id ? "#181D27" : "#6B7280",
-              textAlign: "left",
-            }}
+            className={`${styles.stepName} ${
+              currentStep === step.id ? styles.active : styles.inactive
+            }`}
           >
             {step.name}
           </span>

@@ -1,0 +1,64 @@
+// ------------------------------------------------------------
+// Most of the color values in this file are sourced from this Figma link.
+// https://www.figma.com/design/VSmESEP5a5lQMAtENbl5SB/Segmented-Career-Editor?node-id=1-2&t=4Kc0fhOpRhhdI7Iu-1
+// ------------------------------------------------------------
+
+// Neutral Colors
+$color-primary-neutral-200: #e9eaeb;
+$color-primary-neutral-400: #A4A7AE;
+$color-primary-neutral-600: #535862;
+
+// Primary Colors
+$color-primary-dark: #181d27;
+$color-primary-dark-alt: #181d26;
+$color-white: #ffffff;
+
+// Secondary Colors (Blue-gray)
+$color-secondary-blue-gray-50: #f8f9fc;
+$color-secondary-blue-gray-200: #d5d9ea;
+$color-secondary-blue-gray-700: #383e70;
+$color-secondary-blue-gray-800: #1E1F3B;
+
+// Secondary Colors (Blue)
+$color-secondary-blue-50: #EFF8FF;
+$color-secondary-blue-200: #B2DDFF;
+$color-secondary-blue-700: #175CD3;
+
+// Text Colors
+$color-text-primary: #181d27;
+$color-text-secondary: #414651;
+$color-text-tertiary: #717680;
+$color-text-tips: #717680;
+
+// Icon Colors
+$color-general-icons: #71767f;
+
+// Border Colors
+$color-border-primary: #e9eaeb;
+$color-border-light: #eaecf4;
+$color-border-medium: #d1d5db;
+$color-border-dark: #d5d7da;
+
+// Background Colors
+$color-bg-light: #f8f9fc;
+
+// State Colors
+$color-error: #ea443e;
+$color-error-light: #f9a29d;
+$color-success: #039855;
+
+$color-success-50: #ECFDF3;
+$color-success-200: #A6F4C5;
+$color-success-500: #12B76A;
+
+// Button Colors
+$color-button-disabled: #d5d7da;
+
+// Box Shadows
+$inner-shadow-xs: 0px 0px 2px 0px rgba(0, 16, 53, 0.16) inset;
+
+// Gradient Colors
+$color-gradient-stop-blue: rgba(159, 202, 237, 1);
+$color-gradient-stop-purple: rgba(206, 182, 218, 1);
+$color-gradient-stop-pink: rgba(235, 172, 201, 1);
+$color-gradient-stop-yellow: rgba(252, 206, 192, 1);

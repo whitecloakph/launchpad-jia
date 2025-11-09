@@ -12,6 +12,7 @@ import CareerActionModal from "./CareerActionModal";
 import FullScreenLoadingAnimation from "./FullScreenLoadingAnimation";
 import axios from "axios";
 import { candidateActionToast, errorToast } from "@/lib/Utils";
+import styles from "@/lib/styles/screens/careerFormSegmented.module.scss";
 
 const getInitialFormData = () => ({
   jobTitle: "",
@@ -76,6 +77,7 @@ export default function CareerFormSegmented({
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [invalidSteps, setInvalidSteps] = useState<number[]>([]);
+  const [validatedSteps, setValidatedSteps] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState("");
   const [triggerValidation, setTriggerValidation] = useState(false);
@@ -94,6 +96,9 @@ export default function CareerFormSegmented({
         completed.push(3);
       completed.push(4);
       setCompletedSteps(completed);
+
+      // For existing careers, mark all completed steps as validated
+      setValidatedSteps(completed);
     }
   }, [career]);
 
@@ -114,11 +119,6 @@ export default function CareerFormSegmented({
 
   const handleNext = () => {
     handleStepChange(currentStep + 1);
-  };
-
-  const handlePrevious = () => {
-    setCurrentStep(currentStep - 1);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleEditStep = (step: number) => {
@@ -186,6 +186,10 @@ export default function CareerFormSegmented({
             setInvalidSteps(
               invalidSteps.filter((step) => step !== currentStep)
             );
+            // Add to validated steps
+            if (!validatedSteps.includes(currentStep)) {
+              setValidatedSteps([...validatedSteps, currentStep]);
+            }
             handleNext();
             setTriggerValidation(false);
           } else {
@@ -193,6 +197,8 @@ export default function CareerFormSegmented({
             if (!invalidSteps.includes(currentStep)) {
               setInvalidSteps([...invalidSteps, currentStep]);
             }
+            // Remove from validated steps if invalid
+            setValidatedSteps(validatedSteps.filter((step) => step !== currentStep));
           }
         }, 100);
       } else {
@@ -263,24 +269,13 @@ export default function CareerFormSegmented({
       const response = await axios.post("/api/add-career", careerData);
       if (response.status === 200) {
         candidateActionToast(
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginLeft: 8,
-            }}
-          >
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#181D27" }}>
+          <div className={styles.toastContainer}>
+            <span className={styles.toastText}>
               Career {status === "active" ? "published" : "saved as draft"}
             </span>
           </div>,
           1300,
-          <i
-            className="la la-check-circle"
-            style={{ color: "#039855", fontSize: 32 }}
-          ></i>
+          <i className={`la la-check-circle ${styles.toastIcon}`}></i>
         );
         setTimeout(() => {
           window.location.href = `/recruiter-dashboard/careers`;
@@ -342,24 +337,13 @@ export default function CareerFormSegmented({
       const response = await axios.post("/api/update-career", updatedCareer);
       if (response.status === 200) {
         candidateActionToast(
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginLeft: 8,
-            }}
-          >
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#181D27" }}>
+          <div className={styles.toastContainer}>
+            <span className={styles.toastText}>
               Career updated
             </span>
           </div>,
           1300,
-          <i
-            className="la la-check-circle"
-            style={{ color: "#039855", fontSize: 32 }}
-          ></i>
+          <i className={`la la-check-circle ${styles.toastIcon}`}></i>
         );
         setTimeout(() => {
           window.location.href = `/recruiter-dashboard/careers/manage/${career._id}`;
@@ -379,6 +363,15 @@ export default function CareerFormSegmented({
         return prev.filter((step) => step !== 1);
       } else if (!prev.includes(1)) {
         return [...prev, 1];
+      }
+      return prev;
+    });
+
+    setValidatedSteps((prev) => {
+      if (isValid && !prev.includes(1)) {
+        return [...prev, 1];
+      } else if (!isValid) {
+        return prev.filter((step) => step !== 1);
       }
       return prev;
     });
@@ -425,88 +418,32 @@ export default function CareerFormSegmented({
 
   return (
     <div className="col">
-      <div
-        style={{
-          marginBottom: "35px",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <h1 style={{ fontSize: "24px", fontWeight: 550, color: "#111827" }}>
+      <div className={styles.header}>
+        <h1 className={styles.headerTitle}>
           {formType === "add" ? "Add new career" : "Edit Career Details"}
         </h1>
         {currentStep !== 5 && (
-          <div
-            style={{
-              height: "40px",
-              display: "flex",
-              gap: "1em",
-            }}
-          >
+          <div className={styles.buttonContainer}>
             <button
               onClick={() => confirmSaveCareer("inactive")}
-              style={{
-                border: "2px solid #d5d7da",
-                backgroundColor: "transparent",
-                boxShadow: "none",
-                color: "#414651",
-                borderRadius: "2em",
-                paddingLeft: "1em",
-                paddingRight: "1em",
-                fontWeight: "500",
-                cursor: "pointer",
-              }}
+              className={styles.saveUnpublishedBtn}
             >
               Save as Unpublished
             </button>
             <button
               onClick={handleSaveContinue}
-              style={{
-                borderColor: "#181d27",
-                backgroundColor: "#181d27",
-                color: "#fff",
-                borderRadius: "2em",
-                paddingLeft: "1em",
-                paddingRight: "1em",
-                fontWeight: "450",
-                cursor: "pointer",
-              }}
+              className={styles.saveContinueBtn}
             >
               Save and Continue
-              <i
-                className="la la-arrow-right"
-                style={{
-                  scale: 1.5,
-                  marginLeft: "0.75em",
-                }}
-              ></i>
+              <i className={`la la-arrow-right ${styles.continueIcon}`}></i>
             </button>
           </div>
         )}
         {currentStep === 5 && formType === "add" && (
-          <div
-            style={{
-              height: "40px",
-              display: "flex",
-              gap: "1em",
-            }}
-          >
+          <div className={styles.buttonContainer}>
             <button
               disabled={!isFormValid() || isSaving}
-              style={{
-                border: "2px solid #d5d7da",
-                backgroundColor: "transparent",
-                boxShadow: "none",
-                color: "#414651",
-                borderRadius: "2em",
-                paddingLeft: "1em",
-                paddingRight: "1em",
-                fontWeight: "500",
-                cursor: !isFormValid() || isSaving ? "not-allowed" : "pointer",
-              }}
+              className={styles.saveUnpublishedBtn}
               onClick={() => {
                 confirmSaveCareer("inactive");
               }}
@@ -515,25 +452,12 @@ export default function CareerFormSegmented({
             </button>
             <button
               disabled={!isFormValid() || isSaving}
-              style={{
-                borderColor: "#181d27",
-                backgroundColor: "#181d27",
-                color: "#fff",
-                borderRadius: "2em",
-                paddingLeft: "1em",
-                paddingRight: "1em",
-                fontWeight: "450",
-                background: !isFormValid() || isSaving ? "#D5D7DA" : "black",
-                cursor: !isFormValid() || isSaving ? "not-allowed" : "pointer",
-              }}
+              className={styles.publishBtn}
               onClick={() => {
                 confirmSaveCareer("active");
               }}
             >
-              <i
-                className="la la-check-circle"
-                style={{ color: "#fff", fontSize: 20, marginRight: 8 }}
-              ></i>
+              <i className={`la la-check-circle ${styles.checkIcon}`}></i>
               Publish
             </button>
           </div>
@@ -544,6 +468,7 @@ export default function CareerFormSegmented({
         currentStep={currentStep}
         completedSteps={completedSteps}
         invalidSteps={invalidSteps}
+        validatedSteps={validatedSteps}
       />
 
       {renderStep()}

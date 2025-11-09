@@ -1,0 +1,170 @@
+@import "../variables";
+
+// Layout Containers
+.mainWrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 24px;
+}
+
+.formContent {
+  flex: 1;
+}
+
+.tipsSidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+// Section Headers
+.sectionHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding: 4px;
+}
+
+.numberBadge {
+  width: 32px;
+  height: 32px;
+  background-color: $color-primary-dark;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.numberBadgeText {
+  color: $color-white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  color: $color-primary-dark-alt;
+  font-weight: 700;
+}
+
+// AI Interview Settings Section
+.settingGroup {
+  margin-bottom: 8px;
+}
+
+.formLabel {
+  font-weight: 500;
+  color: $color-primary-dark-alt;
+  margin-bottom: 0;
+  display: block;
+}
+
+.formLabelFlex {
+  font-weight: 500;
+  color: $color-primary-dark-alt;
+  margin-bottom: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.descriptionText {
+  color: $color-text-secondary;
+}
+
+.divider {
+  margin: 0 0 8px 0;
+  border-top: 1px solid $color-border-light;
+}
+
+// Video Interview Toggle
+.videoToggleWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.videoToggleDescription {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: $color-text-secondary;
+}
+
+.toggleControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 35px;
+}
+
+// Secret Prompt Section
+.secretPromptLabel {
+  font-weight: 500;
+  color: $color-primary-dark-alt;
+  margin-bottom: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.helpIconCursor {
+  cursor: pointer;
+}
+
+.textarea {
+  width: 100%;
+  border: 1px solid $color-border-light;
+  border-radius: 5px;
+  padding: 0.625rem 0.75rem;
+  line-height: 1.5;
+  resize: none;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+// AI Interview Questions Card
+.questionsCard {
+  margin-top: 16px;
+}
+
+// Tips Section
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding: 4px;
+}
+
+.tipsHeaderTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-primary-dark;
+}
+
+.tipsContainer {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $color-text-tips;
+}
+
+.tipsParagraph {
+  font-weight: 410;
+  margin-bottom: 12px;
+}
+
+.tipsStrong {
+  color: $color-text-primary;
+  font-weight: 550;
+}

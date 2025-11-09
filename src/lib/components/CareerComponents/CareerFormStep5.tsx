@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  COLOR_BORDER_LIGHT,
-  COLOR_BORDER_PRIMARY,
-  COLOR_GENERAL_ICONS,
-  COLOR_TEXT_PRIMARY,
-  COLOR_TEXT_SECONDARY,
-  COLOR_TEXT_TERTIARY,
-  COLOR_WHITE,
-} from "@/lib/styles/variables";
+import styles from "@/lib/styles/screens/careerFormStep5.module.scss";
 import { useState } from "react";
 
 interface CareerFormStep5Props {
@@ -35,36 +27,23 @@ export default function CareerFormStep5({
   };
 
   return (
-    <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
+    <div className={styles.mainContainer}>
       {/* Step 1: Career Details & Team Access */}
-      <div className="layered-card-outer" style={{ marginBottom: 12 }}>
+      <div className={`layered-card-outer ${styles.sectionCard}`}>
         <div
-          className="layered-card-middle"
-          style={{ cursor: "pointer" }}
+          className={`layered-card-middle ${styles.sectionCardClickable}`}
           onClick={() => toggleSection(1)}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 8,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderLeft}>
               <i
                 className={
-                  expandedSection === 1 ? "la la-angle-up" : "la la-angle-down"
+                  expandedSection === 1
+                    ? `la la-angle-up ${styles.toggleIcon}`
+                    : `la la-angle-down ${styles.toggleIcon}`
                 }
-                style={{ fontSize: 20, color: COLOR_GENERAL_ICONS }}
               ></i>
-              <span
-                style={{
-                  color: COLOR_TEXT_PRIMARY,
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
+              <span className={styles.sectionTitle}>
                 Career Details & Team Access
               </span>
             </div>
@@ -73,224 +52,66 @@ export default function CareerFormStep5({
                 e.stopPropagation();
                 onEditStep(1);
               }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "4px 8px",
-                color: "#181D27",
-              }}
+              className={styles.editButton}
             >
-              <i className="la la-pen" style={{ fontSize: 18 }}></i>
+              <i className={`la la-pen ${styles.editIcon}`}></i>
             </button>
           </div>
 
           {expandedSection === 1 && (
-            <div
-              style={{
-                backgroundColor: "#fff",
-                padding: "2em",
-                borderRadius: "20px",
-                boxShadow: "0px 0px 2px 0px rgba(0, 16, 53, 0.16) inset",
-              }}
-            >
+            <div className={styles.expandedContent}>
               <div>
                 {/* Job Title */}
-                <div
-                  style={{
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 500,
-                      color: COLOR_TEXT_PRIMARY,
-                      margin: 0,
-                    }}
-                  >
-                    Job Title
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 18,
-                      fontWeight: 500,
-                      color: COLOR_TEXT_SECONDARY,
-                      margin: 0,
-                    }}
-                  >
+                <div className={styles.fieldSection}>
+                  <p className={styles.fieldLabel}>Job Title</p>
+                  <p className={styles.fieldValue}>
                     {formData.jobTitle || "—"}
                   </p>
                 </div>
 
                 {/* Employment Type & Work Arrangement */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gap: 20,
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
-                >
+                <div className={styles.fieldGrid}>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
-                      Employment Type
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_SECONDARY,
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.fieldLabel}>Employment Type</p>
+                    <p className={styles.fieldValue}>
                       {formData.employmentType || "—"}
                     </p>
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
-                      Work Arrangement
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_SECONDARY,
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.fieldLabel}>Work Arrangement</p>
+                    <p className={styles.fieldValue}>
                       {formData.workSetup || "—"}
                     </p>
                   </div>
                 </div>
 
                 {/* Location */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gap: 20,
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
-                >
+                <div className={styles.fieldGrid}>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
-                      Country
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_SECONDARY,
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.fieldLabel}>Country</p>
+                    <p className={styles.fieldValue}>
                       {formData.country || "Philippines"}
                     </p>
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
-                      State / Province
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_SECONDARY,
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.fieldLabel}>State / Province</p>
+                    <p className={styles.fieldValue}>
                       {formData.province || "—"}
                     </p>
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
-                      City
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_SECONDARY,
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.fieldLabel}>City</p>
+                    <p className={styles.fieldValue}>
                       {formData.city || "—"}
                     </p>
                   </div>
                 </div>
 
                 {/* Salary */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gap: 20,
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
-                >
+                <div className={styles.fieldGrid}>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
-                      Minimum Salary
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_SECONDARY,
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.fieldLabel}>Minimum Salary</p>
+                    <p className={styles.fieldValue}>
                       {formData.minimumSalary
                         ? `₱${Number(formData.minimumSalary).toLocaleString()}`
                         : formData.salaryNegotiable !== false
@@ -299,24 +120,8 @@ export default function CareerFormStep5({
                     </p>
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
-                      Maximum Salary
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_SECONDARY,
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.fieldLabel}>Maximum Salary</p>
+                    <p className={styles.fieldValue}>
                       {formData.maximumSalary
                         ? `₱${Number(formData.maximumSalary).toLocaleString()}`
                         : formData.salaryNegotiable !== false
@@ -327,31 +132,10 @@ export default function CareerFormStep5({
                 </div>
 
                 {/* Job Description */}
-                <div
-                  style={{
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 500,
-                      color: COLOR_TEXT_PRIMARY,
-                      margin: "0 0 8px 0",
-                    }}
-                  >
-                    Job Description
-                  </p>
+                <div className={styles.fieldSection}>
+                  <p className={styles.fieldLabel}>Job Description</p>
                   <div
-                    style={{
-                      fontSize: 18,
-                      lineHeight: "1.6",
-                      color: COLOR_TEXT_SECONDARY,
-                      maxHeight: "400px",
-                      overflowY: "auto",
-                    }}
+                    className={styles.descriptionContainer}
                     dangerouslySetInnerHTML={{
                       __html: formData.description || "—",
                     }}
@@ -360,67 +144,24 @@ export default function CareerFormStep5({
 
                 {/* Team Access */}
                 <div>
-                  <p
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 500,
-                      color: COLOR_TEXT_PRIMARY,
-                      margin: "0 0 8px 0",
-                    }}
-                  >
-                    Team Access
-                  </p>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "12px",
-                      borderRadius: "8px",
-                    }}
-                  >
+                  <p className={styles.fieldLabel}>Team Access</p>
+                  <div className={styles.teamAccessItem}>
                     <img
                       src={
                         formData.createdByImage || "/profile-placeholder.png"
                       }
                       alt="Job Owner"
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                      }}
+                      className={styles.teamAvatar}
                     />
-                    <div style={{ flex: 1 }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontWeight: 600,
-                          fontSize: 14,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
-                      >
+                    <div className={styles.teamInfo}>
+                      <p className={styles.teamName}>
                         {formData.createdByName || "Job Owner"}
                       </p>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 13,
-                          color: "#71767f",
-                        }}
-                      >
+                      <p className={styles.teamEmail}>
                         {formData.createdBy || "—"}
                       </p>
                     </div>
-                    <div
-                      style={{
-                        padding: "6px 12px",
-                        fontSize: 13,
-                        color: COLOR_TEXT_PRIMARY,
-                      }}
-                    >
-                      Job Owner
-                    </div>
+                    <div className={styles.teamRole}>Job Owner</div>
                   </div>
                 </div>
               </div>
@@ -430,34 +171,21 @@ export default function CareerFormStep5({
       </div>
 
       {/* Step 2: CV Review & Pre-screening */}
-      <div className="layered-card-outer" style={{ marginBottom: 12 }}>
+      <div className={`layered-card-outer ${styles.sectionCard}`}>
         <div
-          className="layered-card-middle"
-          style={{ cursor: "pointer" }}
+          className={`layered-card-middle ${styles.sectionCardClickable}`}
           onClick={() => toggleSection(2)}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 8,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderLeft}>
               <i
                 className={
-                  expandedSection === 2 ? "la la-angle-up" : "la la-angle-down"
+                  expandedSection === 2
+                    ? `la la-angle-up ${styles.toggleIcon}`
+                    : `la la-angle-down ${styles.toggleIcon}`
                 }
-                style={{ fontSize: 20, color: COLOR_GENERAL_ICONS }}
               ></i>
-              <span
-                style={{
-                  color: COLOR_TEXT_PRIMARY,
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
+              <span className={styles.sectionTitle}>
                 CV Review & Pre-Screening Questions
               </span>
             </div>
@@ -466,61 +194,30 @@ export default function CareerFormStep5({
                 e.stopPropagation();
                 onEditStep(2);
               }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "4px 8px",
-                color: "#181D27",
-              }}
+              className={styles.editButton}
             >
-              <i className="la la-pen" style={{ fontSize: 18 }}></i>
+              <i className={`la la-pen ${styles.editIcon}`}></i>
             </button>
           </div>
 
           {expandedSection === 2 && (
-            <div
-              style={{
-                padding: "0 16px 16px 16px",
-                borderTop: "1px solid #E5E7EB",
-              }}
-            >
-              <div style={{ padding: "16px 0" }}>
+            <div className={styles.expandedContentAlt}>
+              <div className={styles.innerPadding}>
                 {/* CV Screening */}
                 <div
-                  style={{
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
+                  className={styles.fieldSection}
                 >
                   <p
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 500,
-                      color: COLOR_TEXT_PRIMARY,
-                      margin: "0 0 8px 0",
-                    }}
+                    className={styles.fieldLabel}
                   >
                     CV Screening
                   </p>
                   <p
-                    style={{
-                      fontSize: 15,
-                      margin: 0,
-                      color: COLOR_TEXT_SECONDARY,
-                    }}
+                    className={styles.videoValue}
                   >
                     Automatically endorse candidates who are{" "}
                     <span
-                      style={{
-                        padding: "4px 10px",
-                        backgroundColor: "#f0f8ff",
-                        border: "1px solid #b5dcfd",
-                        borderRadius: 16,
-                        fontWeight: 500,
-                        color: "#2858ce",
-                      }}
+                      className={styles.screeningBadge}
                     >
                       {formData.screeningSetting || "Good Fit"}
                     </span>{" "}
@@ -530,37 +227,16 @@ export default function CareerFormStep5({
 
                 {/* CV Secret Prompt */}
                 {formData.cvSecretPrompt && (
-                  <div
-                    style={{
-                      paddingBottom: 20,
-                      marginBottom: 20,
-                      borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: "0 0 8px 0",
-                      }}
-                    >
-                      CV Secret Prompt
-                    </p>
+                  <div className={styles.fieldSection}>
+                    <p className={styles.fieldLabel}>CV Secret Prompt</p>
                     <ul
-                      style={{
-                        margin: 0,
-                        paddingLeft: "20px",
-                        color: COLOR_TEXT_SECONDARY,
-                        fontSize: 15,
-                        lineHeight: "1.6",
-                      }}
+                      className={styles.secretPromptList}
                     >
                       {formData.cvSecretPrompt
                         .split("\n")
                         .filter((line: string) => line.trim())
                         .map((line: string, index: number) => (
-                          <li key={index} style={{ marginBottom: 4 }}>
+                          <li key={index} className={styles.secretPromptItem}>
                             {line.trim().replace(/^[•\-]\s*/, "")}
                           </li>
                         ))}
@@ -570,76 +246,28 @@ export default function CareerFormStep5({
 
                 {/* Pre-Screening Questions */}
                 <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 12,
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
+                  <div className={styles.questionsSectionHeader}>
+                    <p className={styles.questionsTitle}>
                       Pre-Screening Questions
                     </p>
                     {formData.prescreeningQuestions?.length > 0 && (
-                      <span
-                        style={{
-                          padding: "2px 8px",
-                          backgroundColor: COLOR_WHITE,
-                          borderRadius: "12px",
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
-                      >
+                      <span className={styles.questionsCount}>
                         {formData.prescreeningQuestions.length}
                       </span>
                     )}
                   </div>
                   {formData.prescreeningQuestions &&
                   formData.prescreeningQuestions.length > 0 ? (
-                    <div style={{ marginTop: 12 }}>
+                    <div className={styles.questionsContainer}>
                       {formData.prescreeningQuestions.map(
                         (q: any, index: number) => (
-                          <div
-                            key={q.id}
-                            style={{
-                              marginBottom: 16,
-                              paddingBottom: 16,
-                              borderBottom:
-                                index <
-                                formData.prescreeningQuestions.length - 1
-                                  ? `1px solid ${COLOR_BORDER_LIGHT}`
-                                  : "none",
-                            }}
-                          >
-                            <p
-                              style={{
-                                fontSize: 15,
-                                fontWeight: 500,
-                                margin: "0 0 10px 0",
-                                color: COLOR_TEXT_PRIMARY,
-                              }}
-                            >
+                          <div key={q.id} className={styles.questionItem}>
+                            <p className={styles.questionText}>
                               {index + 1}. {q.question}
                             </p>
                             {/* Range type: Display min-max with currency */}
                             {q.type === "range" ? (
-                              <p
-                                style={{
-                                  fontSize: 14,
-                                  color: COLOR_TEXT_SECONDARY,
-                                  margin: 0,
-                                  paddingLeft: "20px",
-                                }}
-                              >
+                              <p className={styles.questionMeta}>
                                 Range: {q.currency || "PHP"}{" "}
                                 {q.rangeMin?.toLocaleString()} -{" "}
                                 {q.currency || "PHP"}{" "}
@@ -647,49 +275,20 @@ export default function CareerFormStep5({
                               </p>
                             ) : /* Short answer type: Single-line text input */ q.type ===
                               "short-answer" ? (
-                              <p
-                                style={{
-                                  fontSize: 14,
-                                  color: COLOR_TEXT_SECONDARY,
-                                  margin: 0,
-                                  paddingLeft: "20px",
-                                  fontStyle: "italic",
-                                }}
-                              >
+                              <p className={styles.questionMetaItalic}>
                                 Short answer text
                               </p>
                             ) : /* Long answer type: Multi-line text input */ q.type ===
                               "long-answer" ? (
-                              <span
-                                style={{
-                                  fontSize: 14,
-                                  color: COLOR_TEXT_SECONDARY,
-                                  margin: 0,
-                                  paddingLeft: "20px",
-                                  fontStyle: "italic",
-                                }}
-                              >
+                              <span className={styles.questionMetaItalic}>
                                 Long answer text
                               </span>
                             ) : /* Dropdown/Checkboxes type: Display list of options */ q.options &&
                               q.options.length > 0 ? (
-                              <ul
-                                style={{
-                                  margin: 0,
-                                  paddingLeft: "20px",
-                                  listStyleType: "disc",
-                                }}
-                              >
+                              <ul className={styles.optionsList}>
                                 {q.options.map(
                                   (opt: string, optIndex: number) => (
-                                    <li
-                                      key={optIndex}
-                                      style={{
-                                        fontSize: 14,
-                                        color: COLOR_TEXT_SECONDARY,
-                                        marginBottom: 4,
-                                      }}
-                                    >
+                                    <li key={optIndex} className={styles.optionItem}>
                                       {opt}
                                     </li>
                                   )
@@ -701,14 +300,7 @@ export default function CareerFormStep5({
                       )}
                     </div>
                   ) : (
-                    <p
-                      style={{
-                        fontSize: 14,
-                        color: COLOR_TEXT_TERTIARY,
-                        margin: "8px 0 0 0",
-                        fontStyle: "italic",
-                      }}
-                    >
+                    <p className={styles.noQuestionsText}>
                       No pre-screening questions added
                     </p>
                   )}
@@ -720,97 +312,51 @@ export default function CareerFormStep5({
       </div>
 
       {/* Step 3: AI Interview Setup */}
-      <div className="layered-card-outer" style={{ marginBottom: 12 }}>
+      <div className={`layered-card-outer ${styles.sectionCard}`}>
         <div
-          className="layered-card-middle"
-          style={{ cursor: "pointer" }}
+          className={`layered-card-middle ${styles.sectionCardClickable}`}
           onClick={() => toggleSection(3)}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 8,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderLeft}>
               <i
                 className={
-                  expandedSection === 3 ? "la la-angle-up" : "la la-angle-down"
+                  expandedSection === 3
+                    ? `la la-angle-up ${styles.toggleIcon}`
+                    : `la la-angle-down ${styles.toggleIcon}`
                 }
-                style={{ fontSize: 20, color: COLOR_GENERAL_ICONS }}
               ></i>
-              <span
-                style={{
-                  color: COLOR_TEXT_PRIMARY,
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
-                AI Interview Setup
-              </span>
+              <span className={styles.sectionTitle}>AI Interview Setup</span>
             </div>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onEditStep(3);
               }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "4px 8px",
-                color: "#181D27",
-              }}
+              className={styles.editButton}
             >
-              <i className="la la-pen" style={{ fontSize: 18 }}></i>
+              <i className={`la la-pen ${styles.editIcon}`}></i>
             </button>
           </div>
 
           {expandedSection === 3 && (
-            <div
-              style={{
-                padding: "0 16px 16px 16px",
-                borderTop: "1px solid #E5E7EB",
-              }}
-            >
-              <div style={{ padding: "16px 0" }}>
+            <div className={styles.expandedContentAlt}>
+              <div className={styles.innerPadding}>
                 {/* AI Interview Screening */}
                 <div
-                  style={{
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
+                  className={styles.fieldSection}
                 >
                   <p
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 500,
-                      color: COLOR_TEXT_PRIMARY,
-                      margin: "0 0 8px 0",
-                    }}
+                    className={styles.fieldLabel}
                   >
                     AI Interview Screening
                   </p>
                   <p
-                    style={{
-                      fontSize: 15,
-                      margin: 0,
-                      color: COLOR_TEXT_SECONDARY,
-                    }}
+                    className={styles.videoValue}
                   >
                     Automatically endorse candidates who are{" "}
                     <span
-                      style={{
-                        padding: "4px 10px",
-                        backgroundColor: "#f0f8ff",
-                        border: "1px solid #b5dcfd",
-                        borderRadius: 16,
-                        fontWeight: 500,
-                        color: "#2858ce",
-                      }}
+                      className={styles.screeningBadge}
                     >
                       {formData.screeningSetting || "Good Fit"}
                     </span>{" "}
@@ -819,90 +365,32 @@ export default function CareerFormStep5({
                 </div>
 
                 {/* Require Video on Interview */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    paddingBottom: 20,
-                    marginBottom: 20,
-                    borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 500,
-                      color: COLOR_TEXT_PRIMARY,
-                      margin: "0 0 8px 0",
-                    }}
-                  >
+                <div className={styles.videoRequirement}>
+                  <p className={styles.videoLabel}>
                     Require Video on Interview
                   </p>
-                  <p
-                    style={{
-                      fontSize: 15,
-                      margin: 0,
-                      color: COLOR_TEXT_SECONDARY,
-                    }}
-                  >
+                  <p className={styles.videoValue}>
                     {formData.requireVideo !== false ? "Yes" : "No"}{" "}
                     {formData.requireVideo !== false && (
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
-                          border: "2px solid #abf5c7",
-                          backgroundColor: "#edfdf3",
-                          color: "#2eb86f",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                          marginLeft: "4px",
-                          paddingBottom: 2,
-                        }}
-                      >
-                        ✓
-                      </span>
+                      <span className={styles.videoCheckmark}>✓</span>
                     )}
                   </p>
                 </div>
 
                 {/* AI Interview Secret Prompt */}
                 {formData.aiInterviewSecretPrompt && (
-                  <div
-                    style={{
-                      paddingBottom: 20,
-                      marginBottom: 20,
-                      borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: "0 0 8px 0",
-                      }}
-                    >
+                  <div className={styles.fieldSection}>
+                    <p className={styles.fieldLabel}>
                       AI Interview Secret Prompt
                     </p>
                     <ul
-                      style={{
-                        margin: 0,
-                        paddingLeft: "20px",
-                        color: COLOR_TEXT_SECONDARY,
-                        fontSize: 15,
-                        lineHeight: "1.6",
-                      }}
+                      className={styles.secretPromptList}
                     >
                       {formData.aiInterviewSecretPrompt
                         .split("\n")
                         .filter((line: string) => line.trim())
                         .map((line: string, index: number) => (
-                          <li key={index} style={{ marginBottom: 4 }}>
+                          <li key={index} className={styles.secretPromptItem}>
                             {line.trim().replace(/^[•\-]\s*/, "")}
                           </li>
                         ))}
@@ -912,35 +400,12 @@ export default function CareerFormStep5({
 
                 {/* Interview Questions */}
                 <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 12,
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                        color: COLOR_TEXT_PRIMARY,
-                        margin: 0,
-                      }}
-                    >
+                  <div className={styles.questionsSectionHeader}>
+                    <p className={styles.questionsTitle}>
                       Interview Questions
                     </p>
                     {getTotalQuestions() > 0 && (
-                      <span
-                        style={{
-                          padding: "2px 8px",
-                          backgroundColor: COLOR_WHITE,
-                          borderRadius: "12px",
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
-                      >
+                      <span className={styles.questionsCount}>
                         {getTotalQuestions()}
                       </span>
                     )}
@@ -952,29 +417,14 @@ export default function CareerFormStep5({
                         return (
                           <div
                             key={category.id}
-                            style={{
-                              marginTop: 16,
-                              paddingBottom: 16,
-                              borderBottom:
-                                catIndex < formData.questions.length - 1
-                                  ? `1px solid ${COLOR_BORDER_LIGHT}`
-                                  : "none",
-                            }}
+                            className={styles.interviewQuestionsContainer}
                           >
-                            <p
-                              style={{
-                                fontSize: 15,
-                                fontWeight: 600,
-                                margin: "0 0 12px 0",
-                                color: COLOR_TEXT_PRIMARY,
-                              }}
-                            >
+                            <p className={styles.categoryTitle}>
                               {category.category}
                             </p>
                             <ol
+                              className={styles.questionsList}
                               style={{
-                                margin: 0,
-                                paddingLeft: "20px",
                                 counterReset: `item ${formData.questions
                                   .slice(0, catIndex)
                                   .reduce(
@@ -988,12 +438,7 @@ export default function CareerFormStep5({
                                 (q: any, index: number) => (
                                   <li
                                     key={q.id || index}
-                                    style={{
-                                      fontSize: 14,
-                                      color: COLOR_TEXT_SECONDARY,
-                                      marginBottom: 8,
-                                      lineHeight: "1.5",
-                                    }}
+                                    className={styles.interviewQuestionItem}
                                   >
                                     {typeof q === "string" ? q : q.question}
                                   </li>
@@ -1014,148 +459,64 @@ export default function CareerFormStep5({
       </div>
 
       {/* Step 4: Pipeline Stages */}
-      <div className="layered-card-outer" style={{ marginBottom: 12 }}>
+      <div className={`layered-card-outer ${styles.sectionCard}`}>
         <div
-          className="layered-card-middle"
-          style={{ cursor: "pointer" }}
+          className={`layered-card-middle ${styles.sectionCardClickable}`}
           onClick={() => toggleSection(4)}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 8,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderLeft}>
               <i
                 className={
-                  expandedSection === 4 ? "la la-angle-up" : "la la-angle-down"
+                  expandedSection === 4
+                    ? `la la-angle-up ${styles.toggleIcon}`
+                    : `la la-angle-down ${styles.toggleIcon}`
                 }
-                style={{ fontSize: 20, color: COLOR_GENERAL_ICONS }}
               ></i>
-              <span
-                style={{
-                  color: COLOR_TEXT_PRIMARY,
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
-                Pipeline Stages
-              </span>
+              <span className={styles.sectionTitle}>Pipeline Stages</span>
             </div>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onEditStep(4);
               }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "4px 8px",
-                color: "#181D27",
-              }}
+              className={styles.editButton}
             >
-              <i className="la la-pen" style={{ fontSize: 18 }}></i>
+              <i className={`la la-pen ${styles.editIcon}`}></i>
             </button>
           </div>
 
           {expandedSection === 4 && (
-            <div
-              style={{
-                padding: "0 16px 16px 16px",
-                borderTop: "1px solid #E5E7EB",
-              }}
-            >
-              <div style={{ padding: "16px 0" }}>
+            <div className={styles.expandedContentAlt}>
+              <div className={styles.innerPadding}>
                 {/* Pipeline Stages Grid */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                    gap: 16,
-                    height: 300,
-                  }}
-                >
+                <div className={styles.pipelineGrid}>
                   {/* CV Screening */}
                   <div
-                    style={{
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: 8,
-                      padding: 16,
-                      border: `1px solid ${COLOR_BORDER_LIGHT}`,
-                    }}
+                    className={styles.pipelineStage}
                   >
                     <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        marginBottom: 12,
-                      }}
+                      className={styles.stageHeader}
                     >
                       <i
-                        className="la la-user-check"
-                        style={{
-                          fontSize: 18,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={`la la-user-check ${styles.stageIcon}`}
                       ></i>
                       <p
-                        style={{
-                          margin: 0,
-                          fontSize: 15,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={styles.stageName}
                       >
                         CV Screening
                       </p>
                     </div>
-                    <div style={{ marginBottom: 8 }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_SECONDARY,
-                          marginBottom: 6,
-                        }}
-                      >
-                        Substages
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 4,
-                        }}
-                      >
+                    <div className={styles.substagesSection}>
+                      <p className={styles.substagesLabel}>Substages</p>
+                      <div className={styles.substagesList}>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           Waiting Submission
                         </p>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           For Review
                         </p>
@@ -1165,81 +526,30 @@ export default function CareerFormStep5({
 
                   {/* AI Interview */}
                   <div
-                    style={{
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: 8,
-                      padding: 16,
-                      border: `1px solid ${COLOR_BORDER_LIGHT}`,
-                    }}
+                    className={styles.pipelineStage}
                   >
                     <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        marginBottom: 12,
-                      }}
+                      className={styles.stageHeader}
                     >
                       <i
-                        className="la la-microphone"
-                        style={{
-                          fontSize: 18,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={`la la-microphone ${styles.stageIcon}`}
                       ></i>
                       <p
-                        style={{
-                          margin: 0,
-                          fontSize: 15,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={styles.stageName}
                       >
                         AI Interview
                       </p>
                     </div>
-                    <div style={{ marginBottom: 8 }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_SECONDARY,
-                          marginBottom: 6,
-                        }}
-                      >
-                        Substages
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 4,
-                        }}
-                      >
+                    <div className={styles.substagesSection}>
+                      <p className={styles.substagesLabel}>Substages</p>
+                      <div className={styles.substagesList}>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           Waiting Interview
                         </p>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           For Review
                         </p>
@@ -1249,81 +559,30 @@ export default function CareerFormStep5({
 
                   {/* Personality Test */}
                   <div
-                    style={{
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: 8,
-                      padding: 16,
-                      border: `1px solid ${COLOR_BORDER_LIGHT}`,
-                    }}
+                    className={styles.pipelineStage}
                   >
                     <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        marginBottom: 12,
-                      }}
+                      className={styles.stageHeader}
                     >
                       <i
-                        className="la la-brain"
-                        style={{
-                          fontSize: 18,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={`la la-brain ${styles.stageIcon}`}
                       ></i>
                       <p
-                        style={{
-                          margin: 0,
-                          fontSize: 15,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={styles.stageName}
                       >
                         Personality Test
                       </p>
                     </div>
-                    <div style={{ marginBottom: 8 }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_SECONDARY,
-                          marginBottom: 6,
-                        }}
-                      >
-                        Substages
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 4,
-                        }}
-                      >
+                    <div className={styles.substagesSection}>
+                      <p className={styles.substagesLabel}>Substages</p>
+                      <div className={styles.substagesList}>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           Waiting Submission
                         </p>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           For Review
                         </p>
@@ -1333,81 +592,30 @@ export default function CareerFormStep5({
 
                   {/* Coding Test */}
                   <div
-                    style={{
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: 8,
-                      padding: 16,
-                      border: `1px solid ${COLOR_BORDER_LIGHT}`,
-                    }}
+                    className={styles.pipelineStage}
                   >
                     <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        marginBottom: 12,
-                      }}
+                      className={styles.stageHeader}
                     >
                       <i
-                        className="la la-code"
-                        style={{
-                          fontSize: 18,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={`la la-code ${styles.stageIcon}`}
                       ></i>
                       <p
-                        style={{
-                          margin: 0,
-                          fontSize: 15,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_PRIMARY,
-                        }}
+                        className={styles.stageName}
                       >
                         Coding Test
                       </p>
                     </div>
-                    <div style={{ marginBottom: 8 }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: COLOR_TEXT_SECONDARY,
-                          marginBottom: 6,
-                        }}
-                      >
-                        Substages
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 4,
-                        }}
-                      >
+                    <div className={styles.substagesSection}>
+                      <p className={styles.substagesLabel}>Substages</p>
+                      <div className={styles.substagesList}>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           Waiting Submission
                         </p>
                         <p
-                          style={{
-                            border: `1px solid ${COLOR_BORDER_PRIMARY}`,
-                            backgroundColor: "#fff",
-                            margin: 0,
-                            padding: "0.75em",
-                            color: COLOR_TEXT_SECONDARY,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
+                          className={styles.substageItem}
                         >
                           For Review
                         </p>

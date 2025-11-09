@@ -1,0 +1,401 @@
+@import "../variables";
+
+// Main Container
+.mainContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Section Cards
+.sectionCard {
+  margin-bottom: 12px;
+}
+
+.sectionCardClickable {
+  cursor: pointer;
+}
+
+// Section Header
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+}
+
+.sectionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggleIcon {
+  font-size: 20px;
+  color: $color-general-icons;
+}
+
+.sectionTitle {
+  color: $color-text-primary;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: $color-primary-neutral-600;
+}
+
+.editIcon {
+  font-size: 18px;
+}
+
+// Expanded Content
+.expandedContent {
+  background-color: $color-white;
+  padding: 2em;
+  border-radius: 20px;
+  box-shadow: $inner-shadow-xs;
+}
+
+.expandedContentAlt {
+  padding: 0 16px 16px 16px;
+  border-top: 1px solid $color-border-primary;
+}
+
+.innerPadding {
+  padding: 16px 0;
+}
+
+// Field Sections
+.fieldSection {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid $color-border-light;
+}
+
+.fieldSectionNoBottomMargin {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.fieldSectionNoBorder {
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid $color-border-light;
+}
+
+.fieldGridTwoCol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid $color-border-light;
+}
+
+// Field Labels & Values
+.fieldLabel {
+  font-size: 16px;
+  font-weight: 500;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+.fieldValue {
+  font-size: 18px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+// Job Description
+.descriptionContainer {
+  font-size: 18px;
+  line-height: 1.6;
+  color: $color-text-secondary;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+// Team Access
+.teamAccessItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.teamAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.teamInfo {
+  flex: 1;
+}
+
+.teamName {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  color: $color-text-primary;
+}
+
+.teamEmail {
+  margin: 0;
+  font-size: 13px;
+  color: $color-text-tertiary;
+}
+
+.teamRole {
+  padding: 6px 12px;
+  font-size: 13px;
+  color: $color-text-primary;
+}
+
+// CV Screening Badge
+.screeningBadge {
+  padding: 4px 10px;
+  background-color: $color-secondary-blue-50;
+  border: 1px solid $color-secondary-blue-200;
+  border-radius: 16px;
+  font-weight: 500;
+  color: $color-secondary-blue-700;
+}
+
+// Secret Prompt Lists
+.secretPromptList {
+  margin: 0;
+  padding-left: 20px;
+  color: $color-text-secondary;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.secretPromptItem {
+  margin-bottom: 4px;
+}
+
+// Pre-screening Questions
+.questionsSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.questionsTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+.questionsCount {
+  padding: 2px 8px;
+  background-color: $color-white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.questionsContainer {
+  margin-top: 12px;
+}
+
+.questionItem {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.questionText {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+  color: $color-text-primary;
+}
+
+.questionMeta {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.questionMetaItalic {
+  @extend .questionMeta;
+  font-style: italic;
+}
+
+.optionsList {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.optionItem {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin-bottom: 4px;
+}
+
+.noQuestionsText {
+  font-size: 14px;
+  color: $color-text-tertiary;
+  margin: 8px 0 0 0;
+  font-style: italic;
+}
+
+// Interview Questions
+.interviewQuestionsContainer {
+  margin-top: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.categoryTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: $color-text-primary;
+}
+
+.questionsList {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.interviewQuestionItem {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+// Video Requirement
+.videoRequirement {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid $color-border-light;
+}
+
+.videoLabel {
+  font-size: 16px;
+  font-weight: 500;
+  color: $color-text-primary;
+  margin: 0 0 8px 0;
+}
+
+.videoValue {
+  font-size: 15px;
+  margin: 0;
+  color: $color-text-secondary;
+}
+
+.videoCheckmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid $color-success-200;
+  background-color: $color-success-50;
+  color: $color-success-500;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 4px;
+  padding-bottom: 2px;
+}
+
+// Pipeline Stages Grid
+.pipelineGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  height: 300px;
+}
+
+.pipelineStage {
+  background-color: $color-bg-light;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid $color-border-light;
+}
+
+.stageHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stageIcon {
+  font-size: 18px;
+  color: $color-text-primary;
+}
+
+.stageName {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.substagesSection {
+  margin-bottom: 8px;
+}
+
+.substagesLabel {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text-secondary;
+  margin-bottom: 6px;
+}
+
+.substagesList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.substageItem {
+  border: 1px solid $color-border-primary;
+  background-color: $color-white;
+  margin: 0;
+  padding: 0.75em;
+  color: $color-text-secondary;
+  font-size: 16px;
+  font-weight: 500;
+}

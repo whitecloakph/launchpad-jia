@@ -1,3 +1,5 @@
+@import "./variables";
+
 .input-group {
   background-color: #f8f9fa !important;
 }
@@ -930,7 +932,6 @@ $gifURL: "/gr-1.gif";
   overflow-y: auto;
   flex-direction: column;
   justify-content: space-between;
-  border-right: 1px solid #e9eaeb;
 
   .sidebar-header {
     display: flex;
@@ -1210,8 +1211,11 @@ $gifURL: "/gr-1.gif";
   }
   .main-content,
   #panel {
-    margin-left: 260px !important;
-    width: calc(100vw - 260px) !important;
+    margin: 2em 2em 2em 260px !important;
+    width: calc(100vw - 292px) !important;
+    border: 1px solid $color-border-light;
+    border-radius: 24px;
+    box-shadow: $inner-shadow-xs;
     padding-left: 0 !important;
     padding-right: 0 !important;
   }

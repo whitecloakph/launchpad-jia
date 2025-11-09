@@ -1,0 +1,257 @@
+@import "../variables";
+
+// Layout Containers
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 24px;
+}
+
+.formContent {
+  flex: 1;
+}
+
+.sidebarTips {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+// Section Headers
+.sectionHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding: 4px;
+}
+
+.sectionBadge {
+  width: 32px;
+  height: 32px;
+  background-color: $color-primary-dark;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sectionBadgeText {
+  color: $color-white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  color: $color-primary-dark;
+  font-weight: 700;
+}
+
+.cardSpacing {
+  margin-top: 16px;
+}
+
+// Form Fields
+.fieldWrapper {
+  margin-bottom: 16px;
+}
+
+.label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.inputError {
+  border-color: $color-error !important;
+  border-width: 2px !important;
+  padding-right: 40px !important;
+}
+
+.editorError {
+  outline: 2px solid $color-error;
+  border-radius: 8px;
+}
+
+// Grid Layouts
+.gridThreeColumn {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.gridTwoColumn {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+// Currency Input Styles
+.currencySymbol {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.currencyCode {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.salaryInput {
+  padding-left: 28px;
+}
+
+.salaryInputError {
+  border-color: $color-error !important;
+  border-width: 2px !important;
+  padding-right: 100px !important;
+}
+
+.salaryInputNoError {
+  padding-right: 70px;
+}
+
+// Warning Icons
+.warningIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.warningIconSalary {
+  position: absolute;
+  right: 65px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+// Error Messages
+.errorText {
+  color: $color-error;
+  font-size: 14px;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+// Toggle Section
+.toggleContainer {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+// Team Access Section
+.description {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.memberCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.memberAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.memberInfo {
+  flex: 1;
+}
+
+.memberName {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.memberEmail {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.roleBadge {
+  padding: 4px 12px;
+  background-color: $color-white;
+  border: 1px solid $color-border-dark;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.disclaimer {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+// Tips Section
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding: 4px;
+}
+
+.tipsTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-primary-dark;
+}
+
+.tipsContent {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $color-text-tips;
+}
+
+.tipsParagraph {
+  font-weight: 410;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.tipsStrong {
+  color: $color-primary-dark;
+  font-weight: 550;
+}

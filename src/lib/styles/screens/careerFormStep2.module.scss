@@ -1,0 +1,195 @@
+@import "../variables";
+
+// Layout Containers
+.mainWrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 24px;
+}
+
+.formContent {
+  flex: 1;
+}
+
+.tipsSidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+// Section Headers
+.sectionHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding: 4px;
+}
+
+.sectionHeaderSpaced {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 8px;
+  padding: 4px;
+}
+
+.sectionHeaderInner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding: 4px;
+}
+
+// Badge/Number Circle Styles
+.numberBadge {
+  width: 32px;
+  height: 32px;
+  background-color: $color-primary-dark;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.numberBadgeText {
+  color: $color-white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+// Section Titles
+.sectionTitle {
+  font-size: 16px;
+  color: $color-primary-dark-alt;
+  font-weight: 700;
+}
+
+.sectionTitleAlt {
+  font-size: 16px;
+  color: $color-primary-dark;
+  font-weight: 700;
+}
+
+.tipsHeaderTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-primary-dark;
+}
+
+// Labels & Text
+.formLabel {
+  font-weight: 500;
+  color: $color-primary-dark-alt;
+  margin-bottom: 0;
+  display: block;
+}
+
+.formLabelFlex {
+  font-weight: 500;
+  color: $color-primary-dark-alt;
+  margin-bottom: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.descriptionText {
+  color: $color-text-secondary;
+}
+
+.optionalText {
+  font-size: 14px;
+  font-weight: 400;
+  color: $color-text-primary;
+}
+
+.countBadge {
+  padding: 2px 10px;
+  background-color: $color-secondary-blue-gray-50;
+  border: 1px solid $color-secondary-blue-gray-200;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-secondary-blue-gray-700;
+}
+
+// Buttons
+.addCustomButton {
+  padding: 8px 16px;
+  background-color: $color-primary-dark;
+  color: $color-white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+// Form Inputs
+.textarea {
+  width: 100%;
+  border: 1px solid $color-border-light;
+  border-radius: 5px;
+  padding: 0.625rem 0.75rem;
+  line-height: 1.5;
+  resize: none;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+// Dividers
+.divider {
+  margin: 0 0 8px 0;
+  border-top: 1px solid $color-border-light;
+}
+
+// Spacing Utilities
+.marginBottomSmall {
+  margin-bottom: 8px;
+}
+
+.marginTopMedium {
+  margin-top: 16px;
+}
+
+// Tips Section
+.tipsContainer {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $color-text-tips;
+}
+
+.tipsParagraph {
+  font-weight: 410;
+  margin-bottom: 12px;
+}
+
+.tipsParagraphLast {
+  font-weight: 410;
+  margin-bottom: 0;
+}
+
+.tipsStrong {
+  color: $color-text-primary;
+  font-weight: 550;
+}
+
+// Miscellaneous
+.helpIconCursor {
+  cursor: pointer;
+}
