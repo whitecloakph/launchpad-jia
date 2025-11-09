@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 export default function CustomDropdown(props) {
-    const { onSelectSetting, screeningSetting, settingList, placeholder } = props;
+    const { onSelectSetting, screeningSetting, settingList, placeholder, hasError } = props;
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
@@ -10,7 +10,12 @@ export default function CustomDropdown(props) {
           <button
             disabled={settingList.length === 0}
             className="dropdown-btn fade-in-bottom"
-            style={{ width: "100%", textTransform: "capitalize" }}
+            style={{ 
+              width: "100%", 
+              textTransform: "capitalize",
+              borderColor: hasError ? "#EF4444" : undefined,
+              borderWidth: hasError ? "2px" : undefined
+            }}
             type="button"
             onClick={() => setDropdownOpen((v) => !v)}
           >
@@ -31,7 +36,7 @@ export default function CustomDropdown(props) {
               dropdownOpen ? " show" : ""
             }`}
             style={{
-              padding: "10px",
+              padding: "6px",
               maxHeight: 200,
               overflowY: "auto",
             }}

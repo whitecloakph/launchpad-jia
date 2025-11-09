@@ -347,11 +347,11 @@ export default function (props) {
         <div className="layered-card-middle">
           <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
               <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {/* <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <i className="la la-comment-alt" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
-                </div>
+                </div> */}
                 <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>
-                  Interview Questions 
+                  2. AI Interview Questions 
                 </span>
                 <div style={{ borderRadius: "50%", width: 30, height: 22, border: "1px solid #D5D9EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, backgroundColor: "#F8F9FC", color: "#181D27", fontWeight: 700 }}>
                   {questions.reduce((acc, group) => acc + group.questions.length, 0)}
