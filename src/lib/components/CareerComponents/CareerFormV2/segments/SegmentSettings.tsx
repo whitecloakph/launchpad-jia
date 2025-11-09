@@ -20,17 +20,87 @@ const screeningSettingList = [
 export default function SegmentSettings({
   screeningSetting,
   setScreeningSetting,
-  requireVideo,
-  setRequireVideo,
 }: {
   screeningSetting: string;
   setScreeningSetting: (value: string) => void;
-  requireVideo: boolean;
-  setRequireVideo: (value: boolean) => void;
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div className="layered-card-outer">
+      <div className="layered-card-middle">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <span className="career-label">1. CV Review Settings</span>
+        </div>
+        <div className="layered-card-content">
+          <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+            <span className="sub-career-label">
+              CV Screening <span style={{ color: "#EF4444" }}>*</span>
+            </span>
+          </div>
+          <span
+            style={{
+              fontSize: "16px",
+              marginBottom: "8px",
+              color: "#414651",
+            }}
+          >
+            Jia automatically endorses candidates who meet the chosen criteria.
+          </span>
+          <div style={{ width: "30%" }}>
+            <CustomDropdown
+              onSelectSetting={(setting) => setScreeningSetting(setting)}
+              screeningSetting={screeningSetting}
+              settingList={screeningSettingList}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              gap: 8,
+              marginTop: 16,
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+              <span className="sub-career-label">CV Secret Prompt </span>
+              <span>(optional)</span>
+            </div>
+            <span
+              style={{
+                fontSize: "16px",
+                marginBottom: "8px",
+                color: "#414651",
+              }}
+            >
+              Secret Prompts give you extra control over Jia’s evaluation style,
+              complementing her accurate assessment of requirements from the job
+              description.
+            </span>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 8,
+              }}
+            >
+              <div className="layered-card-content">
+                <span>Coming Soon</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Team Access PlaceHolder */}
+      <div>
         <div className="layered-card-middle">
           <div
             style={{
@@ -40,80 +110,11 @@ export default function SegmentSettings({
               gap: 8,
             }}
           >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "#181D27",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <i
-                className="la la-cog"
-                style={{ color: "#FFFFFF", fontSize: 20 }}
-              ></i>
-            </div>
-            <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-              Settings
-            </span>
+            <span className="career-label">2. Pre-Screening Questions</span>
+            <span style={{ paddingTop: 8 }}>(optional)</span>
           </div>
           <div className="layered-card-content">
-            <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-              <i
-                className="la la-id-badge"
-                style={{ color: "#414651", fontSize: 20 }}
-              ></i>
-              <span>
-                Screening Setting <span style={{ color: "#EF4444" }}>*</span>
-              </span>
-            </div>
-            <CustomDropdown
-              onSelectSetting={(setting) => setScreeningSetting(setting)}
-              screeningSetting={screeningSetting}
-              settingList={screeningSettingList}
-            />
-            <span>
-              This settings allows Jia to automatically endorse candidates who
-              meet the chosen criteria.
-            </span>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 8,
-                marginTop: 16,
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-                <i
-                  className="la la-video"
-                  style={{ color: "#414651", fontSize: 20 }}
-                ></i>
-                <span>Require Video Interview</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "flex-start",
-                  gap: 8,
-                }}
-              >
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={requireVideo}
-                    onChange={() => setRequireVideo(!requireVideo)}
-                  />
-                  <span className="slider round"></span>
-                </label>
-                <span>{requireVideo ? "Yes" : "No"}</span>
-              </div>
-            </div>
+            <span>Coming Soon</span>
           </div>
         </div>
       </div>

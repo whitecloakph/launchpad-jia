@@ -395,8 +395,6 @@ export default function CareerFormV2({
           <SegmentSettings
             screeningSetting={screeningSetting}
             setScreeningSetting={setScreeningSetting}
-            requireVideo={requireVideo}
-            setRequireVideo={setRequireVideo}
           />
         );
       case 2:
@@ -406,6 +404,10 @@ export default function CareerFormV2({
             setQuestions={setQuestions}
             jobTitle={jobTitle}
             description={description}
+            screeningSetting={screeningSetting}
+            setScreeningSetting={setScreeningSetting}
+            requireVideo={requireVideo}
+            setRequireVideo={setRequireVideo}
           />
         );
       case 3:
