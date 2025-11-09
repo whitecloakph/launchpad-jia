@@ -98,10 +98,137 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
     const [showSaveModal, setShowSaveModal] = useState("");
     const [isSavingCareer, setIsSavingCareer] = useState(false);
     const savingCareerRef = useRef(false);
+    const [workEmail, setWorkEmail] = useState("");
+    const [errors, setErrors] = useState({
+      jobTitle: "",
+      description: "",
+      workEmail: "",
+    });
+    // Segmented form state (only for Add flow)
+    const [currentStep, setCurrentStep] = useState<number>(1);
+    const draftTimeoutRef = useRef<any>(null);
+    const steps = [
+      { key: "details", label: "Career Details & Team Access" },
+      { key: "cv", label: "CV Review & Pre-screening" },
+      { key: "ai", label: "AI Interview Setup" },
+      { key: "pipeline", label: "Pipeline Stages" },
+      { key: "review", label: "Review Career" },
+    ];
+
+    const validateField = (name, value) => {
+      switch (name) {
+        case "jobTitle":
+          if (!value.trim()) return "Job title is required.";
+          break;
+        case "description":
+          if (!value.trim()) return "Description is required.";
+          break;
+        default:
+          return "";
+      }
+      return "";
+    };
+    
+    
+
+
 
     const isFormValid = () => {
         return jobTitle?.trim().length > 0 && description?.trim().length > 0 && questions.some((q) => q.questions.length > 0) && workSetup?.trim().length > 0;
     }
+
+    // Step validation (per current step)
+    const isStepComplete = (index: number) => {
+        switch (index) {
+            case 1:
+                return (
+                    jobTitle?.trim().length > 0 &&
+                    description?.trim().length > 0 &&
+                    employmentType?.trim().length > 0 &&
+                    workSetup?.trim().length > 0 &&
+                    (province?.trim()?.length ?? 0) > 0 &&
+                    (city?.trim()?.length ?? 0) > 0
+                );
+            case 2:
+                return !!screeningSetting;
+            case 3:
+                return questions.some((q) => q.questions.length > 0);
+            case 4:
+                return true; // Pipeline builder not in scope
+            case 5:
+                return isFormValid();
+            default:
+                return false;
+        }
+    };
+
+    const isCurrentStepReady = () => isStepComplete(currentStep);
+
+    // Persist draft to localStorage for add flow
+    const persistDraft = () => {
+        if (formType !== "add") return;
+        try {
+            const payload = {
+                jobTitle,
+                description,
+                workSetup,
+                workSetupRemarks,
+                screeningSetting,
+                employmentType,
+                requireVideo,
+                salaryNegotiable,
+                minimumSalary,
+                maximumSalary,
+                questions,
+                country,
+                province,
+                city,
+                currentStep,
+            };
+            localStorage.setItem("careerFormDraft", JSON.stringify(payload));
+        } catch (e) {
+            // Ignore storage errors
+        }
+    };
+
+    useEffect(() => {
+        if (formType !== "add") return;
+        try {
+            const raw = localStorage.getItem("careerFormDraft");
+            if (raw) {
+                const draft = JSON.parse(raw);
+                setJobTitle(draft.jobTitle ?? "");
+                setDescription(draft.description ?? "");
+                setWorkSetup(draft.workSetup ?? "");
+                setWorkSetupRemarks(draft.workSetupRemarks ?? "");
+                setScreeningSetting(draft.screeningSetting ?? "Good Fit and above");
+                setEmploymentType(draft.employmentType ?? "Full-Time");
+                setRequireVideo(draft.requireVideo ?? true);
+                setSalaryNegotiable(draft.salaryNegotiable ?? true);
+                setMinimumSalary(draft.minimumSalary ?? "");
+                setMaximumSalary(draft.maximumSalary ?? "");
+                if (Array.isArray(draft.questions)) setQuestions(draft.questions);
+                setCountry(draft.country ?? "Philippines");
+                setProvince(draft.province ?? "");
+                setCity(draft.city ?? "");
+                setCurrentStep(draft.currentStep ?? 1);
+            }
+        } catch (e) {
+            // Ignore parse errors
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (formType !== "add") return;
+        if (draftTimeoutRef.current) clearTimeout(draftTimeoutRef.current);
+        draftTimeoutRef.current = setTimeout(() => {
+            persistDraft();
+        }, 300);
+        return () => {
+            if (draftTimeoutRef.current) clearTimeout(draftTimeoutRef.current);
+        };
+    }, [formType, jobTitle, description, workSetup, workSetupRemarks, screeningSetting, employmentType, requireVideo, salaryNegotiable, minimumSalary, maximumSalary, questions, country, province, city, currentStep]);
 
     const updateCareer = async (status: string) => {
         if (Number(minimumSalary) && Number(maximumSalary) && Number(minimumSalary) > Number(maximumSalary)) {
@@ -158,6 +285,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
 
   
     const confirmSaveCareer = (status: string) => {
+      
+      
         if (Number(minimumSalary) && Number(maximumSalary) && Number(minimumSalary) > Number(maximumSalary)) {
         errorToast("Minimum salary cannot be greater than maximum salary", 1300);
         return;
@@ -206,6 +335,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             
             const response = await axios.post("/api/add-career", career);
             if (response.status === 200) {
+            try { localStorage.removeItem("careerFormDraft"); } catch {}
             candidateActionToast(
                 <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8, marginLeft: 8 }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: "#181D27" }}>Career added {status === "active" ? "and published" : ""}</span>
@@ -243,26 +373,130 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
 
     return (
         <div className="col">
-        {formType === "add" ? (<div style={{ marginBottom: "35px", display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+        {formType === "add" ? (<>
+            <div style={{ marginBottom: "16px", display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
               <h1 style={{ fontSize: "24px", fontWeight: 550, color: "#111827" }}>Add new career</h1>
               <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
-                  <button
-                  disabled={!isFormValid() || isSavingCareer}
-                   style={{ width: "fit-content", color: "#414651", background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px", cursor: !isFormValid() || isSavingCareer ? "not-allowed" : "pointer", whiteSpace: "nowrap" }} onClick={() => {
-                    confirmSaveCareer("inactive");
-                      }}>
-                          Save as Unpublished
-                  </button>
-                  <button 
-                  disabled={!isFormValid() || isSavingCareer}
-                  style={{ width: "fit-content", background: !isFormValid() || isSavingCareer ? "#D5D7DA" : "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px", cursor: !isFormValid() || isSavingCareer ? "not-allowed" : "pointer", whiteSpace: "nowrap"}} onClick={() => {
-                    confirmSaveCareer("active");
-                  }}>
-                    <i className="la la-check-circle" style={{ color: "#fff", fontSize: 20, marginRight: 8 }}></i>
-                      Save as Published
-                  </button>
-                </div>
-        </div>) : (
+                <button
+                  disabled={!isCurrentStepReady() || isSavingCareer}
+                  style={{
+                    width: "fit-content",
+                    color: !isCurrentStepReady() || isSavingCareer ? "#98A2B3" : "#414651",
+                    background: "#fff",
+                    border: "1px solid #D5D7DA",
+                    padding: "8px 16px",
+                    borderRadius: "60px",
+                    cursor: !isCurrentStepReady() || isSavingCareer ? "not-allowed" : "pointer",
+                    whiteSpace: "nowrap",
+                    opacity: !isCurrentStepReady() || isSavingCareer ? 0.6 : 1,
+                  }}
+                  onClick={() => { confirmSaveCareer("inactive"); }}
+                >
+                  Save as Unpublished
+                </button>
+                <button
+                  disabled={isSavingCareer}
+                  style={{ width: "fit-content", background: "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px", cursor: isSavingCareer ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}
+                  onClick={() => {
+                    if (currentStep === steps.length) {
+                      // Final step publishes
+                      confirmSaveCareer("active");
+                    } else {
+                      setCurrentStep((s) => Math.min(s + 1, steps.length));
+                    }
+                  }}
+                >
+                  {currentStep === steps.length ? (
+                    <>
+                      <i className="la la-check-circle" style={{ color: "#fff", fontSize: 20, marginRight: 8 }}></i>
+                      Save & Publish
+                    </>
+                  ) : (
+                    <>Save and Continue</>
+                  )}
+                </button>
+              </div>
+            </div>
+            {/* Stepper */}
+            <div style={{ position: "relative", width: "100%", marginBottom: 24, padding: "0 24px 0 12px" }}>
+              {/* Baseline: one continuous line */}
+              <div style={{ position: "absolute", top: 11, left: 0, right: 0, height: 2, background: "#E4E7EC", borderRadius: 2 }}></div>
+              {/* Progress overlay: stretches between circles based on step index */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 11,
+                  left: 0,
+                  height: 2,
+                  width: `${((Math.max(1, Math.min(currentStep, steps.length)) - 1) / Math.max(1, steps.length - 1)) * 100}%`,
+                  background: "#111827",
+                  borderRadius: 2,
+                  transition: "width 240ms ease",
+                }}
+              ></div>
+
+              {/* Row 1: circles aligned to the left edge of each segment */}
+              <div style={{ position: "relative", display: "grid", gridTemplateColumns: `repeat(${steps.length}, 1fr)`, alignItems: "center", paddingBottom: 8 }}>
+                {steps.map((s, idx) => {
+                  const index = idx + 1;
+                  const isActive = currentStep === index;
+                  const isCompleted = currentStep > index;
+                  const showInnerDot = isActive || isCompleted;
+
+                   return (
+                    <div key={`${s.key}-circle`} style={{ width: 20, display: "flex", alignItems: "center", justifyContent: "flex-start", justifySelf: "start" }}>
+                      <div
+                        onClick={() => setCurrentStep(index)}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          border: `2px solid ${showInnerDot ? "#111827" : "#D5D7DA"}`,
+                          background: "#FFFFFF",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                        }}
+                        title={s.label}
+                        aria-current={isActive ? "step" : undefined}
+                        role="button"
+                      >
+                        {showInnerDot && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#111827" }}></div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Row 2: labels left-aligned within each segment; prevent right overflow */}
+              <div style={{ position: "relative", display: "grid", gridTemplateColumns: `repeat(${steps.length}, 1fr)`, alignItems: "start" }}>
+                {steps.map((s, idx) => {
+                  const index = idx + 1;
+                  const isActive = currentStep === index;
+                  return (
+                    <div key={`${s.key}-label-wrap`} style={{ position: "relative", width: "100%", overflow: "hidden", justifySelf: "start" }}>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          fontSize: 14,
+                          color: isActive ? "#111827" : "#667085",
+                          fontWeight: isActive ? 700 : 500,
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                          maxWidth: "100%",
+                          textAlign: "left",
+                        }}
+                      >
+                        {s.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+        </>) : (
             <div style={{ marginBottom: "35px", display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
             <h1 style={{ fontSize: "24px", fontWeight: 550, color: "#111827" }}>Edit Career Details</h1>
             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
@@ -290,245 +524,644 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
               </div>
        </div>
         )}
-        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", gap: 16, alignItems: "flex-start", marginTop: 16 }}>
-        <div style={{ width: "60%", display: "flex", flexDirection: "column", gap: 8 }}>
-          <div className="layered-card-outer">
-              <div className="layered-card-middle">
-              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <i className="la la-suitcase" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
-                  </div>
-                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Career Information</span>
-                  </div>
-                  <div className="layered-card-content">
-                      <span>Job Title</span>
-                      <input
-                      value={jobTitle}
-                      className="form-control"
-                      placeholder="Enter job title"
-                      onChange={(e) => {
-                          setJobTitle(e.target.value || "");
-                      }}
-                      ></input>
-                      <span>Description</span>
-                      <RichTextEditor setText={setDescription} text={description} />
-                  </div>
-              </div>
-          </div>
-
-          <InterviewQuestionGeneratorV2 questions={questions} setQuestions={(questions) => setQuestions(questions)} jobTitle={jobTitle} description={description} />
-        </div>
-
-        <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
-        <div className="layered-card-outer">
-              <div className="layered-card-middle">
-              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <i className="la la-cog" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
-                  </div>
-                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Settings</span>
-                  </div>
-                  <div className="layered-card-content">
-                      <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-                         <i className="la la-id-badge" style={{ color: "#414651", fontSize: 20 }}></i>
-                         <span>Screening Setting</span>
+        {/* Segmented content */}
+        {formType === "add" ? (
+          <>
+            {currentStep === 1 && (
+              <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", gap: 16, alignItems: "flex-start", marginTop: 16 }}>
+                <div style={{ width: "60%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-suitcase" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Career Information</span>
                       </div>
-                      <CustomDropdown
-                      onSelectSetting={(setting) => {
-                          setScreeningSetting(setting);
-                      }}
-                      screeningSetting={screeningSetting}
-                      settingList={screeningSettingList}
-                      />
-                      <span>This settings allows Jia to automatically endorse candidates who meet the chosen criteria.</span>
-                      <div style={{ display: "flex", flexDirection: "row",justifyContent: "space-between", gap: 8 }}>
-                          <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-                              <i className="la la-video" style={{ color: "#414651", fontSize: 20 }}></i>
-                              <span>Require Video Interview</span>
-                          </div>
-                          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
-                              <label className="switch">
-                                  <input type="checkbox" checked={requireVideo} onChange={() => setRequireVideo(!requireVideo)} />
-                                  <span className="slider round"></span>
-                              </label>
-                              <span>{requireVideo ? "Yes" : "No"}</span>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-
-          <div className="layered-card-outer">
-              <div className="layered-card-middle">
-              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <i className="la la-ellipsis-h" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
-                  </div>
-                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Additional Information</span>
-                  </div>
-                  <div className="layered-card-content">
-                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Work Setting</span>
-                      <span>Employment Type</span>
-                      <CustomDropdown
-                      onSelectSetting={(employmentType) => {
-                          setEmploymentType(employmentType);
-                      }}
-                      screeningSetting={employmentType}
-                      settingList={employmentTypeOptions}
-                      placeholder="Select Employment Type"
-                      />
-
-                      <span>Work Setup Arrangement</span>
-                      <CustomDropdown
-                      onSelectSetting={(setting) => {
-                          setWorkSetup(setting);
-                      }}
-                      screeningSetting={workSetup}
-                      settingList={workSetupOptions}
-                      placeholder="Select Work Setup"
-                      />
-
-                      <span>Work Setup Remarks</span>
-                      <input
-                        className="form-control"
-                        placeholder="Additional remarks about work setup (optional)"
-                        value={workSetupRemarks}
-                        onChange={(e) => {
-                          setWorkSetupRemarks(e.target.value || "");
-                        }}
-                      ></input>
-
-                      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Salary</span>
-
-                          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8, minWidth: "130px" }}>
-                              <label className="switch">
-                                  <input type="checkbox" checked={salaryNegotiable} onChange={() => setSalaryNegotiable(!salaryNegotiable)} />
-                                  <span className="slider round"></span>
-                              </label>
-                              <span>{salaryNegotiable ? "Negotiable" : "Fixed"}</span>
-                          </div>
-                      </div>
-
-                      <span>Minimum Salary</span>
-                      <div style={{ position: "relative" }}>
-                        <span
-                          style={{
-                            position: "absolute",
-                            left: "12px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            color: "#6c757d",
-                            fontSize: "16px",
-                            pointerEvents: "none",
-                          }}
-                        >
-                          P
-                        </span>
+                      <div className="layered-card-content">
+                        <span>Job Title</span>
                         <input
-                          type="number"
+                          value={jobTitle}
                           className="form-control"
-                          style={{ paddingLeft: "28px" }}
-                          placeholder="0"
-                          min={0}
-                          value={minimumSalary}
+                          placeholder="Enter job title"
                           onChange={(e) => {
-                            setMinimumSalary(e.target.value || "");
+                            const value = e.target.value;
+                            setJobTitle(value);
+                            setErrors((prev) => ({ ...prev, jobTitle: "" }));
+                          }}
+                          onBlur={(e) => {
+                            const message = validateField("jobTitle", e.target.value);
+                            setErrors((prev) => ({ ...prev, jobTitle: message }));
+                          }}
+                          style={{
+                            border: errors.jobTitle ? "1px solid red" : "1px solid #D1D5DB",
+                            outline: "none",
                           }}
                         />
-                      <span style={{
-                        position: "absolute",
-                        right: "30px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}>
-                        PHP
-                      </span>
-                      </div>
-
-                      <span>Maximum Salary</span>
-                      <div style={{ position: "relative" }}>
-                      <span
+                        {errors.jobTitle && (
+                          <span style={{ color: "red", fontSize: "13px" }}>{errors.jobTitle}</span>
+                        )}
+                        <span>Description</span>
+                        <div
                           style={{
+                            border: errors.description ? "1px solid red" : "1px solid transparent",
+                            borderRadius: "6px",
+                            padding: errors.description ? "2px" : "0",
+                          }}
+                        >
+                          <RichTextEditor
+                            setText={(text) => {
+                              setDescription(text);
+                              setErrors((prev) => ({ ...prev, description: "" }));
+                            }}
+                            text={description}
+                          />
+                        </div>
+                        {errors.description && (
+                          <span style={{ color: "red", fontSize: "13px" }}>{errors.description}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-ellipsis-h" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Additional Information</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Work Setting</span>
+                        <span>Employment Type</span>
+                        <CustomDropdown
+                          onSelectSetting={(employmentType) => {
+                            setEmploymentType(employmentType);
+                          }}
+                          screeningSetting={employmentType}
+                          settingList={employmentTypeOptions}
+                          placeholder="Select Employment Type"
+                        />
+                        <span>Work Setup Arrangement</span>
+                        <CustomDropdown
+                          onSelectSetting={(setting) => {
+                            setWorkSetup(setting);
+                          }}
+                          screeningSetting={workSetup}
+                          settingList={workSetupOptions}
+                          placeholder="Select Work Setup"
+                        />
+                        <span>Work Setup Remarks</span>
+                        <input
+                          className="form-control"
+                          placeholder="Additional remarks about work setup (optional)"
+                          value={workSetupRemarks}
+                          onChange={(e) => {
+                            setWorkSetupRemarks(e.target.value || "");
+                          }}
+                        ></input>
+                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Salary</span>
+                          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8, minWidth: "130px" }}>
+                            <label className="switch">
+                              <input type="checkbox" checked={salaryNegotiable} onChange={() => setSalaryNegotiable(!salaryNegotiable)} />
+                              <span className="slider round"></span>
+                            </label>
+                            <span>{salaryNegotiable ? "Negotiable" : "Fixed"}</span>
+                          </div>
+                        </div>
+                        <span>Minimum Salary</span>
+                        <div style={{ position: "relative" }}>
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: "12px",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              color: "#6c757d",
+                              fontSize: "16px",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            P
+                          </span>
+                          <input
+                            type="number"
+                            className="form-control"
+                            style={{ paddingLeft: "28px" }}
+                            placeholder="0"
+                            min={0}
+                            value={minimumSalary}
+                            onChange={(e) => {
+                              setMinimumSalary(e.target.value || "");
+                            }}
+                          />
+                          <span style={{
                             position: "absolute",
-                            left: "12px",
+                            right: "30px",
                             top: "50%",
                             transform: "translateY(-50%)",
                             color: "#6c757d",
                             fontSize: "16px",
                             pointerEvents: "none",
+                          }}>
+                            PHP
+                          </span>
+                        </div>
+                        <span>Maximum Salary</span>
+                        <div style={{ position: "relative" }}>
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: "12px",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              color: "#6c757d",
+                              fontSize: "16px",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            P
+                          </span>
+                          <input
+                            type="number"
+                            className="form-control"
+                            style={{ paddingLeft: "28px" }}
+                            placeholder="0"
+                            min={0}
+                            value={maximumSalary}
+                            onChange={(e) => {
+                              setMaximumSalary(e.target.value || "");
+                            }}
+                          ></input>
+                          <span style={{
+                            position: "absolute",
+                            right: "30px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            color: "#6c757d",
+                            fontSize: "16px",
+                            pointerEvents: "none",
+                          }}>
+                            PHP
+                          </span>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Location</span>
+                        <span>Country</span>
+                        <CustomDropdown
+                          onSelectSetting={(setting) => {
+                            setCountry(setting);
                           }}
-                        >
-                          P
-                        </span>
-                      <input
-                        type="number"
-                        className="form-control"
-                        style={{ paddingLeft: "28px" }}
-                        placeholder="0"
-                        min={0}
-                        value={maximumSalary}
-                        onChange={(e) => {
-                          setMaximumSalary(e.target.value || "");
-                        }}
-                      ></input>
-                      <span style={{
-                        position: "absolute",
-                        right: "30px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}>
-                        PHP
-                      </span>
+                          screeningSetting={country}
+                          settingList={[]}
+                          placeholder="Select Country"
+                        />
+                        <span>State / Province</span>
+                        <CustomDropdown
+                          onSelectSetting={(province) => {
+                            setProvince(province);
+                            const provinceObj = provinceList.find((p) => p.name === province);
+                            const cities = philippineCitiesAndProvinces.cities.filter((city) => city.province === provinceObj.key);
+                            setCityList(cities);
+                            setCity(cities[0].name);
+                          }}
+                          screeningSetting={province}
+                          settingList={provinceList}
+                          placeholder="Select State / Province"
+                        />
+                        <span>City</span>
+                        <CustomDropdown
+                          onSelectSetting={(city) => {
+                            setCity(city);
+                          }}
+                          screeningSetting={city}
+                          settingList={cityList}
+                          placeholder="Select City"
+                        />
                       </div>
-                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Location</span>
+            {currentStep === 2 && (
+              <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", gap: 16, alignItems: "flex-start", marginTop: 16 }}>
+                <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-cog" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>CV Review & Pre-screening</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+                          <i className="la la-id-badge" style={{ color: "#414651", fontSize: 20 }}></i>
+                          <span>Screening Setting</span>
+                        </div>
+                        <CustomDropdown
+                          onSelectSetting={(setting) => {
+                            setScreeningSetting(setting);
+                          }}
+                          screeningSetting={screeningSetting}
+                          settingList={screeningSettingList}
+                        />
+                        <span>This settings allows Jia to automatically endorse candidates who meet the chosen criteria.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                      <span>Country</span>
-                      <CustomDropdown
-                      onSelectSetting={(setting) => {
-                          setCountry(setting);
-                      }}
-                      screeningSetting={country}
-                      settingList={[]}
-                      placeholder="Select Country"
-                      />
+            {currentStep === 3 && (
+              <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", gap: 16, alignItems: "flex-start", marginTop: 16 }}>
+                <div style={{ width: "60%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <InterviewQuestionGeneratorV2 questions={questions} setQuestions={(questions) => setQuestions(questions)} jobTitle={jobTitle} description={description} />
+                </div>
+                <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-video" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>AI Interview Setup</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <div style={{ display: "flex", flexDirection: "row",justifyContent: "space-between", gap: 8 }}>
+                          <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+                            <i className="la la-video" style={{ color: "#414651", fontSize: 20 }}></i>
+                            <span>Require Video Interview</span>
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
+                            <label className="switch">
+                              <input type="checkbox" checked={requireVideo} onChange={() => setRequireVideo(!requireVideo)} />
+                              <span className="slider round"></span>
+                            </label>
+                            <span>{requireVideo ? "Yes" : "No"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                      <span>State / Province</span>
-                      <CustomDropdown
-                      onSelectSetting={(province) => {
-                          setProvince(province);
-                          const provinceObj = provinceList.find((p) => p.name === province);
-                          const cities = philippineCitiesAndProvinces.cities.filter((city) => city.province === provinceObj.key);
-                          setCityList(cities);
-                          setCity(cities[0].name);
-                      }}
-                      screeningSetting={province}
-                      settingList={provinceList}
-                      placeholder="Select State / Province"
-                      />
+            {currentStep === 4 && (
+              <div style={{ width: "100%", marginTop: 16 }}>
+                <div className="layered-card-outer">
+                  <div className="layered-card-middle">
+                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <i className="la la-stream" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                      </div>
+                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Pipeline Stages</span>
+                    </div>
+                    <div className="layered-card-content">
+                      <span>Pipeline builder is not included in this ticket. Proceed to the next step to review details.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                      <span>City</span>
-                      <CustomDropdown
-                      onSelectSetting={(city) => {
-                          setCity(city);
-                      }}
-                      screeningSetting={city}
-                      settingList={cityList}
-                      placeholder="Select City"
-                      />
+            {currentStep === 5 && (
+              <div style={{ width: "100%", marginTop: 16 }}>
+                <div className="layered-card-outer">
+                  <div className="layered-card-middle">
+                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <i className="la la-eye" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                      </div>
+                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Review Career</span>
+                    </div>
+                    <div className="layered-card-content">
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                        <div><span style={{ color: "#667085" }}>Job Title</span><br /><span style={{ fontWeight: 600 }}>{jobTitle || "-"}</span></div>
+                        <div><span style={{ color: "#667085" }}>Employment Type</span><br /><span style={{ fontWeight: 600 }}>{employmentType || "-"}</span></div>
+                        <div><span style={{ color: "#667085" }}>Work Setup</span><br /><span style={{ fontWeight: 600 }}>{workSetup || "-"}</span></div>
+                        <div><span style={{ color: "#667085" }}>Salary</span><br /><span style={{ fontWeight: 600 }}>{salaryNegotiable ? "Negotiable" : `${minimumSalary || 0} - ${maximumSalary || 0} PHP`}</span></div>
+                        <div><span style={{ color: "#667085" }}>Location</span><br /><span style={{ fontWeight: 600 }}>{country} • {province} • {city}</span></div>
+                        <div><span style={{ color: "#667085" }}>Require Video Interview</span><br /><span style={{ fontWeight: 600 }}>{requireVideo ? "Yes" : "No"}</span></div>
+                      </div>
+                      <div style={{ marginTop: 16 }}>
+                        <span style={{ color: "#667085" }}>Description</span>
+                        <div dangerouslySetInnerHTML={{ __html: description || "<em>No description</em>" }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Bottom nav */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
+              <button
+                style={{ width: "fit-content", color: "#414651", background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px", cursor: currentStep === 1 ? "not-allowed" : "pointer" }}
+                disabled={currentStep === 1}
+                onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
+              >
+                Back
+              </button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  style={{ width: "fit-content", color: "#414651", background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px" }}
+                  onClick={() => { setCurrentStep(steps.length); }}
+                >
+                  Skip to Review
+                </button>
+                <button
+                  style={{ width: "fit-content", background: "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px" }}
+                  onClick={() => {
+                    if (currentStep === steps.length) {
+                      confirmSaveCareer("active");
+                    } else {
+                      setCurrentStep((s) => Math.min(s + 1, steps.length));
+                    }
+                  }}
+                >
+                  {currentStep === steps.length ? "Save & Publish" : "Next"}
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", gap: 16, alignItems: "flex-start", marginTop: 16 }}>
+            <div style={{ width: "60%", display: "flex", flexDirection: "column", gap: 8 }}>
+              <div className="layered-card-outer">
+                  <div className="layered-card-middle">
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-suitcase" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                      </div>
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Career Information</span>
+                      </div>
+                      <div className="layered-card-content">
+                          <span>Job Title</span>
+                          <input
+                            value={jobTitle}
+                            className="form-control"
+                            placeholder="Enter job title"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setJobTitle(value);
+                              setErrors((prev) => ({ ...prev, jobTitle: "" }));
+                            }}
+                            onBlur={(e) => {
+                              const message = validateField("jobTitle", e.target.value);
+                              setErrors((prev) => ({ ...prev, jobTitle: message }));
+                            }}
+                            style={{
+                              border: errors.jobTitle ? "1px solid red" : "1px solid #D1D5DB",
+                              outline: "none",
+                            }}
+                          />
+                          {errors.jobTitle && (
+                            <span style={{ color: "red", fontSize: "13px" }}>{errors.jobTitle}</span>
+                          )}
+                          <span>Description</span>
+                          <div
+                            style={{
+                              border: errors.description ? "1px solid red" : "1px solid transparent",
+                              borderRadius: "6px",
+                              padding: errors.description ? "2px" : "0",
+                            }}
+                          >
+                            <RichTextEditor
+                              setText={(text) => {
+                                setDescription(text);
+                                setErrors((prev) => ({ ...prev, description: "" }));
+                              }}
+                              text={description}
+                            />
+                          </div>
+                          {errors.description && (
+                            <span style={{ color: "red", fontSize: "13px" }}>{errors.description}</span>
+                          )}
+                      </div>
                   </div>
               </div>
+
+              <InterviewQuestionGeneratorV2 questions={questions} setQuestions={(questions) => setQuestions(questions)} jobTitle={jobTitle} description={description} />
+            </div>
+
+            <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
+            <div className="layered-card-outer">
+                  <div className="layered-card-middle">
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-cog" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                      </div>
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Settings</span>
+                      </div>
+                      <div className="layered-card-content">
+                          <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+                             <i className="la la-id-badge" style={{ color: "#414651", fontSize: 20 }}></i>
+                             <span>Screening Setting</span>
+                          </div>
+                          <CustomDropdown
+                          onSelectSetting={(setting) => {
+                              setScreeningSetting(setting);
+                          }}
+                          screeningSetting={screeningSetting}
+                          settingList={screeningSettingList}
+                          />
+                          <span>This settings allows Jia to automatically endorse candidates who meet the chosen criteria.</span>
+                          <div style={{ display: "flex", flexDirection: "row",justifyContent: "space-between", gap: 8 }}>
+                              <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+                                  <i className="la la-video" style={{ color: "#414651", fontSize: 20 }}></i>
+                                  <span>Require Video Interview</span>
+                              </div>
+                              <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
+                                  <label className="switch">
+                                      <input type="checkbox" checked={requireVideo} onChange={() => setRequireVideo(!requireVideo)} />
+                                      <span className="slider round"></span>
+                                  </label>
+                                  <span>{requireVideo ? "Yes" : "No"}</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div className="layered-card-outer">
+                  <div className="layered-card-middle">
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-ellipsis-h" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                      </div>
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Additional Information</span>
+                      </div>
+                      <div className="layered-card-content">
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Work Setting</span>
+                          <span>Employment Type</span>
+                          <CustomDropdown
+                          onSelectSetting={(employmentType) => {
+                              setEmploymentType(employmentType);
+                          }}
+                          screeningSetting={employmentType}
+                          settingList={employmentTypeOptions}
+                          placeholder="Select Employment Type"
+                          />
+
+                          <span>Work Setup Arrangement</span>
+                          <CustomDropdown
+                          onSelectSetting={(setting) => {
+                              setWorkSetup(setting);
+                          }}
+                          screeningSetting={workSetup}
+                          settingList={workSetupOptions}
+                          placeholder="Select Work Setup"
+                          />
+
+                          <span>Work Setup Remarks</span>
+                          <input
+                            className="form-control"
+                            placeholder="Additional remarks about work setup (optional)"
+                            value={workSetupRemarks}
+                            onChange={(e) => {
+                              setWorkSetupRemarks(e.target.value || "");
+                            }}
+                          ></input>
+
+                          <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+                              <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Salary</span>
+
+                              <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8, minWidth: "130px" }}>
+                                  <label className="switch">
+                                      <input type="checkbox" checked={salaryNegotiable} onChange={() => setSalaryNegotiable(!salaryNegotiable)} />
+                                      <span className="slider round"></span>
+                                  </label>
+                                  <span>{salaryNegotiable ? "Negotiable" : "Fixed"}</span>
+                              </div>
+                          </div>
+
+                          <span>Minimum Salary</span>
+                          <div style={{ position: "relative" }}>
+                            <span
+                              style={{
+                                position: "absolute",
+                                left: "12px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                color: "#6c757d",
+                                fontSize: "16px",
+                                pointerEvents: "none",
+                              }}
+                            >
+                              P
+                            </span>
+                            <input
+                              type="number"
+                              className="form-control"
+                              style={{ paddingLeft: "28px" }}
+                              placeholder="0"
+                              min={0}
+                              value={minimumSalary}
+                              onChange={(e) => {
+                                setMinimumSalary(e.target.value || "");
+                              }}
+                            />
+                          <span style={{
+                            position: "absolute",
+                            right: "30px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            color: "#6c757d",
+                            fontSize: "16px",
+                            pointerEvents: "none",
+                          }}>
+                            PHP
+                          </span>
+                          </div>
+
+                          <span>Maximum Salary</span>
+                          <div style={{ position: "relative" }}>
+                          <span
+                              style={{
+                                position: "absolute",
+                                left: "12px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                color: "#6c757d",
+                                fontSize: "16px",
+                                pointerEvents: "none",
+                              }}
+                            >
+                              P
+                            </span>
+                          <input
+                            type="number"
+                            className="form-control"
+                            style={{ paddingLeft: "28px" }}
+                            placeholder="0"
+                            min={0}
+                            value={maximumSalary}
+                            onChange={(e) => {
+                              setMaximumSalary(e.target.value || "");
+                            }}
+                          ></input>
+                          <span style={{
+                            position: "absolute",
+                            right: "30px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            color: "#6c757d",
+                            fontSize: "16px",
+                            pointerEvents: "none",
+                          }}>
+                            PHP
+                          </span>
+                          </div>
+                          
+
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Location</span>
+
+                          <span>Country</span>
+                          <CustomDropdown
+                          onSelectSetting={(setting) => {
+                              setCountry(setting);
+                          }}
+                          screeningSetting={country}
+                          settingList={[]}
+                          placeholder="Select Country"
+                          />
+
+                          <span>State / Province</span>
+                          <CustomDropdown
+                          onSelectSetting={(province) => {
+                              setProvince(province);
+                              const provinceObj = provinceList.find((p) => p.name === province);
+                              const cities = philippineCitiesAndProvinces.cities.filter((city) => city.province === provinceObj.key);
+                              setCityList(cities);
+                              setCity(cities[0].name);
+                          }}
+                          screeningSetting={province}
+                          settingList={provinceList}
+                          placeholder="Select State / Province"
+                          />
+
+                          <span>City</span>
+                          <CustomDropdown
+                          onSelectSetting={(city) => {
+                              setCity(city);
+                          }}
+                          screeningSetting={city}
+                          settingList={cityList}
+                          placeholder="Select City"
+                          />
+                      </div>
+                  </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
       {showSaveModal && (
          <CareerActionModal action={showSaveModal} onAction={(action) => saveCareer(action)} />
         )}

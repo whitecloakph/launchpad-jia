@@ -51,12 +51,18 @@ export async function POST(request: Request) {
             pipeline: [
                 {
                     $addFields: {
-                        _id: { $toString: "$_id" }
+                        _idStr: { $toString: "$_id" }
                     }
                 },
                 {
                     $match: {
-                        $expr: { $eq: ["$_id", "$$planId"] }
+                        $expr: {
+                            $and: [
+                                { $ne: ["$$planId", null] },
+                                { $ne: ["$$planId", ""] },
+                                { $eq: ["$_idStr", "$$planId"] }
+                            ]
+                        }
                     }
                 }
             ],
@@ -64,8 +70,26 @@ export async function POST(request: Request) {
         }
       },
       {
-        $unwind: "$plan"
+        $unwind: {
+          path: "$plan",
+          preserveNullAndEmptyArrays: true
+        }
       },
+      {
+        $addFields: {
+          plan: {
+            $ifNull: [
+              "$plan",
+              {
+                _id: "default",
+                name: "Default Plan",
+                jobLimit: 100, // High default limit for development
+                createdAt: new Date()
+              }
+            ]
+          }
+        }
+      }
     ]).toArray();
 
     if (!orgDetails || orgDetails.length === 0) {
@@ -73,8 +97,14 @@ export async function POST(request: Request) {
     }
 
     const totalActiveCareers = await db.collection("careers").countDocuments({ orgID, status: "active" });
+    const jobLimit = orgDetails[0].plan?.jobLimit || 100; // Default to 100 if no plan
+    const extraJobSlots = orgDetails[0].extraJobSlots || 0;
+    const maxJobs = jobLimit + extraJobSlots;
 
-    if (totalActiveCareers >= (orgDetails[0].plan.jobLimit + (orgDetails[0].extraJobSlots || 0))) {
+    // Allow bypassing in development via environment variable or skip check if limit is very high
+    const bypassLimit = process.env.BYPASS_JOB_LIMIT === "true" || jobLimit >= 1000;
+    
+    if (!bypassLimit && totalActiveCareers >= maxJobs) {
       return NextResponse.json({ error: "You have reached the maximum number of jobs for your plan" }, { status: 400 });
     }
 

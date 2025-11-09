@@ -33,12 +33,18 @@ export async function POST(req: Request) {
             pipeline: [
                 {
                     $addFields: {
-                        _id: { $toString: "$_id" }
+                        _idStr: { $toString: "$_id" }
                     }
                 },
                 {
                     $match: {
-                        $expr: { $eq: ["$_id", "$$planId"] }
+                        $expr: {
+                            $and: [
+                                { $ne: ["$$planId", null] },
+                                { $ne: ["$$planId", ""] },
+                                { $eq: ["$_idStr", "$$planId"] }
+                            ]
+                        }
                     }
                 }
             ],
@@ -46,8 +52,26 @@ export async function POST(req: Request) {
         }
     },
     {
-      $unwind: "$plan"
+      $unwind: {
+        path: "$plan",
+        preserveNullAndEmptyArrays: true
+      }
     },
+    {
+      $addFields: {
+        plan: {
+          $ifNull: [
+            "$plan",
+            {
+              _id: "default",
+              name: "Default Plan",
+              jobLimit: 100, // High default limit for development
+              createdAt: new Date()
+            }
+          ]
+        }
+      }
+    }
     ]).toArray();
 
     if (!orgDoc || orgDoc.length === 0) {
