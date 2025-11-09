@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import InterviewQuestionGeneratorV2 from "./InterviewQuestionGeneratorV2";
 import RichTextEditor from "@/lib/components/CareerComponents/RichTextEditor";
 import CustomDropdown from "@/lib/components/CareerComponents/CustomDropdown";
+import TipsComponent from "@/lib/components/CareerComponents/TipsComponent";
 import philippineCitiesAndProvinces from "../../../../public/philippines-locations.json";
 import { candidateActionToast, errorToast } from "@/lib/Utils";
 import { useAppContext } from "@/lib/context/AppContext";
@@ -82,6 +83,57 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
   // AI Interview settings
   const [aiInterviewScreening, setAiInterviewScreening] = useState(career?.aiInterviewScreening || "Good Fit and above");
   const [aiSecretPrompt, setAiSecretPrompt] = useState(career?.aiSecretPrompt || "");
+  
+  // Pipeline settings
+  const [pipelineStages, setPipelineStages] = useState(career?.pipelineStages || [
+    {
+      id: 1,
+      name: "CV Screening",
+      type: "core",
+      color: "#6B7280",
+      locked: true,
+      substages: [
+        { id: 11, name: "Waiting Submission", canEdit: false, canDelete: false },
+        { id: 12, name: "For Review", canEdit: false, canDelete: false }
+      ]
+    },
+    {
+      id: 2,
+      name: "AI Interview",
+      type: "core", 
+      color: "#6B7280",
+      locked: true,
+      substages: [
+        { id: 21, name: "Waiting Interview", canEdit: false, canDelete: false },
+        { id: 22, name: "For Review", canEdit: false, canDelete: false }
+      ]
+    },
+    {
+      id: 3,
+      name: "Final Human Interview",
+      type: "core",
+      color: "#DC2626",
+      locked: false,
+      substages: [
+        { id: 31, name: "Waiting Schedule", canEdit: true, canDelete: false },
+        { id: 32, name: "Waiting Interview", canEdit: true, canDelete: false },
+        { id: 33, name: "For Review", canEdit: true, canDelete: false }
+      ]
+    },
+    {
+      id: 4,
+      name: "Job Offer",
+      type: "core",
+      color: "#059669",
+      locked: false,
+      substages: [
+        { id: 41, name: "For Final Review", canEdit: true, canDelete: false },
+        { id: 42, name: "Waiting Offer Acceptance", canEdit: true, canDelete: false },
+        { id: 43, name: "For Contract Signing", canEdit: true, canDelete: false },
+        { id: 44, name: "Hired", canEdit: true, canDelete: false }
+      ]
+    }
+  ]);
   
   const [questions, setQuestions] = useState(career?.questions || [
     {
@@ -295,6 +347,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
       aiSecretPrompt,
       requireVideo,
       salaryNegotiable,
+      pipelineStages,
       minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
       maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
       country,
@@ -416,6 +469,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
           orgID,
           requireVideo,
           salaryNegotiable,
+          pipelineStages,
           minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
           maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
           country,
@@ -465,6 +519,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
           aiSecretPrompt,
           requireVideo,
           salaryNegotiable,
+          pipelineStages,
           minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
           maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
           country,
@@ -524,6 +579,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
           aiSecretPrompt,
           requireVideo,
           salaryNegotiable,
+          pipelineStages,
           minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
           maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
           country,
@@ -570,6 +626,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
         orgID,
         requireVideo,
         salaryNegotiable,
+        pipelineStages,
         minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
         maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
         country,
@@ -1516,6 +1573,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           aiSecretPrompt,
                           requireVideo,
                           salaryNegotiable,
+                          pipelineStages,
                           minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
                           maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
                           country,
@@ -1763,6 +1821,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           aiSecretPrompt,
                           requireVideo,
                           salaryNegotiable,
+                          pipelineStages,
                           minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
                           maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
                           country,
@@ -1804,16 +1863,317 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
 
           {/* Step 4: Pipeline */}
           {currentStep === 3 && (
-            <div className="layered-card-outer">
-              <div className="layered-card-middle">
-                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                  <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>Pipeline Stages</span>
-                </div>
-                <div className="layered-card-content">
-                  <p style={{ color: "#6c757d" }}>Configure pipeline stages here.</p>
+            <>
+              <div className="layered-card-outer">
+                <div className="layered-card-middle">
+                  <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>Customize pipeline stages</span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <button
+                        style={{
+                          background: "transparent",
+                          color: "#6c757d",
+                          border: "1px solid #D1D5DB",
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          cursor: "pointer",
+                          fontSize: 13,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6
+                        }}
+                        onClick={() => {
+                          // Reset to default pipeline
+                          setPipelineStages([
+                            {
+                              id: 1,
+                              name: "CV Screening",
+                              type: "core",
+                              color: "#6B7280",
+                              locked: true,
+                              substages: [
+                                { id: 11, name: "Waiting Submission", canEdit: false, canDelete: false },
+                                { id: 12, name: "For Review", canEdit: false, canDelete: false }
+                              ]
+                            },
+                            {
+                              id: 2,
+                              name: "AI Interview",
+                              type: "core", 
+                              color: "#6B7280",
+                              locked: true,
+                              substages: [
+                                { id: 21, name: "Waiting Interview", canEdit: false, canDelete: false },
+                                { id: 22, name: "For Review", canEdit: false, canDelete: false }
+                              ]
+                            },
+                            {
+                              id: 3,
+                              name: "Final Human Interview",
+                              type: "core",
+                              color: "#DC2626",
+                              locked: false,
+                              substages: [
+                                { id: 31, name: "Waiting Schedule", canEdit: true, canDelete: false },
+                                { id: 32, name: "Waiting Interview", canEdit: true, canDelete: false },
+                                { id: 33, name: "For Review", canEdit: true, canDelete: false }
+                              ]
+                            },
+                            {
+                              id: 4,
+                              name: "Job Offer",
+                              type: "core",
+                              color: "#059669",
+                              locked: false,
+                              substages: [
+                                { id: 41, name: "For Final Review", canEdit: true, canDelete: false },
+                                { id: 42, name: "Waiting Offer Acceptance", canEdit: true, canDelete: false },
+                                { id: 43, name: "For Contract Signing", canEdit: true, canDelete: false },
+                                { id: 44, name: "Hired", canEdit: true, canDelete: false }
+                              ]
+                            }
+                          ]);
+                        }}
+                      >
+                        <i className="la la-undo" style={{ fontSize: 14 }}></i>
+                        Restore to default
+                      </button>
+                      <button
+                        style={{
+                          background: "transparent",
+                          color: "#6c757d",
+                          border: "1px solid #D1D5DB",
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          cursor: "pointer",
+                          fontSize: 13,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6
+                        }}
+                      >
+                        Copy pipeline from existing job
+                        <i className="la la-angle-down" style={{ fontSize: 14 }}></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="layered-card-content">
+                    {/* Pipeline Stages */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+                      {pipelineStages.map((stage, index) => (
+                        <div key={stage.id} style={{ display: "flex", flexDirection: "column" }}>
+                          {/* Stage Header */}
+                          <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            marginBottom: 12,
+                            padding: "8px 12px",
+                            backgroundColor: "#F9FAFB",
+                            borderRadius: "8px",
+                            border: "1px solid #E5E7EB"
+                          }}>
+                            <div style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: "50%",
+                              backgroundColor: stage.color
+                            }}></div>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: "#181D27", flex: 1 }}>
+                              {stage.name}
+                            </span>
+                            {stage.locked && (
+                              <i className="la la-lock" style={{ fontSize: 12, color: "#9CA3AF" }}></i>
+                            )}
+                          </div>
+
+                          {/* Substages */}
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            <span style={{ fontSize: 12, color: "#6c757d", marginBottom: 4 }}>Substages</span>
+                            {stage.substages.map((substage) => (
+                              <div key={substage.id} style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                padding: "8px 12px",
+                                backgroundColor: "#FFFFFF",
+                                border: "1px solid #E5E7EB",
+                                borderRadius: "6px",
+                                fontSize: 13,
+                                color: "#374151"
+                              }}>
+                                <span style={{ flex: 1 }}>{substage.name}</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                  {substage.canEdit && (
+                                    <button
+                                      style={{
+                                        background: "none",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        color: "#6B7280",
+                                        padding: "2px"
+                                      }}
+                                      onClick={() => {
+                                        // Edit substage functionality
+                                        const newName = prompt("Edit substage name:", substage.name);
+                                        if (newName && newName.trim()) {
+                                          const updatedStages = [...pipelineStages];
+                                          const stageIndex = updatedStages.findIndex(s => s.id === stage.id);
+                                          const substageIndex = updatedStages[stageIndex].substages.findIndex(ss => ss.id === substage.id);
+                                          updatedStages[stageIndex].substages[substageIndex].name = newName.trim();
+                                          setPipelineStages(updatedStages);
+                                        }
+                                      }}
+                                    >
+                                      <i className="la la-edit" style={{ fontSize: 12 }}></i>
+                                    </button>
+                                  )}
+                                  <button
+                                    style={{
+                                      background: "none",
+                                      border: "none",
+                                      cursor: "pointer",
+                                      color: "#6B7280",
+                                      padding: "2px"
+                                    }}
+                                  >
+                                    <i className="la la-grip-vertical" style={{ fontSize: 12 }}></i>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                            
+                            {/* Add New Substage Button */}
+                            <button
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: 6,
+                                padding: "8px 12px",
+                                backgroundColor: "transparent",
+                                border: "1px dashed #D1D5DB",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontSize: 13,
+                                color: "#6B7280"
+                              }}
+                              onClick={() => {
+                                const newSubstageName = prompt("Enter new substage name:");
+                                if (newSubstageName && newSubstageName.trim()) {
+                                  const updatedStages = [...pipelineStages];
+                                  const stageIndex = updatedStages.findIndex(s => s.id === stage.id);
+                                  const newSubstage = {
+                                    id: Date.now(), // Simple ID generation
+                                    name: newSubstageName.trim(),
+                                    canEdit: true,
+                                    canDelete: true
+                                  };
+                                  updatedStages[stageIndex].substages.push(newSubstage);
+                                  setPipelineStages(updatedStages);
+                                }
+                              }}
+                            >
+                              <i className="la la-plus" style={{ fontSize: 12 }}></i>
+                              Add new stage
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {/* Step Navigation */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 24 }}>
+                <button
+                  onClick={() => setCurrentStep(2)}
+                  style={{
+                    background: "transparent",
+                    color: "#6c757d",
+                    border: "1px solid #D1D5DB",
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 14
+                  }}
+                >
+                  <i className="la la-arrow-left"></i>
+                  Back
+                </button>
+                
+                <button
+                  onClick={async () => {
+                    // Update career with current step data if we have a saved career
+                    if (savedCareerId) {
+                      try {
+                        setIsSavingCareer(true);
+                        let userInfoSlice = {
+                          image: user.image,
+                          name: user.name,
+                          email: user.email,
+                        };
+                        
+                        const updatedCareer = {
+                          _id: savedCareerId,
+                          jobTitle,
+                          description,
+                          workSetup,
+                          workSetupRemarks,
+                          questions,
+                          lastEditedBy: userInfoSlice,
+                          status: "draft",
+                          updatedAt: Date.now(),
+                          screeningSetting,
+                          cvSecretPrompt,
+                          aiInterviewScreening,
+                          aiSecretPrompt,
+                          requireVideo,
+                          salaryNegotiable,
+                          pipelineStages,
+                          minimumSalary: isNaN(Number(minimumSalary)) ? null : Number(minimumSalary),
+                          maximumSalary: isNaN(Number(maximumSalary)) ? null : Number(maximumSalary),
+                          country,
+                          province,
+                          location: city,
+                          employmentType,
+                        };
+
+                        await axios.post("/api/update-career", updatedCareer);
+                        setIsSavingCareer(false);
+                      } catch (error) {
+                        setIsSavingCareer(false);
+                        errorToast("Failed to save changes", 1300);
+                        return;
+                      }
+                    }
+                    setCurrentStep(4);
+                  }}
+                  style={{
+                    background: "#1F2937",
+                    color: "#fff",
+                    border: "none",
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 14,
+                    fontWeight: 500
+                  }}
+                >
+                  Continue
+                  <i className="la la-arrow-right"></i>
+                </button>
+              </div>
+            </>
           )}
 
           {/* Step 5: Review */}
@@ -1830,33 +2190,9 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             </div>
           )}
         </div>
-
-        {/* Tips Sidebar */}
-        <div style={{ width: "320px", display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ backgroundColor: "#FEF9F5", border: "1px solid #FDE5D4", borderRadius: "12px", padding: "20px" }}>
-            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 16 }}>
-              <i className="la la-lightbulb" style={{ fontSize: 20, color: "#EA580C" }}></i>
-              <span style={{ fontSize: 15, fontWeight: 700, color: "#EA580C" }}>Tips</span>
-            </div>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "#181D27", marginBottom: 4 }}>Use clear, standard job titles</p>
-                <p style={{ fontSize: 12, color: "#6c757d", margin: 0 }}>for better searchability (e.g., "Software Engineer" instead of "Code Ninja" or "Tech Rockstar").</p>
-              </div>
-              
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "#181D27", marginBottom: 4 }}>Avoid abbreviations</p>
-                <p style={{ fontSize: 12, color: "#6c757d", margin: 0 }}>or internal role codes that applicants may not understand (e.g., use "QA Engineer" instead of "QE" or "QA-LT").</p>
-              </div>
-              
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "#181D27", marginBottom: 4 }}>Keep it concise</p>
-                <p style={{ fontSize: 12, color: "#6c757d", margin: 0 }}>— job titles should be no more than a few words (2–4 max), avoiding fluff or marketing terms.</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        
+        {/* Tips Component - Only show on steps 1-3 */}
+        {currentStep <= 2 && <TipsComponent currentStep={currentStep} />}
       </div>
       {showSaveModal && (
         <CareerActionModal action={showSaveModal} onAction={(action) => saveCareer(action)} />
