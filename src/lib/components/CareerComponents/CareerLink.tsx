@@ -19,9 +19,6 @@ export default function CareerLink(props: {career: any}) {
             <div className="layered-card-outer">
                 <div className="layered-card-middle">
                 <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
-                <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
-                <i className="la la-link" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
-                </div>
                     <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>Career Link</span>
                 </div>
                 {shareLink && <div className="layered-card-content">

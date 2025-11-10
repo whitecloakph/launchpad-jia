@@ -7,6 +7,7 @@ import { useAppContext } from "../../context/AppContext";
 import DirectInterviewLinkV2 from "./DirectInterviewLinkV2";
 import CareerForm from "./CareerForm";
 import CareerLink from "./CareerLink";
+import Accordion from "./Accordion";
 
 export default function JobDescription({ formData, setFormData, editModal, isEditing, setIsEditing, handleCancelEdit }: { formData: any, setFormData: (formData: any) => void, editModal: boolean, isEditing: boolean, setIsEditing: (isEditing: boolean) => void, handleCancelEdit: () => void }) {
     const { user } = useAppContext();
@@ -127,291 +128,315 @@ export default function JobDescription({ formData, setFormData, editModal, isEdi
 
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 16 }}>
-          <button style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px", cursor: "pointer", whiteSpace: "nowrap" }} onClick={handleEdit}>
-              <i className="la la-edit" style={{ marginRight: 8 }}></i>
-              Edit details
-          </button>
-            <div className="thread-set">
-                <div className="left-thread">
-                    <div className="layered-card-outer">
-                        <div className="layered-card-middle">
-                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
-                      <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
-                      <i className="la la-suitcase" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
+  
+          
+          <div className="thread-set">
+            <div className="left-thread">
+              <Accordion 
+                items={[
+                  {
+                    id: "career-details",
+                    title: "Career Details & Team Access",
+                    content: (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                        {/* Job Title */}
+                        <div>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Job Title</span>
+                          <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.jobTitle || "Not specified"}</span>
+                        </div>
+
+                        {/* Employment Type & Work Setup */}
+                        <div style={{ display: "flex", gap: 20 }}>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Employment Type</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.employmentType || "Not specified"}</span>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Work Arrangement</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.workSetup || "Not specified"}</span>
+                          </div>
+                        </div>
+
+                        {/* Location */}
+                        <div style={{ display: "flex", gap: 20 }}>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Country</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.country || "Philippines"}</span>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>State / Province</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.province || "Not specified"}</span>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>City</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.location || "Not specified"}</span>
+                          </div>
+                        </div>
+
+                        {/* Salary */}
+                        <div style={{ display: "flex", gap: 20 }}>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Minimum Salary</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>₱{formData.minimumSalary || "0"} PHP</span>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Maximum Salary</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>₱{formData.maximumSalary || "0"} PHP</span>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Negotiable</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.salaryNegotiable ? "Yes" : "No"}</span>
+                          </div>
+                        </div>
+
+                        {/* Job Description */}
+                        <div>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Job Description</span>
+                          <div style={{ fontSize: 15, color: "#6c757d", lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: formData.description || "No description provided" }}></div>
+                        </div>
+
+                        {/* Work Setup Remarks */}
+                        {formData.workSetupRemarks && (
+                          <div>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Work Setup Remarks</span>
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.workSetupRemarks}</span>
+                          </div>
+                        )}
+
+                        {/* Created By */}
+                        <div style={{ display: "flex", gap: 20 }}>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Created By</span>
+                            {formData.createdBy && (
+                              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                <img
+                                  src={formData.createdBy.image}
+                                  alt={formData.createdBy.name}
+                                  style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }}
+                                />
+                                <div>
+                                  <span style={{ fontSize: 15, color: "#181D27", display: "block" }}>{formData.createdBy.name}</span>
+                                  <span style={{ fontSize: 13, color: "#6c757d" }}>
+                                    {formData.createdAt ? new Date(formData.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "-"}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Last Updated By</span>
+                            {formData.lastEditedBy && (
+                              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                <img
+                                  src={formData.lastEditedBy.image}
+                                  alt={formData.lastEditedBy.name}
+                                  style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }}
+                                />
+                                <div>
+                                  <span style={{ fontSize: 15, color: "#181D27", display: "block" }}>{formData.lastEditedBy.name}</span>
+                                  <span style={{ fontSize: 13, color: "#6c757d" }}>
+                                    {formData.updatedAt ? new Date(formData.updatedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "-"}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>Career Information</span>
-                    </div>
-                        <div className="layered-card-content">
-                            {isEditing ? <textarea className="form-control" placeholder="Job Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} /> 
-                            : <p style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: formData.description }} />}
+                    )
+                  },
+                  {
+                    id: "cv-review",
+                    title: "CV Review & Pre-Screening Questions",
+                    content: (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                        <div>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>CV Screening</span>
+                          <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.screeningSetting || "Not specified"}</span>
                         </div>
-                        </div>
-                    </div>
-                    {!isEditing ? 
-                    <div className="layered-card-outer">
-                        <div className="layered-card-middle">
-                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
-                          <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
-                          <i className="la la-comment-alt" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
+                        {formData.cvSecretPrompt && (
+                          <div>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>CV Secret Prompt</span>
+                            <div style={{ 
+                              padding: "12px", 
+                              backgroundColor: "#F9FAFB", 
+                              borderRadius: "6px",
+                              border: "1px solid #E5E7EB",
+                              fontSize: 15, 
+                              color: "#6c757d",
+                              lineHeight: 1.5
+                            }}>
+                              {formData.cvSecretPrompt}
+                            </div>
                           </div>
-                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>
-                            Interview Questions 
-                          </span>
-                          <div style={{ borderRadius: "50%", width: 30, height: 22, border: "1px solid #D5D9EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, backgroundColor: "#F8F9FC", color: "#181D27", fontWeight: 700 }}>
-                            {formData.questions.reduce((acc, group) => acc + group.questions.length, 0)}
-                          </div>
+                        )}
+                      </div>
+                    )
+                  },
+                  {
+                    id: "ai-interview",
+                    title: "AI Interview",
+                    content: (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                        <div>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>AI Interview Screening</span>
+                          <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.aiInterviewScreening || "Not specified"}</span>
                         </div>
-                    
-                    <div className="layered-card-content">
-                        {formData.questions?.length > 0 && formData.questions?.map((questionGroup: any, index: number) => (
-                            <div key={index}>
-                                <h4>{questionGroup.category}</h4>
-                                {questionGroup?.questions?.length > 0 && questionGroup?.questions?.map((question: any, index: number) => (
-                                    <ul key={index}>
-                                        <li>{question.question}</li>
-                                    </ul>
+                        <div>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Require Video</span>
+                          <span style={{ fontSize: 15, color: "#6c757d" }}>{formData.requireVideo ? "Yes" : "No"}</span>
+                        </div>
+                        {formData.aiSecretPrompt && (
+                          <div>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>AI Interview Secret Prompt</span>
+                            <div style={{ 
+                              padding: "12px", 
+                              backgroundColor: "#F9FAFB", 
+                              borderRadius: "6px",
+                              border: "1px solid #E5E7EB",
+                              fontSize: 15, 
+                              color: "#6c757d",
+                              lineHeight: 1.5
+                            }}>
+                              {formData.aiSecretPrompt}
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Interview Questions</span>
+                          {formData.questions && formData.questions.length > 0 ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                              {formData.questions.map((category: any, index: number) => (
+                                <div key={index} style={{ 
+                                  padding: "12px", 
+                                  backgroundColor: "#F9FAFB", 
+                                  borderRadius: "6px",
+                                  border: "1px solid #E5E7EB"
+                                }}>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>
+                                    {category.category}
+                                  </span>
+                                  <span style={{ fontSize: 15, color: "#6c757d", display: "block", marginBottom: 8 }}>
+                                    Questions to ask: {category.questionCountToAsk || "All"}
+                                  </span>
+                                  {category.questions && category.questions.length > 0 ? (
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                      {category.questions.map((q: any, qIndex: number) => (
+                                        <span key={qIndex} style={{ fontSize: 15, color: "#374151" }}>
+                                          • {q.question}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <span style={{ fontSize: 15, color: "#6c757d" }}>No questions added</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>No interview questions configured</span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  },
+                  {
+                    id: "pipeline",
+                    title: "Pipeline",
+                    content: (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                        <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Pipeline Stages</span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                          {formData.pipelineStages && formData.pipelineStages.length > 0 ? formData.pipelineStages.map((stage: any, index: number) => (
+                            <div key={stage.id} style={{ 
+                              padding: "12px", 
+                              backgroundColor: "#F9FAFB", 
+                              borderRadius: "6px",
+                              border: "1px solid #E5E7EB"
+                            }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                                <div style={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  backgroundColor: stage.color
+                                }}></div>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27" }}>
+                                  {stage.name}
+                                </span>
+                                {stage.locked && (
+                                  <i className="la la-lock" style={{ fontSize: 12, color: "#9CA3AF" }}></i>
+                                )}
+                              </div>
+                              <div style={{ marginLeft: 16 }}>
+                                <span style={{ fontSize: 15, color: "#6c757d", display: "block", marginBottom: 4 }}>Substages:</span>
+                                {stage.substages && stage.substages.map((substage: any) => (
+                                  <span key={substage.id} style={{ fontSize: 15, color: "#374151", display: "block" }}>
+                                    • {substage.name}
+                                  </span>
                                 ))}
+                              </div>
                             </div>
-                        ))}
-                    </div>
-                    </div>
-                    </div> : <InterviewQuestionGeneratorV2 questions={formData.questions} setQuestions={(questions) => setFormData({ ...formData, questions: questions })} jobTitle={formData.jobTitle} description={formData.description} />}
-                </div>
-
-                <div className="right-thread">
-                    <div className="layered-card-outer">
-                        <div className="layered-card-middle">
-                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
-                      <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
-                      <i className="la la-ellipsis-h" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
-                      </div>
-                      <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>Additional Details</span>
-                      </div>
-                        
-                        <div className="layered-card-content">
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Employment Type:</strong> 
-                                <span>{formData.employmentType || "Full-time"}</span>
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Work Arrangement:</strong> 
-                                <span>{formData.workSetup || "-"}</span>
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Work Arrangement Remarks:</strong> 
-                                <span>{formData.workSetupRemarks || "-"}</span>
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Salary:</strong> 
-                                <span>{formData.salaryNegotiable ? "Negotiable" : "Fixed"}</span>
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Minimum Salary:</strong> 
-                                <span>{formData.minimumSalary || "-"}</span>
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Maximum Salary:</strong> 
-                                <span>{formData.maximumSalary || "-"}</span>
-                            </div>
-                            <div style={{ height: "1px", width: "100%", background: "#E9EAEB", margin: "16px 0" }}></div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Country:</strong> 
-                                <span>Philippines </span>
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>State/Province:</strong> 
-                                <span>{formData.province || "-"}</span>
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>City:</strong> 
-                                <span>{formData.location || "-"}</span>
-                            </div>
-                            <div style={{ height: "1px", width: "100%", background: "#E9EAEB", margin: "16px 0" }}></div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Screening Setting:</strong> 
-                                {isEditing ? <ScreeningSettingButton screeningSetting={formData.screeningSetting} onSelectSetting={(setting) => setFormData({ ...formData, screeningSetting: setting })} /> : 
-                                <span style={{ textTransform: "capitalize" }}>{formData.screeningSetting}</span>}
-                            </div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Require Video:</strong> 
-                                {isEditing ? <button
-                                    className={`button-primary ${formData.requireVideo ? "" : "negative"}`}
-                                    onClick={() => {
-                                    setFormData({ ...formData, requireVideo: !formData.requireVideo });
-                                    }}
-                                >
-                                <i
-                                className={`la ${
-                                    formData.requireVideo ? "la-video" : "la-video-slash"
-                                }`}
-                                ></i>{" "}
-                                {formData.requireVideo ? "On" : "Off"}
-                            </button> :
-                                <span>
-                               {formData.requireVideo ? "Yes" : "No"}</span>}
-                            </div>
-
-                            <div style={{ height: "1px", width: "100%", background: "#E9EAEB", margin: "16px 0" }}></div>
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Created By:</strong> 
-                                {formData.createdBy && <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                                  <img src={formData.createdBy.image} alt="created by" style={{ width: 32, height: 32, borderRadius: "50%" }} />
-                                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
-                                    <span style={{ fontSize: 14, fontWeight: 600, color: "#181D27" }}>{formData.createdBy.name}</span>
-                                    <span style={{ fontSize: 12, color: "#717680" }}> on {formData.createdAt ? new Date(formData.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "-"}</span>
-                                  </div>
-                                </div>}
-                            </div>
-
-                            <div style={{ display: "flex",flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                                <strong>Last Updated By:</strong> 
-                                {formData.lastEditedBy && <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                                  <img src={formData.lastEditedBy.image} alt="created by" style={{ width: 32, height: 32, borderRadius: "50%" }} />
-                                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
-                                    <span style={{ fontSize: 14, fontWeight: 600, color: "#181D27" }}>{formData.lastEditedBy.name}</span>
-                                    <span style={{ fontSize: 12, color: "#717680" }}> on {formData.updatedAt ? new Date(formData.updatedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "-"}</span>
-                                  </div>
-                                </div>}
-                            </div>
+                          )) : (
+                            <span style={{ fontSize: 15, color: "#6c757d" }}>No pipeline stages configured</span>
+                          )}
                         </div>
-                        </div>
-                    </div>
-                    <CareerLink career={formData} />
-                    {/* Card for direct interview link */}
-                    <DirectInterviewLinkV2 formData={formData} setFormData={setFormData} />
-                    {isEditing && 
-                    <div style={{ display: "flex", justifyContent: "center", gap: 16, alignItems: "center", marginBottom: "16px", width: "100%" }}>
-                         <button className="button-primary" style={{ width: "50%" }} onClick={handleCancelEdit}>Cancel</button>
-                        <button className="button-primary" style={{ width: "50%" }} onClick={updateCareer}>Save Changes</button>
-                    </div>}
-                    <div className="layered-card-outer">
-                      <div className="layered-card-middle">
-                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
-                      <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
+                      </div>
+                    )
+                  }
+                ]}
+                allowMultiple={true}
+              />
+            </div>
+
+            <div className="right-thread">
+              <CareerLink career={formData} />
+              <DirectInterviewLinkV2 formData={formData} setFormData={setFormData} />
+              
+              {/* Advanced Settings */}
+              <div className="layered-card-outer" style={{ marginTop: "16px" }}>
+                <div className="layered-card-middle">
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", gap: 8 }}>
+                    <div style={{ width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", gap: 8, background: "#181D27", borderRadius: "60px" }}>
                       <i className="la la-cog" style={{ fontSize: 20, color: "#FFFFFF"}} /> 
-                      </div>
-                      <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>Advanced Settings</span>
-                  </div>
-
-                      <div className="layered-card-content">
-                        <button 
-                        onClick={() => {
-                          deleteCareer();
-                        }}
-                        style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,backgroundColor: "#FFFFFF", color: "#B32318", borderRadius: "60px", padding: "5px 10px", border: "1px solid #B32318", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>
-                                <i className="la la-trash" style={{ color: "#B32318", fontSize: 16 }}></i>
-                                <span>Delete this career</span>
-                        </button>
-                        <span style={{ fontSize: "14px", color: "#717680", textAlign: "center" }}>Be careful, this action cannot be undone.</span>
                     </div>
+                    <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>Advanced Settings</span>
                   </div>
-                </div>
-                </div>
-            </div>
-            {showEditModal && (
-                <div
-                className="modal show fade-in-bottom"
-                style={{
-                  display: "block",
-                  background: "rgba(0,0,0,0.45)",
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  width: "100vw",
-                  height: "100vh",
-                  zIndex: 1050,
-                }}
-                >
-                    <div
-                    style={{
+                  <div className="layered-card-content">
+                    <button 
+                      onClick={() => {
+                        deleteCareer();
+                      }}
+                      style={{
+                        background: "#DC2626",
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 16px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "14px",
                         display: "flex",
-                        justifyContent: "center",
                         alignItems: "center",
-                        height: "100vh",
-                        width: "100vw",
-                    }}>
-                   
-                    <div className="modal-content" style={{ overflowY: "scroll", height: "100vh", width: "90vw", background: "#fff", border: `1.5px solid #E9EAEB`, borderRadius: 14, boxShadow: "0 8px 32px rgba(30,32,60,0.18)", padding: "24px" }}>
-                      <CareerForm career={formData} formType="edit" setShowEditModal={setShowEditModal} />
-                    </div>
+                        gap: "8px"
+                      }}
+                    >
+                      <i className="la la-trash"></i>
+                      Delete Career
+                    </button>
                   </div>
                 </div>
-            )}
+              </div>
+            </div>
+          </div>
+          {/* Career Form Modal */}
+          {showEditModal && (
+            <CareerForm
+              career={formData}
+              formType="edit"
+              setShowEditModal={setShowEditModal}
+            />
+          )}
         </div>
-    )
+    );
 }
 
-function ScreeningSettingButton(props) {
-    const { onSelectSetting, screeningSetting } = props;
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-     // Setting List icons
-    const settingList = [
-        {
-        name: "Good Fit and above",
-        icon: "la la-check",
-        },
-        {
-        name: "Only Strong Fit",
-        icon: "la la-check-double",
-        },
-        {
-        name: "No Automatic Promotion",
-        icon: "la la-times",
-        },
-    ];
-    return (
-        <div className="dropdown w-100">
-        <button
-          className="dropdown-btn fade-in-bottom"
-          style={{ width: "100%" }}
-          type="button"
-          onClick={() => setDropdownOpen((v) => !v)}
-        >
-          <span>
-            <i
-              className={
-                settingList.find(
-                  (setting) => setting.name === screeningSetting
-                )?.icon
-              }
-            ></i>{" "}
-            {screeningSetting}
-          </span>
-          <i className="la la-angle-down ml-10"></i>
-        </button>
-        <div
-          className={`dropdown-menu w-100 mt-1 org-dropdown-anim${
-            dropdownOpen ? " show" : ""
-          }`}
-          style={{
-            padding: "10px",
-          }}
-        >
-          {settingList.map((setting, index) => (
-            <div style={{ borderBottom: "1px solid #ddd" }} key={index}>
-              <button
-                className={`dropdown-item d-flex align-items-center${
-                  screeningSetting === setting.name
-                    ? " bg-primary text-white active-org"
-                    : ""
-                }`}
-                style={{
-                  minWidth: 220,
-                  borderRadius: screeningSetting === setting.name ? 0 : 10,
-                  overflow: "hidden",
-                  paddingBottom: 10,
-                  paddingTop: 10,
-                }}
-                onClick={() => {
-                  onSelectSetting(setting.name);
-                  setDropdownOpen(false);
-                }}
-              >
-                <i className={setting.icon}></i> {setting.name}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-}
