@@ -93,7 +93,7 @@ export default function CareersV2Table() {
   useEffect(() => {
     const fetchOrgDetails = async () => {
       try {
-        const orgDetails = await axios.post("/api/feth-org-details", {
+        const orgDetails = await axios.post("/api/fetch-org-details", {
           orgID: activeOrg._id,
         });
         setAvailableJobSlots((orgDetails.data?.plan?.jobLimit || 3) + (orgDetails.data?.extraJobSlots || 0));

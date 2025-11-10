@@ -46,7 +46,11 @@ export async function POST(req: Request) {
         }
     },
     {
-      $unwind: "$plan"
+      $unwind: {
+        path: "$plan",
+        // TODO: Remove if the plans are set up
+        preserveNullAndEmptyArrays: true
+      }
     },
     ]).toArray();
 
@@ -59,7 +63,7 @@ export async function POST(req: Request) {
 
     return Response.json(orgDoc[0]);
   } catch (error) {
-    console.error("Error in feth-org-details endpoint:", error);
+    console.error("Error in fetch-org-details endpoint:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

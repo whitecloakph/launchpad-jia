@@ -7,7 +7,7 @@ export default function OrgInfoTag(props: any) {
 
   useEffect(() => {
     const fetchOrgDetails = async () => {
-      const response = await fetch("/api/feth-org-details", {
+      const response = await fetch("/api/fetch-org-details", {
         method: "POST",
         body: JSON.stringify({ orgID }),
       });
