@@ -453,6 +453,9 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
         email: user.email,
       };
 
+      // Determine status based on current step
+      const careerStatus = currentStep === 4 ? "active" : "draft";
+
       if (savedCareerId) {
         // Update existing career
         const updatedCareer = {
@@ -463,7 +466,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
           workSetupRemarks,
           questions,
           lastEditedBy: userInfoSlice,
-          status: "draft",
+          status: careerStatus,
           updatedAt: Date.now(),
           screeningSetting,
           cvSecretPrompt,
@@ -480,7 +483,23 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
           employmentType,
         };
 
-        await axios.post("/api/update-career", updatedCareer);
+        const response = await axios.post("/api/update-career", updatedCareer);
+        
+        // If publishing (last step), show success message and redirect
+        if (currentStep === 4 && response.status === 200) {
+          candidateActionToast(
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8, marginLeft: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#181D27" }}>Career published successfully</span>
+            </div>,
+            1300,
+            <i className="la la-check-circle" style={{ color: "#039855", fontSize: 32 }}></i>
+          );
+          setTimeout(() => {
+            window.location.href = `/recruiter-dashboard/careers`;
+          }, 1300);
+          setIsSavingCareer(false);
+          return;
+        }
       } else {
         // Create new career
         const careerData = {
@@ -504,14 +523,30 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
           country,
           province,
           location: city,
-          status: "draft",
+          status: careerStatus,
           employmentType,
         };
 
         const response = await axios.post("/api/add-career", careerData);
         if (response.status === 200) {
           setSavedCareerId(response.data._id);
-          setIsDraft(true);
+          setIsDraft(careerStatus === "draft");
+          
+          // If publishing (last step), show success message and redirect
+          if (currentStep === 4) {
+            candidateActionToast(
+              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8, marginLeft: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#181D27" }}>Career published successfully</span>
+              </div>,
+              1300,
+              <i className="la la-check-circle" style={{ color: "#039855", fontSize: 32 }}></i>
+            );
+            setTimeout(() => {
+              window.location.href = `/recruiter-dashboard/careers`;
+            }, 1300);
+            setIsSavingCareer(false);
+            return;
+          }
         }
       }
 
@@ -688,7 +723,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             <button
               disabled={isSavingCareer}
               style={{ width: "fit-content", background: isSavingCareer ? "#D5D7DA" : "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px", cursor: isSavingCareer ? "not-allowed" : "pointer", whiteSpace: "nowrap" }} onClick={continueToNextStep}>
-              Save and Continue
+              {currentStep === 4 ? "Publish" : "Save and Continue"}
             </button>
           </div>
         </div>) : (
@@ -1900,7 +1935,16 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             {/* Step 5: Review */}
             {currentStep === 4 && (
               <>
-                <Accordion 
+                <div style={{ 
+                  display: "flex", 
+                  justifyContent: "center", 
+                  width: "100%" 
+                }}>
+                  <div style={{ 
+                    width: "90%", 
+                    maxWidth: "1000px" 
+                  }}>
+                    <Accordion 
                       items={[
                         {
                           id: "step1",
@@ -1909,71 +1953,71 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                               {/* Job Title */}
                               <div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Job Title</span>
-                                <span style={{ fontSize: 14, color: "#6c757d" }}>{jobTitle || "Not specified"}</span>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Job Title</span>
+                                <span style={{ fontSize: 15, color: "#6c757d" }}>{jobTitle || "Not specified"}</span>
                               </div>
 
                               {/* Employment Type & Work Setup */}
                               <div style={{ display: "flex", gap: 20 }}>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Employment Type</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>{employmentType || "Not specified"}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Employment Type</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>{employmentType || "Not specified"}</span>
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Work Arrangement</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>{workSetup || "Not specified"}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Work Arrangement</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>{workSetup || "Not specified"}</span>
                                 </div>
                               </div>
 
                               {/* Location */}
                               <div style={{ display: "flex", gap: 20 }}>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Country</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>{country || "Not specified"}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Country</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>{country || "Not specified"}</span>
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>State / Province</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>{province || "Not specified"}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>State / Province</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>{province || "Not specified"}</span>
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>City</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>{city || "Not specified"}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>City</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>{city || "Not specified"}</span>
                                 </div>
                               </div>
 
                               {/* Salary */}
                               <div style={{ display: "flex", gap: 20 }}>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Minimum Salary</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>₱{minimumSalary || "0"} PHP</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Minimum Salary</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>₱{minimumSalary || "0"} PHP</span>
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Maximum Salary</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>₱{maximumSalary || "0"} PHP</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Maximum Salary</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>₱{maximumSalary || "0"} PHP</span>
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Negotiable</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>{salaryNegotiable ? "Yes" : "No"}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Negotiable</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>{salaryNegotiable ? "Yes" : "No"}</span>
                                 </div>
                               </div>
 
                               {/* Job Description */}
                               <div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Job Description</span>
-                                <div style={{ fontSize: 14, color: "#6c757d", lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: description || "No description provided" }}></div>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Job Description</span>
+                                <div style={{ fontSize: 15, color: "#6c757d", lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: description || "No description provided" }}></div>
                               </div>
 
                               {/* Work Setup Remarks */}
                               {workSetupRemarks && (
                                 <div>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Work Setup Remarks</span>
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>{workSetupRemarks}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Work Setup Remarks</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>{workSetupRemarks}</span>
                                 </div>
                               )}
 
                               {/* Team Access */}
                               <div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Team Access</span>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Team Access</span>
                                 {selectedTeamMembers.length > 0 ? (
                                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                                     {selectedTeamMembers.map((member, index) => (
@@ -1983,13 +2027,13 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                                           alt={member.name}
                                           style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }}
                                         />
-                                        <span style={{ fontSize: 14, color: "#181D27" }}>{member.name}</span>
-                                        <span style={{ fontSize: 13, color: "#6c757d" }}>({member.role})</span>
+                                        <span style={{ fontSize: 15, color: "#181D27" }}>{member.name}</span>
+                                        <span style={{ fontSize: 15, color: "#6c757d" }}>({member.role})</span>
                                       </div>
                                     ))}
                                   </div>
                                 ) : (
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>No additional team members added</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>No additional team members added</span>
                                 )}
                               </div>
                             </div>
@@ -2001,18 +2045,18 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           content: (
                             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                               <div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>CV Screening</span>
-                                <span style={{ fontSize: 14, color: "#6c757d" }}>{screeningSetting || "Not specified"}</span>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>CV Screening</span>
+                                <span style={{ fontSize: 15, color: "#6c757d" }}>{screeningSetting || "Not specified"}</span>
                               </div>
                               {cvSecretPrompt && (
                                 <div>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>CV Secret Prompt</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>CV Secret Prompt</span>
                                   <div style={{ 
                                     padding: "12px", 
                                     backgroundColor: "#F9FAFB", 
                                     borderRadius: "6px",
                                     border: "1px solid #E5E7EB",
-                                    fontSize: 14, 
+                                    fontSize: 15, 
                                     color: "#6c757d",
                                     lineHeight: 1.5
                                   }}>
@@ -2029,22 +2073,22 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           content: (
                             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                               <div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>AI Interview Screening</span>
-                                <span style={{ fontSize: 14, color: "#6c757d" }}>{aiInterviewScreening || "Not specified"}</span>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>AI Interview Screening</span>
+                                <span style={{ fontSize: 15, color: "#6c757d" }}>{aiInterviewScreening || "Not specified"}</span>
                               </div>
                               <div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Require Video</span>
-                                <span style={{ fontSize: 14, color: "#6c757d" }}>{requireVideo ? "Yes" : "No"}</span>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>Require Video</span>
+                                <span style={{ fontSize: 15, color: "#6c757d" }}>{requireVideo ? "Yes" : "No"}</span>
                               </div>
                               {aiSecretPrompt && (
                                 <div>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>AI Interview Secret Prompt</span>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>AI Interview Secret Prompt</span>
                                   <div style={{ 
                                     padding: "12px", 
                                     backgroundColor: "#F9FAFB", 
                                     borderRadius: "6px",
                                     border: "1px solid #E5E7EB",
-                                    fontSize: 14, 
+                                    fontSize: 15, 
                                     color: "#6c757d",
                                     lineHeight: 1.5
                                   }}>
@@ -2053,7 +2097,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                                 </div>
                               )}
                               <div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Interview Questions</span>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Interview Questions</span>
                                 {questions.length > 0 ? (
                                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                     {questions.map((category, index) => (
@@ -2063,28 +2107,28 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                                         borderRadius: "6px",
                                         border: "1px solid #E5E7EB"
                                       }}>
-                                        <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>
+                                        <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 4 }}>
                                           {category.category}
                                         </span>
-                                        <span style={{ fontSize: 12, color: "#6c757d", display: "block", marginBottom: 8 }}>
+                                        <span style={{ fontSize: 15, color: "#6c757d", display: "block", marginBottom: 8 }}>
                                           Questions to ask: {category.questionCountToAsk || "All"}
                                         </span>
                                         {category.questions && category.questions.length > 0 ? (
                                           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                                             {category.questions.map((q, qIndex) => (
-                                              <span key={qIndex} style={{ fontSize: 13, color: "#374151" }}>
+                                              <span key={qIndex} style={{ fontSize: 15, color: "#374151" }}>
                                                 • {q.question}
                                               </span>
                                             ))}
                                           </div>
                                         ) : (
-                                          <span style={{ fontSize: 13, color: "#6c757d" }}>No questions added</span>
+                                          <span style={{ fontSize: 15, color: "#6c757d" }}>No questions added</span>
                                         )}
                                       </div>
                                     ))}
                                   </div>
                                 ) : (
-                                  <span style={{ fontSize: 14, color: "#6c757d" }}>No interview questions configured</span>
+                                  <span style={{ fontSize: 15, color: "#6c757d" }}>No interview questions configured</span>
                                 )}
                               </div>
                             </div>
@@ -2095,7 +2139,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           title: "Pipeline",
                           content: (
                             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Pipeline Stages</span>
+                              <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27", display: "block", marginBottom: 8 }}>Pipeline Stages</span>
                               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                 {pipelineStages.map((stage, index) => (
                                   <div key={stage.id} style={{ 
@@ -2111,7 +2155,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                                         borderRadius: "50%",
                                         backgroundColor: stage.color
                                       }}></div>
-                                      <span style={{ fontSize: 14, fontWeight: 600, color: "#181D27" }}>
+                                      <span style={{ fontSize: 15, fontWeight: 600, color: "#181D27" }}>
                                         {stage.name}
                                       </span>
                                       {stage.locked && (
@@ -2119,9 +2163,9 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                                       )}
                                     </div>
                                     <div style={{ marginLeft: 16 }}>
-                                      <span style={{ fontSize: 12, color: "#6c757d", display: "block", marginBottom: 4 }}>Substages:</span>
+                                      <span style={{ fontSize: 15, color: "#6c757d", display: "block", marginBottom: 4 }}>Substages:</span>
                                       {stage.substages.map((substage) => (
-                                        <span key={substage.id} style={{ fontSize: 13, color: "#374151", display: "block" }}>
+                                        <span key={substage.id} style={{ fontSize: 15, color: "#374151", display: "block" }}>
                                           • {substage.name}
                                         </span>
                                       ))}
@@ -2135,6 +2179,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                       ]}
                       allowMultiple={true}
                     />
+                  </div>
+                </div>
               </>
             )}
           </div>
