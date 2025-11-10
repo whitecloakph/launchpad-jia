@@ -76,316 +76,418 @@ export default function SegmentCareerDetails({
   setCityList,
 }: SegmentCareerDetailsProps) {
   return (
-    <div className="flex flex-col gap-4">
-      {/* Career Information Card */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        gap: 20,
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          flex: 0.72,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
         {/* Career Information Card */}
-        <div>
-          <div className="layered-card-middle bg-#F8F9FC">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <span className="career-label">1. Career Information</span>
-            </div>
-            <div className="layered-card-content" style={{ fontSize: 14 }}>
-              <span className="sub-career-label">Basic Information</span>
-              <span>
-                Job Title <span style={{ color: "#EF4444" }}>*</span>
-              </span>
-              <input
-                value={jobTitle}
-                className="form-control"
-                placeholder="Enter job title"
-                onChange={(e) => setJobTitle(e.target.value || "")}
-              />
-              <span className="sub-career-label" style={{ marginTop: 16 }}>
-                Work Setting
-              </span>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "24px",
-                  width: "100%",
-                }}
-              >
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
-                >
-                  <span style={{ marginBottom: "6px" }}>Employment Type</span>
-                  <CustomDropdown
-                    onSelectSetting={(employmentType) =>
-                      setEmploymentType(employmentType)
-                    }
-                    screeningSetting={employmentType}
-                    settingList={employmentTypeOptions}
-                    placeholder="Choose employment type"
-                  />
-                </div>
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
-                >
-                  <span style={{ marginBottom: "6px" }}>
-                    Arrangement <span style={{ color: "#EF4444" }}>*</span>
-                  </span>
-                  <CustomDropdown
-                    onSelectSetting={(setting) => setWorkSetup(setting)}
-                    screeningSetting={workSetup}
-                    settingList={workSetupOptions}
-                    placeholder="Choose work arrangement"
-                  />
-                </div>
-              </div>
-              <span className="sub-career-label" style={{ marginTop: 16 }}>
-                Location
-              </span>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "24px",
-                  width: "100%",
-                }}
-              >
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
-                >
-                  <span style={{ marginBottom: "6px" }}>Country</span>
-                  <CustomDropdown
-                    onSelectSetting={(setting) => setCountry(setting)}
-                    screeningSetting={country}
-                    settingList={[]}
-                    placeholder="Select Country"
-                  />
-                </div>
-
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
-                >
-                  <span style={{ marginBottom: "6px" }}>State / Province</span>
-                  <CustomDropdown
-                    onSelectSetting={(selectedProvince) => {
-                      setProvince(selectedProvince);
-                      const provinceObj = provinceList.find(
-                        (p) => p.name === selectedProvince
-                      );
-                      if (provinceObj) {
-                        const cities =
-                          philippineCitiesAndProvinces.cities.filter(
-                            (city) => city.province === provinceObj.key
-                          );
-                        setCityList(cities);
-                        if (cities.length > 0) {
-                          setCity(cities[0].name);
-                        } else {
-                          setCity("");
-                        }
-                      }
-                    }}
-                    screeningSetting={province}
-                    settingList={provinceList}
-                    placeholder="Select State / Province"
-                  />
-                </div>
-
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
-                >
-                  <span style={{ marginBottom: "6px" }}>City</span>
-                  <CustomDropdown
-                    onSelectSetting={(city) => setCity(city)}
-                    screeningSetting={city}
-                    settingList={cityList}
-                    placeholder="Select City"
-                  />
-                </div>
-              </div>
-
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Career Information Card */}
+          <div>
+            <div className="layered-card-middle bg-#F8F9FC">
               <div
                 style={{
                   display: "flex",
                   flexDirection: "row",
-                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
+                <span className="career-label">1. Career Information</span>
+              </div>
+              <div className="layered-card-content" style={{ fontSize: 14 }}>
+                <span className="sub-career-label">Basic Information</span>
+                <span>
+                  Job Title <span style={{ color: "#EF4444" }}>*</span>
+                </span>
+                <input
+                  value={jobTitle}
+                  className="form-control"
+                  placeholder="Enter job title"
+                  onChange={(e) => setJobTitle(e.target.value || "")}
+                />
                 <span className="sub-career-label" style={{ marginTop: 16 }}>
-                  Salary
+                  Work Setting
                 </span>
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "row",
-                    alignItems: "flex-start",
-                    gap: 8,
-                    minWidth: "130px",
-                    marginTop: 16,
+                    gap: "24px",
+                    width: "100%",
                   }}
                 >
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      checked={salaryNegotiable}
-                      onChange={() => setSalaryNegotiable(!salaryNegotiable)}
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <span style={{ marginBottom: "6px" }}>Employment Type</span>
+                    <CustomDropdown
+                      onSelectSetting={(employmentType) =>
+                        setEmploymentType(employmentType)
+                      }
+                      screeningSetting={employmentType}
+                      settingList={employmentTypeOptions}
+                      placeholder="Choose employment type"
                     />
-                    <span className="slider round"></span>
-                  </label>
-                  <span>{salaryNegotiable ? "Negotiable" : "Fixed"}</span>
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <span style={{ marginBottom: "6px" }}>
+                      Arrangement <span style={{ color: "#EF4444" }}>*</span>
+                    </span>
+                    <CustomDropdown
+                      onSelectSetting={(setting) => setWorkSetup(setting)}
+                      screeningSetting={workSetup}
+                      settingList={workSetupOptions}
+                      placeholder="Choose work arrangement"
+                    />
+                  </div>
+                </div>
+                <span className="sub-career-label" style={{ marginTop: 16 }}>
+                  Location
+                </span>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "24px",
+                    width: "100%",
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <span style={{ marginBottom: "6px" }}>Country</span>
+                    <CustomDropdown
+                      onSelectSetting={(setting) => setCountry(setting)}
+                      screeningSetting={country}
+                      settingList={[]}
+                      placeholder="Select Country"
+                    />
+                  </div>
+
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <span style={{ marginBottom: "6px" }}>
+                      State / Province
+                    </span>
+                    <CustomDropdown
+                      onSelectSetting={(selectedProvince) => {
+                        setProvince(selectedProvince);
+                        const provinceObj = provinceList.find(
+                          (p) => p.name === selectedProvince
+                        );
+                        if (provinceObj) {
+                          const cities =
+                            philippineCitiesAndProvinces.cities.filter(
+                              (city) => city.province === provinceObj.key
+                            );
+                          setCityList(cities);
+                          if (cities.length > 0) {
+                            setCity(cities[0].name);
+                          } else {
+                            setCity("");
+                          }
+                        }
+                      }}
+                      screeningSetting={province}
+                      settingList={provinceList}
+                      placeholder="Select State / Province"
+                    />
+                  </div>
+
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <span style={{ marginBottom: "6px" }}>City</span>
+                    <CustomDropdown
+                      onSelectSetting={(city) => setCity(city)}
+                      screeningSetting={city}
+                      settingList={cityList}
+                      placeholder="Select City"
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span className="sub-career-label" style={{ marginTop: 16 }}>
+                    Salary
+                  </span>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "flex-start",
+                      gap: 8,
+                      minWidth: "130px",
+                      marginTop: 16,
+                    }}
+                  >
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={salaryNegotiable}
+                        onChange={() => setSalaryNegotiable(!salaryNegotiable)}
+                      />
+                      <span className="slider round"></span>
+                    </label>
+                    <span>{salaryNegotiable ? "Negotiable" : "Fixed"}</span>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "24px",
+                    width: "100%",
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <span style={{ marginBottom: "6px" }}>Minimum Salary</span>
+                    <div style={{ position: "relative" }}>
+                      <span
+                        style={{
+                          position: "absolute",
+                          left: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "#6c757d",
+                          fontSize: "16px",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        P
+                      </span>
+                      <input
+                        type="number"
+                        className="form-control"
+                        style={{ paddingLeft: "28px" }}
+                        placeholder="0"
+                        min={0}
+                        value={minimumSalary}
+                        onChange={(e) => setMinimumSalary(e.target.value || "")}
+                      />
+                      <span
+                        style={{
+                          position: "absolute",
+                          right: "30px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "#6c757d",
+                          fontSize: "16px",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        PHP
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <span style={{ marginBottom: "6px" }}>Maximum Salary</span>
+                    <div style={{ position: "relative" }}>
+                      <span
+                        style={{
+                          position: "absolute",
+                          left: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "#6c757d",
+                          fontSize: "16px",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        P
+                      </span>
+                      <input
+                        type="number"
+                        className="form-control"
+                        style={{ paddingLeft: "28px" }}
+                        placeholder="0"
+                        min={0}
+                        value={maximumSalary}
+                        onChange={(e) => setMaximumSalary(e.target.value || "")}
+                      />
+                      <span
+                        style={{
+                          position: "absolute",
+                          right: "30px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "#6c757d",
+                          fontSize: "16px",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        PHP
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Job Description Card */}
+          <div>
+            <div className="layered-card-middle bg-#F8F9FC">
               <div
                 style={{
                   display: "flex",
-                  gap: "24px",
-                  width: "100%",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
+                <span
+                  style={{
+                    fontSize: 16,
+                    color: "#181D27",
+                    fontWeight: 700,
+                    marginLeft: 16,
+                    paddingTop: 8,
+                  }}
                 >
-                  <span style={{ marginBottom: "6px" }}>Minimum Salary</span>
-                  <div style={{ position: "relative" }}>
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: "12px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      P
-                    </span>
-                    <input
-                      type="number"
-                      className="form-control"
-                      style={{ paddingLeft: "28px" }}
-                      placeholder="0"
-                      min={0}
-                      value={minimumSalary}
-                      onChange={(e) => setMinimumSalary(e.target.value || "")}
-                    />
-                    <span
-                      style={{
-                        position: "absolute",
-                        right: "30px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      PHP
-                    </span>
-                  </div>
-                </div>
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
+                  2. Job Description
+                </span>
+              </div>
+              <div className="layered-card-content">
+                <RichTextEditor setText={setDescription} text={description} />
+              </div>
+            </div>
+          </div>
+
+          {/* Team Access PlaceHolder */}
+          <div>
+            <div className="layered-card-middle">
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 16,
+                    color: "#181D27",
+                    fontWeight: 700,
+                    marginLeft: 16,
+                    paddingTop: 8,
+                  }}
                 >
-                  <span style={{ marginBottom: "6px" }}>Maximum Salary</span>
-                  <div style={{ position: "relative" }}>
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: "12px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      P
-                    </span>
-                    <input
-                      type="number"
-                      className="form-control"
-                      style={{ paddingLeft: "28px" }}
-                      placeholder="0"
-                      min={0}
-                      value={maximumSalary}
-                      onChange={(e) => setMaximumSalary(e.target.value || "")}
-                    />
-                    <span
-                      style={{
-                        position: "absolute",
-                        right: "30px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#6c757d",
-                        fontSize: "16px",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      PHP
-                    </span>
-                  </div>
-                </div>
+                  3. Team Access
+                </span>
+              </div>
+              <div className="layered-card-content">
+                <span>Coming Soon</span>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Job Description Card */}
-        <div>
-          <div className="layered-card-middle bg-#F8F9FC">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
+      </div>
+      <div
+        style={{
+          flex: 0.28,
+          position: "sticky",
+          top: 16,
+          height: "fit-content",
+          maxHeight: "80vh",
+          overflowY: "auto",
+        }}
+      >
+        <div className="layered-card-middle">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "flex-start",
+              gap: 8,
+            }}
+          >
+            <span
+              className="career-label"
+              style={{ display: "flex", alignItems: "center", gap: 6 }}
             >
-              <span
+              <i
+                className=" la la-lightbulb"
                 style={{
-                  fontSize: 16,
-                  color: "#181D27",
-                  fontWeight: 700,
-                  marginLeft: 16,
-                  paddingTop: 8,
+                  color: "#414651",
+                  fontSize: 24,
+                  textShadow: "0 0 1px #414651",
                 }}
-              >
-                2. Job Description
-              </span>
-            </div>
-            <div className="layered-card-content">
-              <RichTextEditor setText={setDescription} text={description} />
-            </div>
+              ></i>
+              Tips
+            </span>
           </div>
-        </div>
 
-        {/* Team Access PlaceHolder */}
-        <div>
-          <div className="layered-card-middle">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 16,
-                  color: "#181D27",
-                  fontWeight: 700,
-                  marginLeft: 16,
-                  paddingTop: 8,
-                }}
-              >
-                3. Team Access
-              </span>
-            </div>
-            <div className="layered-card-content">
-              <span>Coming Soon</span>
-            </div>
+          <div className="layered-card-content">
+            <p style={{ marginTop: 4, color: "#414651" }}>
+              <span style={{ fontWeight: 700 }}>
+                Use clear, standard job titles
+              </span>{" "}
+              for better searchability (e.g., “Software Engineer” instead of
+              “Code Ninja” or “Tech Rockstar”).
+            </p>
+            <p style={{ marginTop: 4, color: "#414651" }}>
+              <span style={{ fontWeight: 700 }}>Avoid abbreviations</span> or
+              internal role codes that applicants may not understand (e.g., use
+              “QA Engineer” instead of “QE II” or “QA-TL”).
+            </p>
+            <p style={{ marginTop: 4, color: "#414651" }}>
+              <span style={{ fontWeight: 700 }}>Keep it concise</span> – job
+              titles should be no more than a few words (2–4 max), avoiding
+              fluff or marketing terms.
+            </p>
           </div>
         </div>
       </div>
