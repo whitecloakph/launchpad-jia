@@ -1,4 +1,4 @@
-@import "../variables";
+@use "../variables";
 
 // Main Container
 .mainContainer {
@@ -6,7 +6,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding-top: 32px;
-  border-top: 1px solid $color-border-light;
+  border-top: 1px solid variables.$color-border-light;
 }
 
 // Header Section
@@ -23,13 +23,13 @@
 .headerTitle {
   font-size: 18px;
   font-weight: 600;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
   margin: 0 0 8px 0;
 }
 
 .headerDescription {
   font-size: 14px;
-  color: $color-text-tertiary;
+  color: variables.$color-text-tertiary;
   margin: 0;
   max-width: 600px;
 }
@@ -41,9 +41,9 @@
 
 .actionButton {
   padding: 8px 16px;
-  background-color: $color-white;
-  color: $color-button-disabled;
-  border: 1px solid $color-border-dark;
+  background-color: variables.$color-white;
+  color: variables.$color-button-disabled;
+  border: 1px solid variables.$color-border-dark;
   border-radius: 2em;
   cursor: pointer;
   font-size: 14px;
@@ -55,7 +55,7 @@
 
 .actionButtonPrimary {
   @extend .actionButton;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
 }
 
 // Pipeline Grid
@@ -75,14 +75,14 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border-top: 2px dashed $color-border-light;
-  border-left: 2px dashed $color-border-light;
-  border-right: 2px dashed $color-border-light;
+  border-top: 2px dashed variables.$color-border-light;
+  border-left: 2px dashed variables.$color-border-light;
+  border-right: 2px dashed variables.$color-border-light;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   padding: 16px 16px 32px 16px;
   font-size: 16px;
-  color: $color-border-dark;
+  color: variables.$color-border-dark;
   font-weight: 500;
 }
 
@@ -90,11 +90,11 @@
 .stageCard {
   position: relative;
   bottom: 13px;
-  background-color: $color-bg-light;
+  background-color: variables.$color-bg-light;
   border-radius: 12px;
   padding: 20px;
   border: none;
-  box-shadow: $inner-shadow-xs;
+  box-shadow: variables.$inner-shadow-xs;
 }
 
 // Stage Header
@@ -113,18 +113,18 @@
 
 .stageIcon {
   font-size: 16px;
-  color: $color-primary-neutral-400;
+  color: variables.$color-primary-neutral-400;
 }
 
 .stageName {
   font-size: 15px;
   font-weight: 600;
-  color: $color-secondary-blue-gray-800;
+  color: variables.$color-secondary-blue-gray-800;
 }
 
 .stageHelpIcon {
   font-size: 14px;
-  color: $color-border-dark;
+  color: variables.$color-border-dark;
 }
 
 .stageHeaderRight {
@@ -135,19 +135,19 @@
 
 .stageMenuIcon {
   font-size: 16px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   cursor: pointer;
 }
 
 .stageLockIcon {
   font-size: 14px;
-  color: $color-border-dark;
+  color: variables.$color-border-dark;
 }
 
 // Substages Section
 .substagesLabel {
   font-size: 11px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   font-weight: 500;
   margin-bottom: 12px;
   text-transform: uppercase;
@@ -161,18 +161,18 @@
 }
 
 .substageItem {
-  background-color: $color-white;
+  background-color: variables.$color-white;
   border-radius: 8px;
   padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid $color-border-primary;
+  border: 1px solid variables.$color-border-primary;
 }
 
 .substageName {
   font-size: 14px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   font-weight: 400;
 }
 
@@ -180,8 +180,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background-color: $color-white;
-  border: 1px solid $color-border-primary;
+  background-color: variables.$color-white;
+  border: 1px solid variables.$color-border-primary;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,7 +189,7 @@
 
 .automationIcon {
   font-size: 14px;
-  color: $color-primary-neutral-600;
+  color: variables.$color-primary-neutral-600;
 }
 
 // Add Stage Button
@@ -204,12 +204,12 @@
   width: 40px;
   height: 100%;
   border-radius: 50px;
-  background-color: $color-white;
-  border: 2px dashed $color-border-primary;
+  background-color: variables.$color-white;
+  border: 2px dashed variables.$color-border-primary;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 24px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
 }

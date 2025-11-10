@@ -1,5 +1,4 @@
-// CareerFormStepper Component Styles
-@import "../variables";
+@use "../variables";
 
 .stepperContainer {
   display: flex;
@@ -14,22 +13,22 @@
 // Step Icons
 .warningIcon {
   font-size: 24px;
-  color: $color-error;
+  color: variables.$color-error;
 }
 
 .completedIcon {
   font-size: 24px;
-  color: $color-primary-dark;
+  color: variables.$color-primary-dark;
 }
 
 .currentIcon {
   font-size: 24px;
-  color: $color-primary-dark;
+  color: variables.$color-primary-dark;
 }
 
 .upcomingIcon {
   font-size: 24px;
-  color: $color-border-medium;
+  color: variables.$color-border-medium;
 }
 
 .stepWrapper {
@@ -54,26 +53,26 @@
   &.completed {
     background: linear-gradient(
       90deg,
-      $color-gradient-stop-blue 0%,
-      $color-gradient-stop-purple 34%,
-      $color-gradient-stop-pink 67%,
-      $color-gradient-stop-yellow 100%
+      variables.$color-gradient-stop-blue 0%,
+      variables.$color-gradient-stop-purple 34%,
+      variables.$color-gradient-stop-pink 67%,
+      variables.$color-gradient-stop-yellow 100%
     );
   }
 
   &.current {
     background: linear-gradient(
       90deg,
-      $color-gradient-stop-blue 0%,
-      $color-gradient-stop-purple 17%,
-      $color-gradient-stop-pink 33.5%,
-      $color-gradient-stop-yellow 50%,
-      $color-primary-neutral-200 50%
+      variables.$color-gradient-stop-blue 0%,
+      variables.$color-gradient-stop-purple 17%,
+      variables.$color-gradient-stop-pink 33.5%,
+      variables.$color-gradient-stop-yellow 50%,
+      variables.$color-primary-neutral-200 50%
     );
   }
 
   &.upcoming {
-    background: $color-border-primary;
+    background: variables.$color-border-primary;
   }
 }
 
@@ -83,10 +82,10 @@
   text-align: left;
 
   &.active {
-    color: $color-primary-dark;
+    color: variables.$color-primary-dark;
   }
 
   &.inactive {
-    color: $color-button-disabled;
+    color: variables.$color-button-disabled;
   }
 }

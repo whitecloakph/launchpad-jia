@@ -1,4 +1,4 @@
-@import "../variables";
+@use "../variables";
 
 // Layout Containers
 .mainWrapper {
@@ -31,7 +31,7 @@
 .numberBadge {
   width: 32px;
   height: 32px;
-  background-color: $color-primary-dark;
+  background-color: variables.$color-primary-dark;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -39,14 +39,14 @@
 }
 
 .numberBadgeText {
-  color: $color-white;
+  color: variables.$color-white;
   font-size: 18px;
   font-weight: 600;
 }
 
 .sectionTitle {
   font-size: 16px;
-  color: $color-primary-dark-alt;
+  color: variables.$color-primary-dark-alt;
   font-weight: 700;
 }
 
@@ -57,14 +57,14 @@
 
 .formLabel {
   font-weight: 500;
-  color: $color-primary-dark-alt;
+  color: variables.$color-primary-dark-alt;
   margin-bottom: 0;
   display: block;
 }
 
 .formLabelFlex {
   font-weight: 500;
-  color: $color-primary-dark-alt;
+  color: variables.$color-primary-dark-alt;
   margin-bottom: 0;
   display: flex;
   gap: 8px;
@@ -72,12 +72,12 @@
 }
 
 .descriptionText {
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
 }
 
 .divider {
   margin: 0 0 8px 0;
-  border-top: 1px solid $color-border-light;
+  border-top: 1px solid variables.$color-border-light;
 }
 
 // Video Interview Toggle
@@ -91,7 +91,7 @@
 .videoToggleDescription {
   margin: 4px 0 0 0;
   font-size: 13px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
 }
 
 .toggleControls {
@@ -110,7 +110,7 @@
 // Secret Prompt Section
 .secretPromptLabel {
   font-weight: 500;
-  color: $color-primary-dark-alt;
+  color: variables.$color-primary-dark-alt;
   margin-bottom: 0;
   display: flex;
   gap: 8px;
@@ -123,7 +123,7 @@
 
 .textarea {
   width: 100%;
-  border: 1px solid $color-border-light;
+  border: 1px solid variables.$color-border-light;
   border-radius: 5px;
   padding: 0.625rem 0.75rem;
   line-height: 1.5;
@@ -150,13 +150,13 @@
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: $color-primary-dark;
+  color: variables.$color-primary-dark;
 }
 
 .tipsContainer {
   font-size: 14px;
   line-height: 1.6;
-  color: $color-text-tips;
+  color: variables.$color-text-tips;
 }
 
 .tipsParagraph {
@@ -165,6 +165,6 @@
 }
 
 .tipsStrong {
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
   font-weight: 550;
 }

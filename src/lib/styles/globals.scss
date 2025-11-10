@@ -1,4 +1,4 @@
-@import "./variables";
+@use "variables";
 
 .input-group {
   background-color: #f8f9fa !important;
@@ -1213,11 +1213,15 @@ $gifURL: "/gr-1.gif";
   #panel {
     margin: 2em 2em 2em 260px !important;
     width: calc(100vw - 292px) !important;
-    border: 1px solid $color-border-light;
+    border: 1px solid variables.$color-border-light;
     border-radius: 24px;
-    box-shadow: $inner-shadow-xs;
+    box-shadow: variables.$inner-shadow-xs;
     padding-left: 0 !important;
     padding-right: 0 !important;
+
+    &:last-child {
+      background-color: pink;
+    }
   }
 }
 @media (max-width: 899px) {

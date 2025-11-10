@@ -1,4 +1,4 @@
-@import "../variables";
+@use "../variables";
 
 // Main Container
 .mainContainer {
@@ -32,11 +32,11 @@
 
 .toggleIcon {
   font-size: 20px;
-  color: $color-general-icons;
+  color: variables.$color-general-icons;
 }
 
 .sectionTitle {
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
   font-size: 16px;
   font-weight: 600;
 }
@@ -46,7 +46,7 @@
   border: none;
   cursor: pointer;
   padding: 4px 8px;
-  color: $color-primary-neutral-600;
+  color: variables.$color-primary-neutral-600;
 }
 
 .editIcon {
@@ -55,15 +55,15 @@
 
 // Expanded Content
 .expandedContent {
-  background-color: $color-white;
+  background-color: variables.$color-white;
   padding: 2em;
   border-radius: 20px;
-  box-shadow: $inner-shadow-xs;
+  box-shadow: variables.$inner-shadow-xs;
 }
 
 .expandedContentAlt {
   padding: 0 16px 16px 16px;
-  border-top: 1px solid $color-border-primary;
+  border-top: 1px solid variables.$color-border-primary;
 }
 
 .innerPadding {
@@ -74,13 +74,13 @@
 .fieldSection {
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid $color-border-light;
+  border-bottom: 1px solid variables.$color-border-light;
 }
 
 .fieldSectionNoBottomMargin {
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid $color-border-light;
+  border-bottom: 1px solid variables.$color-border-light;
 
   &:last-child {
     margin-bottom: 0;
@@ -96,7 +96,7 @@
   gap: 20px;
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid $color-border-light;
+  border-bottom: 1px solid variables.$color-border-light;
 }
 
 .fieldGridTwoCol {
@@ -105,21 +105,21 @@
   gap: 20px;
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid $color-border-light;
+  border-bottom: 1px solid variables.$color-border-light;
 }
 
 // Field Labels & Values
 .fieldLabel {
   font-size: 16px;
   font-weight: 500;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
   margin: 0;
 }
 
 .fieldValue {
   font-size: 18px;
   font-weight: 500;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   margin: 0;
 }
 
@@ -127,7 +127,7 @@
 .descriptionContainer {
   font-size: 18px;
   line-height: 1.6;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   max-height: 400px;
   overflow-y: auto;
 }
@@ -156,36 +156,36 @@
   margin: 0;
   font-weight: 600;
   font-size: 14px;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
 }
 
 .teamEmail {
   margin: 0;
   font-size: 13px;
-  color: $color-text-tertiary;
+  color: variables.$color-text-tertiary;
 }
 
 .teamRole {
   padding: 6px 12px;
   font-size: 13px;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
 }
 
 // CV Screening Badge
 .screeningBadge {
   padding: 4px 10px;
-  background-color: $color-secondary-blue-50;
-  border: 1px solid $color-secondary-blue-200;
+  background-color: variables.$color-secondary-blue-50;
+  border: 1px solid variables.$color-secondary-blue-200;
   border-radius: 16px;
   font-weight: 500;
-  color: $color-secondary-blue-700;
+  color: variables.$color-secondary-blue-700;
 }
 
 // Secret Prompt Lists
 .secretPromptList {
   margin: 0;
   padding-left: 20px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   font-size: 15px;
   line-height: 1.6;
 }
@@ -205,17 +205,17 @@
 .questionsTitle {
   font-size: 16px;
   font-weight: 500;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
   margin: 0;
 }
 
 .questionsCount {
   padding: 2px 8px;
-  background-color: $color-white;
+  background-color: variables.$color-white;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
 }
 
 .questionsContainer {
@@ -225,7 +225,7 @@
 .questionItem {
   margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid $color-border-light;
+  border-bottom: 1px solid variables.$color-border-light;
 
   &:last-child {
     border-bottom: none;
@@ -236,12 +236,12 @@
   font-size: 15px;
   font-weight: 500;
   margin: 0 0 10px 0;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
 }
 
 .questionMeta {
   font-size: 14px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   margin: 0;
   padding-left: 20px;
 }
@@ -259,13 +259,13 @@
 
 .optionItem {
   font-size: 14px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   margin-bottom: 4px;
 }
 
 .noQuestionsText {
   font-size: 14px;
-  color: $color-text-tertiary;
+  color: variables.$color-text-tertiary;
   margin: 8px 0 0 0;
   font-style: italic;
 }
@@ -274,7 +274,7 @@
 .interviewQuestionsContainer {
   margin-top: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid $color-border-light;
+  border-bottom: 1px solid variables.$color-border-light;
 
   &:last-child {
     border-bottom: none;
@@ -285,7 +285,7 @@
   font-size: 15px;
   font-weight: 600;
   margin: 0 0 12px 0;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
 }
 
 .questionsList {
@@ -295,7 +295,7 @@
 
 .interviewQuestionItem {
   font-size: 14px;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   margin-bottom: 8px;
   line-height: 1.5;
 }
@@ -306,20 +306,20 @@
   justify-content: space-between;
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid $color-border-light;
+  border-bottom: 1px solid variables.$color-border-light;
 }
 
 .videoLabel {
   font-size: 16px;
   font-weight: 500;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
   margin: 0 0 8px 0;
 }
 
 .videoValue {
   font-size: 15px;
   margin: 0;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
 }
 
 .videoCheckmark {
@@ -329,9 +329,9 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid $color-success-200;
-  background-color: $color-success-50;
-  color: $color-success-500;
+  border: 2px solid variables.$color-success-200;
+  background-color: variables.$color-success-50;
+  color: variables.$color-success-500;
   font-size: 12px;
   font-weight: bold;
   margin-left: 4px;
@@ -347,10 +347,10 @@
 }
 
 .pipelineStage {
-  background-color: $color-bg-light;
+  background-color: variables.$color-bg-light;
   border-radius: 8px;
   padding: 16px;
-  border: 1px solid $color-border-light;
+  border: 1px solid variables.$color-border-light;
 }
 
 .stageHeader {
@@ -362,14 +362,14 @@
 
 .stageIcon {
   font-size: 18px;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
 }
 
 .stageName {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
-  color: $color-text-primary;
+  color: variables.$color-text-primary;
 }
 
 .substagesSection {
@@ -380,7 +380,7 @@
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   margin-bottom: 6px;
 }
 
@@ -391,11 +391,11 @@
 }
 
 .substageItem {
-  border: 1px solid $color-border-primary;
-  background-color: $color-white;
+  border: 1px solid variables.$color-border-primary;
+  background-color: variables.$color-white;
   margin: 0;
   padding: 0.75em;
-  color: $color-text-secondary;
+  color: variables.$color-text-secondary;
   font-size: 16px;
   font-weight: 500;
 }
