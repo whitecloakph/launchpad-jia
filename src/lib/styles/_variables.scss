@@ -19,6 +19,9 @@ $color-secondary-blue-gray-200: #d5d9ea;
 $color-secondary-blue-gray-700: #383e70;
 $color-secondary-blue-gray-800: #1E1F3B;
 
+// Secondary Colors (Indigo)
+$color-secondary-indigo-50: #EEF4FF;
+
 // Secondary Colors (Blue)
 $color-secondary-blue-50: #EFF8FF;
 $color-secondary-blue-200: #B2DDFF;
@@ -44,7 +47,7 @@ $color-bg-light: #f8f9fc;
 
 // State Colors
 $color-error: #ea443e;
-$color-error-light: #f9a29d;
+$color-border-destructive: #f9a29d;
 $color-success: #039855;
 
 $color-success-50: #ECFDF3;
@@ -56,6 +59,7 @@ $color-button-disabled: #d5d7da;
 
 // Box Shadows
 $inner-shadow-xs: 0px 0px 2px 0px rgba(0, 16, 53, 0.16) inset;
+$shadow-xs: 0px 1px 2px 0px rgba(10,13,18,0.05);
 
 // Gradient Colors
 $color-gradient-stop-blue: rgba(159, 202, 237, 1);
