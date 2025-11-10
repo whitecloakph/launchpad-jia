@@ -51,7 +51,13 @@ export default function SegmentInterviewQuestions({
           <span className="career-label">1. CV Review Settings</span>
         </div>
         <div className="layered-card-content">
-          <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+            }}
+          >
             <span className="sub-career-label">
               CV Screening <span style={{ color: "#EF4444" }}>*</span>
             </span>
@@ -59,46 +65,122 @@ export default function SegmentInterviewQuestions({
           <span style={{ marginBottom: "8px" }}>
             Jia automatically endorses candidates who meet the chosen criteria.
           </span>
-          <div style={{ width: "30%" }}>
+          <div
+            style={{
+              width: "30%",
+              borderBottom: "1px solid #E5E7EB",
+              paddingBottom: 30,
+            }}
+          >
             <CustomDropdown
               onSelectSetting={(setting) => setScreeningSetting(setting)}
               screeningSetting={screeningSetting}
               settingList={screeningSettingList}
             />
           </div>
+          <div style={{ borderBottom: "1px solid #D1D5DB", paddingBottom: 25 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexDirection: "column",
+                gap: 8,
+                marginTop: 16,
+              }}
+            >
+              <span className="sub-career-label">
+                Require Video on Interview
+              </span>
+              <span style={{ marginBottom: "8px" }}>
+                Require candidates to keep their camera on. Recordings will
+                appear on their analysis page.
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                  gap: 8,
+                }}
+              >
+                <i
+                  className="la la-video"
+                  style={{
+                    color: "#414651",
+                    fontSize: 24,
+                    textShadow: "0 0 1px #414651",
+                  }}
+                ></i>
+
+                <span>Require Video Interview</span>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                  gap: 8,
+                }}
+              >
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={requireVideo}
+                    onChange={() => setRequireVideo(!requireVideo)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+                <span>{requireVideo ? "Yes" : "No"}</span>
+              </div>
+            </div>
+          </div>
           <div
             style={{
               display: "flex",
-              flexDirection: "row",
+              flexDirection: "column",
               justifyContent: "space-between",
               gap: 8,
               marginTop: 16,
             }}
           >
             <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-              <i
-                className="la la-video"
-                style={{ color: "#414651", fontSize: 20 }}
-              ></i>
-              <span>Require Video Interview</span>
+              <span className="sub-career-label">
+                AI Interview Secret Prompt{" "}
+              </span>
+              <span>(optional)</span>
             </div>
+            <span
+              style={{
+                fontSize: "16px",
+                marginBottom: "8px",
+                color: "#414651",
+              }}
+            >
+              Secret Prompts give you extra control over Jia’s evaluation style,
+              complementing her accurate assessment of requirements from the job
+              description.
+            </span>
+
             <div
               style={{
                 display: "flex",
-                flexDirection: "row",
+                flexDirection: "column",
                 alignItems: "flex-start",
                 gap: 8,
               }}
             >
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={requireVideo}
-                  onChange={() => setRequireVideo(!requireVideo)}
-                />
-                <span className="slider round"></span>
-              </label>
-              <span>{requireVideo ? "Yes" : "No"}</span>
+              <div className="layered-card-content">
+                <span>Coming Soon</span>
+              </div>
             </div>
           </div>
         </div>

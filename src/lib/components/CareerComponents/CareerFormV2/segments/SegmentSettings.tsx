@@ -52,12 +52,14 @@ export default function SegmentSettings({
           >
             Jia automatically endorses candidates who meet the chosen criteria.
           </span>
-          <div style={{ width: "30%" }}>
-            <CustomDropdown
-              onSelectSetting={(setting) => setScreeningSetting(setting)}
-              screeningSetting={screeningSetting}
-              settingList={screeningSettingList}
-            />
+          <div style={{ borderBottom: "1px solid #D1D5DB", paddingBottom: 25 }}>
+            <div style={{ width: "30%" }}>
+              <CustomDropdown
+                onSelectSetting={(setting) => setScreeningSetting(setting)}
+                screeningSetting={screeningSetting}
+                settingList={screeningSettingList}
+              />
+            </div>
           </div>
           <div
             style={{
