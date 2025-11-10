@@ -1,5 +1,3 @@
-import DOMPurify from "isomorphic-dompurify";
-
 // ============================================================================
 // TypeScript Interfaces
 // ============================================================================
@@ -55,32 +53,100 @@ export const MAX_PRESCREENING_QUESTIONS = 50;
 // Sanitization Functions
 // ============================================================================
 
-// Sanitize HTML content to prevent XSS
-export function sanitizeHTML(html: string): string {
-  if (!html) return "";
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      "p",
-      "br",
-      "strong",
-      "em",
-      "u",
-      "h1",
-      "h2",
-      "h3",
-      "ul",
-      "ol",
-      "li",
-      "a",
-    ],
-    ALLOWED_ATTR: ["href", "target"],
-  });
+/**
+ * Escapes HTML special characters to prevent XSS attacks
+ */
+function escapeHTML(text: string): string {
+  const htmlEscapeMap: { [key: string]: string } = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;',
+  };
+  return text.replace(/[&<>"'/]/g, (char) => htmlEscapeMap[char]);
 }
 
-// Sanitize text inputs using DOMPurify (strips all HTML)
+/**
+ * Sanitize HTML content to prevent XSS while allowing specific safe tags
+ */
+export function sanitizeHTML(html: string): string {
+  if (!html || typeof html !== "string") return "";
+
+  // List of allowed tags and attributes
+  const allowedTags = ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'a'];
+  const allowedAttrs: { [key: string]: string[] } = {
+    'a': ['href', 'target']
+  };
+
+  // Remove any script tags and their content
+  let sanitized = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
+  // Remove event handlers (onclick, onerror, etc.)
+  sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
+  sanitized = sanitized.replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '');
+
+  // Remove javascript: protocol in URLs
+  sanitized = sanitized.replace(/href\s*=\s*["']?\s*javascript:/gi, 'href="');
+
+  // Strip tags that are not in the allowed list
+  sanitized = sanitized.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>/gi, (match, tagName) => {
+    const tag = tagName.toLowerCase();
+    if (!allowedTags.includes(tag)) {
+      return '';
+    }
+
+    // For allowed tags, clean their attributes
+    if (tag === 'a') {
+      // Extract and validate href attribute
+      const hrefMatch = match.match(/href\s*=\s*["']([^"']*)["']/i);
+      const targetMatch = match.match(/target\s*=\s*["']([^"']*)["']/i);
+
+      let cleanTag = `<${match.startsWith('</') ? '/' : ''}${tag}`;
+      if (hrefMatch && hrefMatch[1]) {
+        const href = hrefMatch[1].trim();
+        // Only allow http, https, and relative URLs
+        if (href.match(/^(https?:\/\/|\/|\.\/|#)/i)) {
+          cleanTag += ` href="${escapeHTML(href)}"`;
+        }
+      }
+      if (targetMatch && targetMatch[1]) {
+        cleanTag += ` target="${escapeHTML(targetMatch[1])}"`;
+      }
+      cleanTag += '>';
+      return cleanTag;
+    }
+
+    // For other allowed tags, just return the tag without attributes
+    return `<${match.startsWith('</') ? '/' : ''}${tag}>`;
+  });
+
+  return sanitized;
+}
+
+/**
+ * Sanitize text inputs by removing all HTML tags and escaping special characters
+ */
 export function sanitizeText(text: string): string {
   if (!text || typeof text !== "string") return "";
-  return DOMPurify.sanitize(text.trim(), { ALLOWED_TAGS: [] });
+
+  // Remove all HTML tags
+  let sanitized = text.replace(/<[^>]*>/g, '');
+
+  // Trim whitespace
+  sanitized = sanitized.trim();
+
+  // Decode common HTML entities
+  sanitized = sanitized
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&amp;/g, '&');
+
+  return sanitized;
 }
 
 // Sanitize interview questions array

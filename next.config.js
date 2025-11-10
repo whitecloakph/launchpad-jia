@@ -3,11 +3,11 @@ const nextConfig = {
   // Configure webpack to handle ES modules properly
   webpack: (config, { isServer }) => {
     if (isServer) {
-      // Fix for isomorphic-dompurify and jsdom ES module issues
-      config.externals.push({
-        'jsdom': 'commonjs jsdom',
-        'parse5': 'commonjs parse5'
-      });
+      // Exclude jsdom from server bundle to prevent ES module errors
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'jsdom': false,
+      };
     }
     return config;
   },
