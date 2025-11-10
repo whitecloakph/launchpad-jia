@@ -2,7 +2,7 @@
 
 import React from "react";
 import HeaderBar from "@/lib/PageComponent/HeaderBar";
-import CareerForm from "@/lib/components/CareerComponents/CareerFormV2";
+import CareerForm from "@/lib/components/CareerComponents/CareerFormV2/CareerFormV2";
 
 export default function NewCareerPage() {
   return (
