@@ -411,7 +411,14 @@ export default function CareerFormV2({
           />
         );
       case 3:
-        return <div>Pipeline Stages Setup - Coming Soon!</div>;
+        return (
+          <div className="layered-card-middle">
+            <div className="career-label">Customize pipeline stages</div>
+            <div className="layered-card-content">
+              <span>Coming Soon!</span>
+            </div>
+          </div>
+        );
       case 4:
         return (
           <SegmentReview
