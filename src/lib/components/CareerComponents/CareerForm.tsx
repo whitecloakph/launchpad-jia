@@ -121,6 +121,9 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
       "How often are you willing to report to the office each week?",
       "What is your expected monthly salary?",
     ];
+    // AI interview setup
+    const [aiScreeningSetting, setAiScreeningSetting] = useState<string>(career?.aiScreeningSetting || screeningSetting || "Good Fit and above");
+    const [aiSecretPrompt, setAiSecretPrompt] = useState<string>(career?.aiSecretPrompt || "");
     // Segmented form state (only for Add flow)
     const [currentStep, setCurrentStep] = useState<number>(1);
     const draftTimeoutRef = useRef<any>(null);
@@ -192,6 +195,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                 workSetupRemarks,
                 cvSecretPrompt,
                 preScreeningQuestions,
+                aiScreeningSetting,
+                aiSecretPrompt,
                 screeningSetting,
                 employmentType,
                 requireVideo,
@@ -233,6 +238,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                 setCurrentStep(draft.currentStep ?? 1);
                 setCvSecretPrompt(draft.cvSecretPrompt ?? "");
                 setPreScreeningQuestions(draft.preScreeningQuestions ?? []);
+                setAiScreeningSetting(draft.aiScreeningSetting ?? (draft.screeningSetting || "Good Fit and above"));
+                setAiSecretPrompt(draft.aiSecretPrompt ?? "");
             }
         } catch (e) {
             // Ignore parse errors
@@ -337,6 +344,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             workSetupRemarks,
             cvSecretPrompt,
             preScreeningQuestions,
+            aiScreeningSetting,
+            aiSecretPrompt,
             teamMembers,
             questions,
             lastEditedBy: userInfoSlice,
@@ -1026,29 +1035,111 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             {currentStep === 3 && (
               <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", gap: 16, alignItems: "flex-start", marginTop: 16 }}>
                 <div style={{ width: "60%", display: "flex", flexDirection: "column", gap: 8 }}>
-                  <InterviewQuestionGeneratorV2 questions={questions} setQuestions={(questions) => setQuestions(questions)} jobTitle={jobTitle} description={description} />
+                  {/* 1. AI Interview Settings */}
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-robot" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>AI Interview Settings</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>AI Interview Screening</span>
+                        <span>Jia automatically endorses candidates who meet the chosen criteria.</span>
+                        <CustomDropdown
+                          onSelectSetting={(setting) => setAiScreeningSetting(setting)}
+                          screeningSetting={aiScreeningSetting}
+                          settingList={screeningSettingList}
+                        />
+
+                        {/* Require Video */}
+                        <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid #E9EAEB" }}>
+                          <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 8 }}>
+                            <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+                              <i className="la la-video" style={{ color: "#414651", fontSize: 20 }}></i>
+                              <span>Require Video Interview</span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
+                              <label className="switch">
+                                <input type="checkbox" checked={requireVideo} onChange={() => setRequireVideo(!requireVideo)} />
+                                <span className="slider round"></span>
+                              </label>
+                              <span>{requireVideo ? "Yes" : "No"}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Secret Prompt */}
+                        <div style={{ marginTop: 16 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>AI Interview Secret Prompt</span>
+                            <span style={{ color: "#667085" }}>(optional)</span>
+                            <span title="These prompts remain hidden from candidates and the public job portal. Additionally, only Admins and the Job Owner can view the secret prompt." style={{ cursor: "help" }}>
+                              <i className="la la-question-circle" style={{ color: "#98A2B3" }}></i>
+                            </span>
+                          </div>
+                          <span>Secret Prompts give you extra control over Jia’s evaluation style, complementing her accurate assessment of requirements from the job description.</span>
+                          <textarea
+                            className="form-control"
+                            placeholder="Enter a secret prompt (e.g. Treat candidates who speak in Taglish, English, or Tagalog equally. Focus on clarity, coherence, and confidence rather than language preference or accent.)"
+                            value={aiSecretPrompt}
+                            onChange={(e) => setAiSecretPrompt(e.target.value)}
+                            style={{ minHeight: 120, resize: "vertical", marginTop: 8 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. AI Interview Questions */}
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <i className="la la-comments" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                          </div>
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>AI Interview Questions</span>
+                          <div style={{ marginLeft: 8, background: "#EEF2F6", borderRadius: 12, padding: "2px 8px", fontSize: 12, color: "#667085" }}>
+                            {questions.reduce((acc, c) => acc + (c.questions?.length || 0), 0)}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="button-primary-v2"
+                          style={{ color: "#FFFFFF", background: "#111827" }}
+                          onClick={() => {
+                            window.dispatchEvent(new Event("generateAllQuestions"));
+                          }}
+                        >
+                          <span><i className="la la-magic" style={{ fontSize: 17, marginRight: 8 }}></i>Generate all questions</span>
+                        </button>
+                      </div>
+                      <div className="layered-card-content">
+                        <InterviewQuestionGeneratorV2 inline questions={questions} setQuestions={(questions) => setQuestions(questions)} jobTitle={jobTitle} description={description} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Tips */}
                 <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
                   <div className="layered-card-outer">
                     <div className="layered-card-middle">
                       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <i className="la la-video" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                          <i className="la la-lightbulb" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
                         </div>
-                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>AI Interview Setup</span>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Tips</span>
                       </div>
                       <div className="layered-card-content">
-                        <div style={{ display: "flex", flexDirection: "row",justifyContent: "space-between", gap: 8 }}>
-                          <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-                            <i className="la la-video" style={{ color: "#414651", fontSize: 20 }}></i>
-                            <span>Require Video Interview</span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 12, color: "#475467" }}>
+                          <div>
+                            <span style={{ fontWeight: 700 }}>Add a Secret Prompt</span> to fine-tune how Jia scores and evaluates the interview responses.
                           </div>
-                          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
-                            <label className="switch">
-                              <input type="checkbox" checked={requireVideo} onChange={() => setRequireVideo(!requireVideo)} />
-                              <span className="slider round"></span>
-                            </label>
-                            <span>{requireVideo ? "Yes" : "No"}</span>
+                          <div>
+                            <span style={{ fontWeight: 700 }}>Use “Generate Questions”</span> to quickly create tailored interview questions, then refine or mix them with your own for balanced results.
                           </div>
                         </div>
                       </div>
@@ -1096,6 +1187,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                         <div><span style={{ color: "#667085" }}>Require Video Interview</span><br /><span style={{ fontWeight: 600 }}>{requireVideo ? "Yes" : "No"}</span></div>
                         <div><span style={{ color: "#667085" }}>CV Screening</span><br /><span style={{ fontWeight: 600 }}>{screeningSetting}</span></div>
                         <div><span style={{ color: "#667085" }}>Pre-Screening Questions</span><br /><span style={{ fontWeight: 600 }}>{preScreeningQuestions.length}</span></div>
+                        <div><span style={{ color: "#667085" }}>AI Interview Screening</span><br /><span style={{ fontWeight: 600 }}>{aiScreeningSetting}</span></div>
                       </div>
                       <div style={{ marginTop: 16 }}>
                         <span style={{ color: "#667085" }}>Description</span>
@@ -1105,6 +1197,12 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                         <div style={{ marginTop: 16 }}>
                           <span style={{ color: "#667085" }}>CV Secret Prompt</span>
                           <div style={{ whiteSpace: "pre-wrap" }}>{cvSecretPrompt}</div>
+                        </div>
+                      )}
+                      {aiSecretPrompt && (
+                        <div style={{ marginTop: 16 }}>
+                          <span style={{ color: "#667085" }}>AI Interview Secret Prompt</span>
+                          <div style={{ whiteSpace: "pre-wrap" }}>{aiSecretPrompt}</div>
                         </div>
                       )}
                     </div>
