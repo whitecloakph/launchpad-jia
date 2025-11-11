@@ -104,6 +104,15 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
       description: "",
       workEmail: "",
     });
+    // Team Access
+    const teamRoleOptions = [
+      { name: "Job Owner" },
+      { name: "Contributor" },
+      { name: "Reviewer" },
+    ];
+    const [teamMembers, setTeamMembers] = useState<{ email: string; role: string }[]>([
+      { email: user?.email || "", role: "Job Owner" },
+    ]);
     // Segmented form state (only for Add flow)
     const [currentStep, setCurrentStep] = useState<number>(1);
     const draftTimeoutRef = useRef<any>(null);
@@ -314,6 +323,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             description,
             workSetup,
             workSetupRemarks,
+            teamMembers,
             questions,
             lastEditedBy: userInfoSlice,
             createdBy: userInfoSlice,
@@ -561,39 +571,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                         {errors.jobTitle && (
                           <span style={{ color: "red", fontSize: "13px" }}>{errors.jobTitle}</span>
                         )}
-                        <span>Description</span>
-                        <div
-                          style={{
-                            border: errors.description ? "1px solid red" : "1px solid transparent",
-                            borderRadius: "6px",
-                            padding: errors.description ? "2px" : "0",
-                          }}
-                        >
-                          <RichTextEditor
-                            setText={(text) => {
-                              setDescription(text);
-                              setErrors((prev) => ({ ...prev, description: "" }));
-                            }}
-                            text={description}
-                          />
-                        </div>
-                        {errors.description && (
-                          <span style={{ color: "red", fontSize: "13px" }}>{errors.description}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
-                  <div className="layered-card-outer">
-                    <div className="layered-card-middle">
-                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <i className="la la-ellipsis-h" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
-                        </div>
-                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Additional Information</span>
-                      </div>
-                      <div className="layered-card-content">
+
+                        {/* Work Setting */}
                         <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Work Setting</span>
                         <span>Employment Type</span>
                         <CustomDropdown
@@ -604,7 +583,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           settingList={employmentTypeOptions}
                           placeholder="Select Employment Type"
                         />
-                        <span>Work Setup Arrangement</span>
+                        <span>Arrangement</span>
                         <CustomDropdown
                           onSelectSetting={(setting) => {
                             setWorkSetup(setting);
@@ -613,24 +592,49 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           settingList={workSetupOptions}
                           placeholder="Select Work Setup"
                         />
-                        <span>Work Setup Remarks</span>
-                        <input
-                          className="form-control"
-                          placeholder="Additional remarks about work setup (optional)"
-                          value={workSetupRemarks}
-                          onChange={(e) => {
-                            setWorkSetupRemarks(e.target.value || "");
+
+                        {/* Location */}
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Location</span>
+                        <span>Country</span>
+                        <CustomDropdown
+                          onSelectSetting={(setting) => {
+                            setCountry(setting);
                           }}
-                        ></input>
-                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Salary</span>
-                          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8, minWidth: "130px" }}>
-                            <label className="switch">
-                              <input type="checkbox" checked={salaryNegotiable} onChange={() => setSalaryNegotiable(!salaryNegotiable)} />
-                              <span className="slider round"></span>
-                            </label>
-                            <span>{salaryNegotiable ? "Negotiable" : "Fixed"}</span>
-                          </div>
+                          screeningSetting={country}
+                          settingList={[]}
+                          placeholder="Select Country"
+                        />
+                        <span>State / Province</span>
+                        <CustomDropdown
+                          onSelectSetting={(province) => {
+                            setProvince(province);
+                            const provinceObj = provinceList.find((p) => p.name === province);
+                            const cities = philippineCitiesAndProvinces.cities.filter((city) => city.province === provinceObj.key);
+                            setCityList(cities);
+                            setCity(cities[0].name);
+                          }}
+                          screeningSetting={province}
+                          settingList={provinceList}
+                          placeholder="Select State / Province"
+                        />
+                        <span>City</span>
+                        <CustomDropdown
+                          onSelectSetting={(city) => {
+                            setCity(city);
+                          }}
+                          screeningSetting={city}
+                          settingList={cityList}
+                          placeholder="Select City"
+                        />
+
+                        {/* Salary */}
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Salary</span>
+                        <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                          <label className="switch">
+                            <input type="checkbox" checked={salaryNegotiable} onChange={() => setSalaryNegotiable(!salaryNegotiable)} />
+                            <span className="slider round"></span>
+                          </label>
+                          <span>{salaryNegotiable ? "Negotiable" : "Fixed"}</span>
                         </div>
                         <span>Minimum Salary</span>
                         <div style={{ position: "relative" }}>
@@ -708,38 +712,132 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                             PHP
                           </span>
                         </div>
-                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Location</span>
-                        <span>Country</span>
-                        <CustomDropdown
-                          onSelectSetting={(setting) => {
-                            setCountry(setting);
+                      </div>
+                    </div>
+                  </div>
+                  {/* Job Description */}
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-file-alt" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Job Description</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <div
+                          style={{
+                            border: errors.description ? "1px solid red" : "1px solid transparent",
+                            borderRadius: "6px",
+                            padding: errors.description ? "2px" : "0",
                           }}
-                          screeningSetting={country}
-                          settingList={[]}
-                          placeholder="Select Country"
-                        />
-                        <span>State / Province</span>
-                        <CustomDropdown
-                          onSelectSetting={(province) => {
-                            setProvince(province);
-                            const provinceObj = provinceList.find((p) => p.name === province);
-                            const cities = philippineCitiesAndProvinces.cities.filter((city) => city.province === provinceObj.key);
-                            setCityList(cities);
-                            setCity(cities[0].name);
-                          }}
-                          screeningSetting={province}
-                          settingList={provinceList}
-                          placeholder="Select State / Province"
-                        />
-                        <span>City</span>
-                        <CustomDropdown
-                          onSelectSetting={(city) => {
-                            setCity(city);
-                          }}
-                          screeningSetting={city}
-                          settingList={cityList}
-                          placeholder="Select City"
-                        />
+                        >
+                          <RichTextEditor
+                            setText={(text) => {
+                              setDescription(text);
+                              setErrors((prev) => ({ ...prev, description: "" }));
+                            }}
+                            text={description}
+                          />
+                        </div>
+                        {errors.description && (
+                          <span style={{ color: "red", fontSize: "13px" }}>{errors.description}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Team Access */}
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-users" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Team Access</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                          <span>You can add other members to collaborate on this career.</span>
+                          <button
+                            type="button"
+                            className="button-primary-v2"
+                            style={{ color: "#414651", background: "#FFFFFF", width: "fit-content" }}
+                            onClick={() => setTeamMembers((prev) => [...prev, { email: "", role: "" }])}
+                          >
+                            <span><i className="la la-user-plus" style={{ fontSize: 17, marginRight: 8 }}></i>Add member</span>
+                          </button>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
+                          {teamMembers.map((member, index) => (
+                            <div key={index} style={{ display: "grid", gridTemplateColumns: "1fr 200px 32px", gap: 12, alignItems: "end" }}>
+                              <div>
+                                <span>Email</span>
+                                <input
+                                  type="email"
+                                  className="form-control"
+                                  placeholder="Enter email"
+                                  value={member.email}
+                                  onChange={(e) => {
+                                    const next = [...teamMembers];
+                                    next[index].email = e.target.value;
+                                    setTeamMembers(next);
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <span>Role</span>
+                                <CustomDropdown
+                                  onSelectSetting={(role) => {
+                                    const next = [...teamMembers];
+                                    next[index].role = role;
+                                    setTeamMembers(next);
+                                  }}
+                                  screeningSetting={member.role}
+                                  settingList={teamRoleOptions}
+                                  placeholder="Select role"
+                                />
+                              </div>
+                              <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+                                {index > 0 && (
+                                  <div title="Remove" style={{ cursor: "pointer" }} onClick={() => {
+                                    const next = [...teamMembers];
+                                    next.splice(index, 1);
+                                    setTeamMembers(next);
+                                  }}>
+                                    <i className="la la-trash" style={{ fontSize: 24 }}></i>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ marginTop: 8, color: "#667085" }}>*Admins can view all careers regardless of specific access settings.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-lightbulb" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Tips</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <div style={{ display: "flex", flexDirection: "column", gap: 12, color: "#475467" }}>
+                          <div>
+                            <span style={{ fontWeight: 700 }}>Use clear, standard job titles</span> for better searchability (e.g., “Software Engineer” instead of “Code Ninja” or “Tech Rockstar”).
+                          </div>
+                          <div>
+                            <span style={{ fontWeight: 700 }}>Avoid abbreviations</span> or internal role codes that applicants may not understand (e.g., use “QA Engineer” instead of “QE II” or “QA-TL”).
+                          </div>
+                          <div>
+                            <span style={{ fontWeight: 700 }}>Keep it concise</span> — job titles should be no more than a few words (2—4 max), avoiding fluff or marketing terms.
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
