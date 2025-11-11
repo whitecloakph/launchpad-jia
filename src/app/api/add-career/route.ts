@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       country,
       province,
       employmentType,
+      teamMembers,
     } = await request.json();
     // Validate required fields
     if (!jobTitle || !description || !questions || !location || !workSetup) {
@@ -131,6 +132,7 @@ export async function POST(request: Request) {
       country,
       province,
       employmentType,
+      teamMembers: Array.isArray(teamMembers) ? teamMembers : [],
     };
 
     await db.collection("careers").insertOne(career);
