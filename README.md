@@ -157,34 +157,62 @@ jia-web-app/
 
 ## Deployment with Vercel
 
-### Preparing for Deployment
+This project is designed to run on Vercel (serverless) out‑of‑the‑box. Below is a concise, reproducible flow.
 
-1. Make sure your project is pushed to a Git repository (GitHub, GitLab, or Bitbucket).
+### 1) Push your code
+- Ensure all changes are committed and pushed to your Git host (GitHub/GitLab/Bitbucket).
 
-2. Ensure all environment variables are properly set in your local `.env` file.
+### 2) Create the Vercel project
+1. Go to [Vercel](https://vercel.com) → New Project → Import your Git repository.
+2. Framework Preset: Next.js (auto‑detected).
+3. Build command / Output directory: use defaults.
 
-### Deploying to Vercel
+### 3) Set environment variables (required)
+In Vercel → Project → Settings → Environment Variables
 
-1. Create an account on [Vercel](https://vercel.com) if you don't have one.
+Required
+- `MONGODB_URI` — your full MongoDB connection string.
 
-2. From the Vercel dashboard, click "New Project".
+Recommended
+- `OPENAI_API_KEY` — used by the LLM engine. If not set, the app also supports reading the key from the `global-settings` document in Mongo (see Optional below).
+- `BYPASS_JOB_LIMIT` — set to `true` for demos/dev to ignore plan job limits (optional).
 
-3. Import your Git repository.
+Firebase/Client config
+- Add any `NEXT_PUBLIC_*` variables you use for client features (Firebase, etc.).
 
-4. Configure project:
+Notes
+- Vercel automatically provides `NODE_ENV=production` on Production deployments.
 
-   - Set the framework preset to "Next.js"
-   - Configure the environment variables (copy from your `.env` file)
-   - Add any additional build settings if needed
+### 4) Allow Vercel to access MongoDB
+- In MongoDB Atlas, add Vercel’s egress IP(s) to your Network Access, or allow access from anywhere (0.0.0.0/0) for testing.
 
-5. Click "Deploy".
+### 5) Deploy
+- Click “Deploy” and wait for the green “Ready” badge.
 
-### Updating Environment Variables on Vercel
+### 6) Post‑deploy checks
+Navigate to your deployed URL and verify:
+- Recruiter flow → Add career:
+  - Step 1: Career Details (Work Arrangement, Location, etc.).
+  - Step 2: CV Review & Pre‑screening (Add custom, Dropdown/Range options).
+  - Step 3: AI Interview Setup (“Generate all questions” works if `OPENAI_API_KEY` is present or seeded in DB).
+  - Step 5: Review (collapsible sections) → Save & Publish (disabled until required fields are valid).
 
-1. Go to your project on Vercel dashboard.
-2. Navigate to "Settings" > "Environment Variables".
-3. Add or update your environment variables as needed.
-4. Redeploy your application for the changes to take effect.
+### Optional: Seed global settings in Mongo
+If you prefer not to set `OPENAI_API_KEY` in Vercel and want DB‑based config, create this upsert in your DB:
+```json
+{
+  "name": "global-settings",
+  "openai_api_key": "sk-...",
+  "openai_model": "gpt-4o-mini",
+  "question_gen_prompt": { "prompt": "Instruction used when generating interview questions" }
+}
+```
+The app gracefully handles an empty `global-settings` (returns `{}`), so this is truly optional.
+
+### Troubleshooting production deploys
+- LLM engine returns 500: set `OPENAI_API_KEY` on Vercel or seed it in `global-settings`.
+- Add career returns 400: required fields missing (`jobTitle`, `description`, `questions`, `location`, `workSetup`) or validation failed.
+- Mongo connection errors: verify `MONGODB_URI` and Atlas network access.
 
 ### Setting up a Custom Domain
 
