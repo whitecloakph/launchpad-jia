@@ -12,6 +12,7 @@ import SegmentCareerDetails from "./segments/SegmentCareerDetails";
 import SegmentSettings from "./segments/SegmentSettings";
 import SegmentInterviewQuestions from "./segments/SegmentInterviewQuestions";
 import SegmentReview from "./segments/SegmentReview";
+import { PreScreeningQuestion } from "@/lib/types";
 
 export default function CareerFormV2({
   career,
@@ -92,6 +93,13 @@ export default function CareerFormV2({
   const [showSaveModal, setShowSaveModal] = useState("");
   const [isSavingCareer, setIsSavingCareer] = useState(false);
   const savingCareerRef = useRef(false);
+  const [preScreeningQuestions, setPreScreeningQuestions] = useState<
+    PreScreeningQuestion[]
+  >(
+    career?.preScreeningQuestions
+      ? JSON.parse(career.preScreeningQuestions)
+      : []
+  );
 
   // Segment Configuration
   const segments = [
@@ -218,6 +226,7 @@ export default function CareerFormV2({
       province,
       location: city,
       employmentType,
+      preScreeningQuestions: JSON.stringify(preScreeningQuestions),
     };
     try {
       setIsSavingCareer(true);
@@ -303,6 +312,7 @@ export default function CareerFormV2({
         location: city,
         status,
         employmentType,
+        preScreeningQuestions: JSON.stringify(preScreeningQuestions),
       };
 
       try {
@@ -395,6 +405,8 @@ export default function CareerFormV2({
           <SegmentSettings
             screeningSetting={screeningSetting}
             setScreeningSetting={setScreeningSetting}
+            preScreeningQuestions={preScreeningQuestions}
+            setPreScreeningQuestions={setPreScreeningQuestions}
           />
         );
       case 2:
@@ -435,6 +447,7 @@ export default function CareerFormV2({
             screeningSetting={screeningSetting}
             requireVideo={requireVideo}
             questions={questions}
+            preScreeningQuestions={preScreeningQuestions}
             setCurrentSegment={setCurrentSegment}
           />
         );

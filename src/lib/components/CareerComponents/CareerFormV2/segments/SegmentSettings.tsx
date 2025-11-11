@@ -1,6 +1,7 @@
 "use client";
 
 import CustomDropdown from "@/lib/components/CareerComponents/CustomDropdown";
+import PreScreeningQuestionGenerator from "../../PreScreeningQuestionGenerator";
 
 const screeningSettingList = [
   { name: "Good Fit and above", icon: "la la-check" },
@@ -8,12 +9,36 @@ const screeningSettingList = [
   { name: "No Automatic Promotion", icon: "la la-times" },
 ];
 
+interface PreScreeningQuestion {
+  id: string;
+  question: string;
+  answerType:
+    | "short_answer"
+    | "long_answer"
+    | "dropdown"
+    | "checkboxes"
+    | "range";
+  options?: string[];
+  rangeConfig?: {
+    min: number;
+    max: number;
+    step: number;
+    minLabel?: string;
+    maxLabel?: string;
+  };
+  required: boolean;
+}
+
 export default function SegmentSettings({
   screeningSetting,
   setScreeningSetting,
+  preScreeningQuestions,
+  setPreScreeningQuestions,
 }: {
   screeningSetting: string;
   setScreeningSetting: (value: string) => void;
+  preScreeningQuestions: PreScreeningQuestion[];
+  setPreScreeningQuestions: (questions: PreScreeningQuestion[]) => void;
 }) {
   return (
     <div
@@ -66,7 +91,7 @@ export default function SegmentSettings({
             <div
               style={{ borderBottom: "1px solid #D1D5DB", paddingBottom: 25 }}
             >
-              <div style={{ width: "30%" }}>
+              <div style={{ width: "40%" }}>
                 <CustomDropdown
                   onSelectSetting={(setting) => setScreeningSetting(setting)}
                   screeningSetting={screeningSetting}
@@ -97,7 +122,7 @@ export default function SegmentSettings({
                   color: "#414651",
                 }}
               >
-                Secret Prompts give you extra control over Jia’s evaluation
+                Secret Prompts give you extra control over Jia's evaluation
                 style.
               </span>
 
@@ -117,24 +142,12 @@ export default function SegmentSettings({
           </div>
         </div>
 
-        {/* SECOND EXISTING CARD */}
-        <div className="layered-card-middle">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span className="career-label">2. Pre-Screening Questions</span>
-            <span style={{ paddingTop: 8 }}>(optional)</span>
-          </div>
+        {/* Pre-Screening Questions Card */}
 
-          <div className="layered-card-content">
-            <span>Coming Soon</span>
-          </div>
-        </div>
+        <PreScreeningQuestionGenerator
+          questions={preScreeningQuestions}
+          setQuestions={setPreScreeningQuestions}
+        />
       </div>
 
       <div
@@ -161,7 +174,7 @@ export default function SegmentSettings({
               style={{ display: "flex", alignItems: "center", gap: 6 }}
             >
               <i
-                className=" la la-lightbulb"
+                className="la la-lightbulb"
                 style={{
                   color: "#414651",
                   fontSize: 24,
