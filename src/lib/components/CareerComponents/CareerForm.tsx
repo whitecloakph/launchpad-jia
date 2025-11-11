@@ -113,6 +113,14 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
     const [teamMembers, setTeamMembers] = useState<{ email: string; role: string }[]>([
       { email: user?.email || "", role: "Job Owner" },
     ]);
+    // CV review & pre-screening
+    const [cvSecretPrompt, setCvSecretPrompt] = useState<string>(career?.cvSecretPrompt || "");
+    const [preScreeningQuestions, setPreScreeningQuestions] = useState<string[]>(career?.preScreeningQuestions || []);
+    const suggestedPreScreeningQuestions = [
+      "How long is your notice period?",
+      "How often are you willing to report to the office each week?",
+      "What is your expected monthly salary?",
+    ];
     // Segmented form state (only for Add flow)
     const [currentStep, setCurrentStep] = useState<number>(1);
     const draftTimeoutRef = useRef<any>(null);
@@ -182,6 +190,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                 description,
                 workSetup,
                 workSetupRemarks,
+                cvSecretPrompt,
+                preScreeningQuestions,
                 screeningSetting,
                 employmentType,
                 requireVideo,
@@ -221,6 +231,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                 setProvince(draft.province ?? "");
                 setCity(draft.city ?? "");
                 setCurrentStep(draft.currentStep ?? 1);
+                setCvSecretPrompt(draft.cvSecretPrompt ?? "");
+                setPreScreeningQuestions(draft.preScreeningQuestions ?? []);
             }
         } catch (e) {
             // Ignore parse errors
@@ -323,6 +335,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             description,
             workSetup,
             workSetupRemarks,
+            cvSecretPrompt,
+            preScreeningQuestions,
             teamMembers,
             questions,
             lastEditedBy: userInfoSlice,
@@ -847,20 +861,19 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
 
             {currentStep === 2 && (
               <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", gap: 16, alignItems: "flex-start", marginTop: 16 }}>
-                <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ width: "60%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  {/* 1. CV Review Settings */}
                   <div className="layered-card-outer">
                     <div className="layered-card-middle">
                       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <i className="la la-cog" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                          <i className="la la-list" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
                         </div>
-                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>CV Review & Pre-screening</span>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>CV Review Settings</span>
                       </div>
                       <div className="layered-card-content">
-                        <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-                          <i className="la la-id-badge" style={{ color: "#414651", fontSize: 20 }}></i>
-                          <span>Screening Setting</span>
-                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>CV Screening</span>
+                        <span>Jia automatically endorses candidates who meet the chosen criteria.</span>
                         <CustomDropdown
                           onSelectSetting={(setting) => {
                             setScreeningSetting(setting);
@@ -868,7 +881,141 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           screeningSetting={screeningSetting}
                           settingList={screeningSettingList}
                         />
-                        <span>This settings allows Jia to automatically endorse candidates who meet the chosen criteria.</span>
+
+                        {/* Secret prompt */}
+                        <div style={{ marginTop: 16 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>CV Secret Prompt</span>
+                            <span style={{ color: "#667085" }}>(optional)</span>
+                            <span title="These prompts remain hidden from candidates and the public job portal. Additionally, only Admins and the Job Owner can view the secret prompt." style={{ cursor: "help" }}>
+                              <i className="la la-question-circle" style={{ color: "#98A2B3" }}></i>
+                            </span>
+                          </div>
+                          <span>Secret Prompts give you extra control over Jia’s evaluation style, complementing her accurate assessment of requirements from the job description.</span>
+                          <textarea
+                            className="form-control"
+                            placeholder="Enter a secret prompt (e.g. Give higher fit scores to candidates who participate in hackathons or competitions.)"
+                            value={cvSecretPrompt}
+                            onChange={(e) => setCvSecretPrompt(e.target.value)}
+                            style={{ minHeight: 140, resize: "vertical", marginTop: 8 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Pre-Screening Questions */}
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <i className="la la-list-ul" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                          </div>
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Pre-Screening Questions</span>
+                          <span style={{ color: "#667085", marginLeft: 6 }}>(optional)</span>
+                          <div style={{ marginLeft: 8, background: "#EEF2F6", borderRadius: 12, padding: "2px 8px", fontSize: 12, color: "#667085" }}>{preScreeningQuestions.length}</div>
+                        </div>
+                        <button
+                          type="button"
+                          className="button-primary-v2"
+                          style={{ color: "#414651", background: "#FFFFFF", width: "fit-content" }}
+                          onClick={() => {
+                            const text = window.prompt("Add custom pre-screening question");
+                            if (text && text.trim()) {
+                              setPreScreeningQuestions((prev) => [...prev, text.trim()]);
+                            }
+                          }}
+                        >
+                          <span><i className="la la-plus" style={{ fontSize: 17, marginRight: 8 }}></i>Add custom</span>
+                        </button>
+                      </div>
+                      <div className="layered-card-content">
+                        {preScreeningQuestions.length === 0 && (
+                          <div style={{ color: "#667085", marginBottom: 12 }}>No pre-screening questions added yet.</div>
+                        )}
+                        {preScreeningQuestions.length > 0 && (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+                            {preScreeningQuestions.map((q, idx) => (
+                              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #E9EAEB", borderRadius: 8, padding: "8px 12px" }}>
+                                <span>{q}</span>
+                                <div style={{ display: "flex", gap: 8 }}>
+                                  <button
+                                    type="button"
+                                    className="button-primary-v2"
+                                    style={{ color: "#414651", background: "#FFFFFF" }}
+                                    onClick={() => {
+                                      const text = window.prompt("Edit question", q);
+                                      if (text && text.trim()) {
+                                        setPreScreeningQuestions((prev) => prev.map((item, i) => (i === idx ? text.trim() : item)));
+                                      }
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="button-primary-v2"
+                                    style={{ color: "#B42318", background: "#FFFFFF" }}
+                                    onClick={() => setPreScreeningQuestions((prev) => prev.filter((_, i) => i !== idx))}
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div style={{ marginTop: 4 }}>
+                          <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Suggested Pre-screening Questions:</span>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
+                            {suggestedPreScreeningQuestions.map((item, idx) => (
+                              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #F0F2F5", paddingBottom: 8 }}>
+                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                  <span style={{ fontWeight: 600 }}>{["Notice Period", "Work Setup", "Asking Salary"][idx]}</span>
+                                  <span style={{ color: "#667085" }}>{item}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="button-primary-v2"
+                                  style={{ color: "#414651", background: "#FFFFFF" }}
+                                  onClick={() => {
+                                    if (!preScreeningQuestions.includes(item)) {
+                                      setPreScreeningQuestions((prev) => [...prev, item]);
+                                    }
+                                  }}
+                                >
+                                  Add
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tips */}
+                <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div className="layered-card-outer">
+                    <div className="layered-card-middle">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="la la-lightbulb" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
+                        </div>
+                        <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Tips</span>
+                      </div>
+                      <div className="layered-card-content">
+                        <div style={{ display: "flex", flexDirection: "column", gap: 12, color: "#475467" }}>
+                          <div>
+                            <span style={{ fontWeight: 700 }}>Add a Secret Prompt</span> to fine-tune how Jia scores and evaluates submitted CVs.
+                          </div>
+                          <div>
+                            <span style={{ fontWeight: 700 }}>Add Pre-Screening questions</span> to collect key details such as notice period, work setup, or salary expectations to guide your review and candidate discussions.
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -947,11 +1094,19 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                         <div><span style={{ color: "#667085" }}>Salary</span><br /><span style={{ fontWeight: 600 }}>{salaryNegotiable ? "Negotiable" : `${minimumSalary || 0} - ${maximumSalary || 0} PHP`}</span></div>
                         <div><span style={{ color: "#667085" }}>Location</span><br /><span style={{ fontWeight: 600 }}>{country} • {province} • {city}</span></div>
                         <div><span style={{ color: "#667085" }}>Require Video Interview</span><br /><span style={{ fontWeight: 600 }}>{requireVideo ? "Yes" : "No"}</span></div>
+                        <div><span style={{ color: "#667085" }}>CV Screening</span><br /><span style={{ fontWeight: 600 }}>{screeningSetting}</span></div>
+                        <div><span style={{ color: "#667085" }}>Pre-Screening Questions</span><br /><span style={{ fontWeight: 600 }}>{preScreeningQuestions.length}</span></div>
                       </div>
                       <div style={{ marginTop: 16 }}>
                         <span style={{ color: "#667085" }}>Description</span>
                         <div dangerouslySetInnerHTML={{ __html: description || "<em>No description</em>" }}></div>
                       </div>
+                      {cvSecretPrompt && (
+                        <div style={{ marginTop: 16 }}>
+                          <span style={{ color: "#667085" }}>CV Secret Prompt</span>
+                          <div style={{ whiteSpace: "pre-wrap" }}>{cvSecretPrompt}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

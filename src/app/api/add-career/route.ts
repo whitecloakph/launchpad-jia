@@ -25,6 +25,8 @@ export async function POST(request: Request) {
       province,
       employmentType,
       teamMembers,
+      cvSecretPrompt,
+      preScreeningQuestions,
     } = await request.json();
     // Validate required fields
     if (!jobTitle || !description || !questions || !location || !workSetup) {
@@ -133,6 +135,8 @@ export async function POST(request: Request) {
       province,
       employmentType,
       teamMembers: Array.isArray(teamMembers) ? teamMembers : [],
+      cvSecretPrompt: typeof cvSecretPrompt === "string" ? cvSecretPrompt : "",
+      preScreeningQuestions: Array.isArray(preScreeningQuestions) ? preScreeningQuestions : [],
     };
 
     await db.collection("careers").insertOne(career);
