@@ -380,7 +380,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             }, 1300);
             }
         } catch (error) {
-            errorToast("Failed to add career", 1300);
+            const serverMessage = (error as any)?.response?.data?.error || "Failed to add career";
+            errorToast(serverMessage, 1600);
         } finally {
             savingCareerRef.current = false;
             setIsSavingCareer(false);
@@ -403,6 +404,44 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
         }
         parseProvinces();
       },[career])
+
+  function ReviewSection({ title, children, onEdit, defaultOpen = false }: { title: string, children: any, onEdit?: () => void, defaultOpen?: boolean }) {
+    const [open, setOpen] = useState<boolean>(!!defaultOpen);
+    return (
+      <div className="layered-card-outer">
+        <div className="layered-card-middle">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={() => setOpen((s) => !s)}
+              style={{ display: "flex", alignItems: "center", gap: 8, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
+              aria-expanded={open}
+            >
+              <i className={`la ${open ? "la-angle-down" : "la-angle-right"}`} style={{ fontSize: 18 }}></i>
+              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>{title}</span>
+            </button>
+            {!!onEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="button-primary-v2"
+                style={{ color: "#414651", background: "#FFFFFF", width: "fit-content" }}
+                title="Edit section"
+              >
+                <i className="la la-pencil-alt" style={{ fontSize: 16, marginRight: 6 }}></i>
+                Edit
+              </button>
+            )}
+          </div>
+          {open && (
+            <div className="layered-card-content" style={{ marginTop: 8 }}>
+              {children}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
     return (
         <div className="col">
@@ -428,8 +467,8 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                   Save as Unpublished
                 </button>
                 <button
-                  disabled={isSavingCareer}
-                  style={{ width: "fit-content", background: "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px", cursor: isSavingCareer ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}
+                  disabled={isSavingCareer || (currentStep === steps.length && !isFormValid())}
+                  style={{ width: "fit-content", background: isSavingCareer || (currentStep === steps.length && !isFormValid()) ? "#D5D7DA" : "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px", cursor: isSavingCareer || (currentStep === steps.length && !isFormValid()) ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}
                   onClick={() => {
                     if (currentStep === steps.length) {
                       // Final step publishes
@@ -1168,46 +1207,173 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
             )}
 
             {currentStep === 5 && (
-              <div style={{ width: "100%", marginTop: 16 }}>
-                <div className="layered-card-outer">
-                  <div className="layered-card-middle">
-                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 32, height: 32, backgroundColor: "#181D27", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <i className="la la-eye" style={{ color: "#FFFFFF", fontSize: 20 }}></i>
-                      </div>
-                      <span style={{fontSize: 16, color: "#181D27", fontWeight: 700}}>Review Career</span>
+              <div style={{ width: "100%", marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+                {/* Collapsible: Career Details & Team Access */}
+                <ReviewSection
+                  title="Career Details & Team Access"
+                  onEdit={() => setCurrentStep(1)}
+                  defaultOpen
+                >
+                  {/* Top: Job Title (full width) */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8 }}>
+                    <div>
+                      <div style={{ color: "#667085" }}>Job Title</div>
+                      <div style={{ fontWeight: 600 }}>{jobTitle || "-"}</div>
                     </div>
-                    <div className="layered-card-content">
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                        <div><span style={{ color: "#667085" }}>Job Title</span><br /><span style={{ fontWeight: 600 }}>{jobTitle || "-"}</span></div>
-                        <div><span style={{ color: "#667085" }}>Employment Type</span><br /><span style={{ fontWeight: 600 }}>{employmentType || "-"}</span></div>
-                        <div><span style={{ color: "#667085" }}>Work Setup</span><br /><span style={{ fontWeight: 600 }}>{workSetup || "-"}</span></div>
-                        <div><span style={{ color: "#667085" }}>Salary</span><br /><span style={{ fontWeight: 600 }}>{salaryNegotiable ? "Negotiable" : `${minimumSalary || 0} - ${maximumSalary || 0} PHP`}</span></div>
-                        <div><span style={{ color: "#667085" }}>Location</span><br /><span style={{ fontWeight: 600 }}>{country} • {province} • {city}</span></div>
-                        <div><span style={{ color: "#667085" }}>Require Video Interview</span><br /><span style={{ fontWeight: 600 }}>{requireVideo ? "Yes" : "No"}</span></div>
-                        <div><span style={{ color: "#667085" }}>CV Screening</span><br /><span style={{ fontWeight: 600 }}>{screeningSetting}</span></div>
-                        <div><span style={{ color: "#667085" }}>Pre-Screening Questions</span><br /><span style={{ fontWeight: 600 }}>{preScreeningQuestions.length}</span></div>
-                        <div><span style={{ color: "#667085" }}>AI Interview Screening</span><br /><span style={{ fontWeight: 600 }}>{aiScreeningSetting}</span></div>
-                      </div>
-                      <div style={{ marginTop: 16 }}>
-                        <span style={{ color: "#667085" }}>Description</span>
-                        <div dangerouslySetInnerHTML={{ __html: description || "<em>No description</em>" }}></div>
-                      </div>
-                      {cvSecretPrompt && (
-                        <div style={{ marginTop: 16 }}>
-                          <span style={{ color: "#667085" }}>CV Secret Prompt</span>
-                          <div style={{ whiteSpace: "pre-wrap" }}>{cvSecretPrompt}</div>
-                        </div>
-                      )}
-                      {aiSecretPrompt && (
-                        <div style={{ marginTop: 16 }}>
-                          <span style={{ color: "#667085" }}>AI Interview Secret Prompt</span>
-                          <div style={{ whiteSpace: "pre-wrap" }}>{aiSecretPrompt}</div>
-                        </div>
+                  </div>
+                  <div style={{ borderTop: "1px solid #E9EAEB", margin: "16px 0" }}></div>
+
+                  {/* Employment + Work arrangement (align with 3-col layout below) */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+                    <div>
+                      <div style={{ color: "#667085" }}>Employment Type</div>
+                      <div style={{ fontWeight: 600 }}>{employmentType || "-"}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: "#667085" }}>Work Arrangement</div>
+                      <div style={{ fontWeight: 600 }}>{workSetup || "-"}</div>
+                    </div>
+                    <div></div>
+                  </div>
+                  <div style={{ borderTop: "1px solid #E9EAEB", margin: "16px 0" }}></div>
+
+                  {/* Location */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+                    <div>
+                      <div style={{ color: "#667085" }}>Country</div>
+                      <div style={{ fontWeight: 600 }}>{country || "-"}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: "#667085" }}>State / Province</div>
+                      <div style={{ fontWeight: 600 }}>{province || "-"}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: "#667085" }}>City</div>
+                      <div style={{ fontWeight: 600 }}>{city || "-"}</div>
+                    </div>
+                  </div>
+                  <div style={{ borderTop: "1px solid #E9EAEB", margin: "16px 0" }}></div>
+
+                  {/* Salary (align with 3-col layout above) */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+                    <div>
+                      <div style={{ color: "#667085" }}>Minimum Salary</div>
+                      <div style={{ fontWeight: 600 }}>{salaryNegotiable ? "Negotiable" : (minimumSalary || "0")}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: "#667085" }}>Maximum Salary</div>
+                      <div style={{ fontWeight: 600 }}>{salaryNegotiable ? "Negotiable" : (maximumSalary || "0")}</div>
+                    </div>
+                    <div></div>
+                  </div>
+                  <div style={{ borderTop: "1px solid #E9EAEB", margin: "16px 0" }}></div>
+
+                  {/* Job Description (full width) */}
+                  <div>
+                    <div style={{ color: "#667085", marginBottom: 6 }}>Job Description</div>
+                    <div dangerouslySetInnerHTML={{ __html: description || "<em>No description</em>" }}></div>
+                  </div>
+
+                  {/* Team Access */}
+                  <div style={{ borderTop: "1px solid #E9EAEB", margin: "16px 0" }}></div>
+                  <div>
+                    <div style={{ fontWeight: 700, marginBottom: 8 }}>Team Access</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {(teamMembers || []).map((member, idx) => {
+                        const isYou = member.email?.toLowerCase() === user?.email?.toLowerCase();
+                        const name = isYou ? `${user?.name || member.email} (You)` : (member.email?.split("@")[0] || member.email || "-");
+                        const avatar = isYou && user?.image ? user.image : "/user-profile.png";
+                        return (
+                          <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                              <img src={avatar} alt="" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
+                              <div style={{ display: "flex", flexDirection: "column" }}>
+                                <span style={{ fontWeight: 600 }}>{name}</span>
+                                <span style={{ color: "#667085", fontSize: 14 }}>{member.email}</span>
+                              </div>
+                            </div>
+                            <div style={{ color: "#667085" }}>{member.role || "-"}</div>
+                          </div>
+                        );
+                      })}
+                      {(!teamMembers || teamMembers.length === 0) && (
+                        <div style={{ color: "#667085" }}>No team members added.</div>
                       )}
                     </div>
                   </div>
-                </div>
+                </ReviewSection>
+
+                {/* Collapsible: CV Review & Pre-Screening */}
+                <ReviewSection
+                  title="CV Review & Pre-Screening Questions"
+                  onEdit={() => setCurrentStep(2)}
+                  defaultOpen
+                >
+                  <div><span style={{ color: "#667085" }}>CV Screening</span><br /><span style={{ fontWeight: 600 }}>{screeningSetting}</span></div>
+                  {cvSecretPrompt && (
+                    <div style={{ marginTop: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <i className="la la-magic" style={{ color: "#9747ff" }}></i>
+                        <span style={{ fontWeight: 700 }}>CV Secret Prompt</span>
+                      </div>
+                      <ul style={{ marginTop: 6, paddingLeft: 18 }}>
+                        {cvSecretPrompt
+                          .split("\n")
+                          .map((line, idx) => line.trim())
+                          .filter((line) => line.length > 0)
+                          .map((line, idx) => (<li key={idx}>{line}</li>))}
+                      </ul>
+                    </div>
+                  )}
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontWeight: 700 }}>Pre-Screening Questions</span>
+                      <div style={{ marginLeft: 4, background: "#EEF2F6", borderRadius: 12, padding: "0 8px", fontSize: 12, color: "#667085" }}>{preScreeningQuestions.length}</div>
+                    </div>
+                    {preScreeningQuestions.length > 0 ? (
+                      <ol style={{ marginTop: 8, paddingLeft: 18 }}>
+                        {preScreeningQuestions.map((q, i) => (<li key={i}>{q}</li>))}
+                      </ol>
+                    ) : (
+                      <div style={{ color: "#667085", marginTop: 6 }}>No pre-screening questions added.</div>
+                    )}
+                  </div>
+                </ReviewSection>
+
+                {/* Collapsible: AI Interview Setup */}
+                <ReviewSection
+                  title="AI Interview Setup"
+                  onEdit={() => setCurrentStep(3)}
+                  defaultOpen
+                >
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div><span style={{ color: "#667085" }}>AI Interview Screening</span><br /><span style={{ fontWeight: 600 }}>{aiScreeningSetting}</span></div>
+                    <div><span style={{ color: "#667085" }}>Require Video Interview</span><br /><span style={{ fontWeight: 600 }}>{requireVideo ? "Yes" : "No"}</span></div>
+                  </div>
+                  {aiSecretPrompt && (
+                    <div style={{ marginTop: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <i className="la la-magic" style={{ color: "#9747ff" }}></i>
+                        <span style={{ fontWeight: 700 }}>AI Interview Secret Prompt</span>
+                      </div>
+                      <ul style={{ marginTop: 6, paddingLeft: 18 }}>
+                        {aiSecretPrompt
+                          .split("\n")
+                          .map((line, idx) => line.trim())
+                          .filter((line) => line.length > 0)
+                          .map((line, idx) => (<li key={idx}>{line}</li>))}
+                      </ul>
+                    </div>
+                  )}
+                </ReviewSection>
+
+                {/* Collapsible: Pipeline Stages */}
+                <ReviewSection
+                  title="Pipeline Stages"
+                  onEdit={() => setCurrentStep(4)}
+                >
+                  <span>Pipeline builder is not included in this ticket. Proceed to the next step to review details.</span>
+                </ReviewSection>
               </div>
             )}
 
@@ -1221,12 +1387,14 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                 Back
               </button>
               <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  style={{ width: "fit-content", color: "#414651", background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px" }}
-                  onClick={() => { setCurrentStep(steps.length); }}
-                >
-                  Skip to Review
-                </button>
+                {currentStep === 4 && (
+                  <button
+                    style={{ width: "fit-content", color: "#414651", background: "#fff", border: "1px solid #D5D7DA", padding: "8px 16px", borderRadius: "60px" }}
+                    onClick={() => { setCurrentStep(steps.length); }}
+                  >
+                    Skip to Review
+                  </button>
+                )}
                 <button
                   style={{ width: "fit-content", background: "black", color: "#fff", border: "1px solid #E9EAEB", padding: "8px 16px", borderRadius: "60px" }}
                   onClick={() => {

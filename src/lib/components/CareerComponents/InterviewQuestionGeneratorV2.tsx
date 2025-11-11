@@ -166,7 +166,8 @@ export default function (props) {
 
     } catch(err) {
       console.log(err);
-      errorToast("Error generating questions, please try again", 1500);
+      const apiErr = (err as any)?.response?.data?.error || (err as any)?.message || "Error generating questions, please try again";
+      errorToast(apiErr, 2000);
     } finally {
       setIsGeneratingQuestions(false);
     }
@@ -256,7 +257,8 @@ export default function (props) {
       <i className="la la-check-circle" style={{ color: "#039855", fontSize: 32 }}></i>);
     } catch (err) {
       console.log(err);
-      errorToast("Error generating questions, please try again", 1500);
+      const apiErr = (err as any)?.response?.data?.error || (err as any)?.message || "Error generating questions, please try again";
+      errorToast(apiErr, 2000);
     } finally {
       setIsGeneratingQuestions(false);
     }
