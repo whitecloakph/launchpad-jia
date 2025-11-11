@@ -764,8 +764,8 @@ export default function () {
                 {getFlattenedQuestions().map((question, index) => (
                   <div key={question.id} className="prescreening-question-card">
                     <div className="prescreening-question-middle">
+                      <h3 className={styles.prescreeningQuestion}>{question.question}</h3>
                       <div className="prescreening-question-inner">
-                        <label>{question.question}</label>
 
                         {/* Dropdown */}
                         {question.type === "dropdown" && (

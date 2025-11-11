@@ -12,11 +12,8 @@ export default function NewCareerPage() {
         currentPage="Add new career"
         icon="la la-suitcase"
       />
-      <div
-        className="container-fluid mt--7"
-        style={{ padding: "6rem 0 1.5rem 0" }}
-      >
-        <div className="row">
+      <div className="container-fluid mt--7" style={{ paddingTop: "6rem" }}>
+        <div className="row" style={{ marginBottom: "2rem" }}>
           <CareerFormSegmented formType="add" />
         </div>
       </div>

@@ -80,7 +80,7 @@ export default function RichTextEditor({setText, text}) {
           onInput={handleDescriptionChange}
           onBlur={handleDescriptionChange}
           onPaste={handlePaste}
-          data-placeholder="Enter description"
+          data-placeholder="Enter job description..."
         ></div>
         {/* Rich Text Editor Toolbar */}
         <div style={{ 

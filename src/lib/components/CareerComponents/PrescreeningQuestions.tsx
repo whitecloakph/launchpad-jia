@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  COLOR_BG_LIGHT,
-  COLOR_BORDER_DARK,
-  COLOR_BORDER_LIGHT,
-  COLOR_BORDER_MEDIUM,
-  COLOR_ERROR,
-  COLOR_TEXT_TERTIARY,
-} from "@/lib/styles/variables";
 import { useState } from "react";
+import styles from "@/lib/styles/screens/careerFormStep2.module.scss";
 
 interface PrescreeningQuestion {
   id: string;
@@ -54,27 +47,6 @@ export default function PrescreeningQuestions({
       : internalShowAddForm;
   const setShowAddForm = setExternalShowAddForm || setInternalShowAddForm;
 
-  const addQuestion = () => {
-    const needsOptions =
-      questionType === "dropdown" || questionType === "checkboxes";
-    const needsRange = questionType === "range";
-
-    if (!newQuestion.trim()) return;
-    if (needsOptions && newOptions.filter((opt) => opt.trim()).length < 1)
-      return;
-    if (needsRange && (!rangeMin || !rangeMax || rangeMin >= rangeMax)) return;
-
-    const question: PrescreeningQuestion = {
-      id: Date.now().toString(),
-      question: newQuestion,
-      type: questionType,
-      ...(needsOptions && { options: newOptions.filter((opt) => opt.trim()) }),
-      ...(needsRange && { rangeMin, rangeMax, currency }),
-    };
-    setQuestions([...questions, question]);
-    resetForm();
-  };
-
   const deleteQuestion = (id: string) => {
     setQuestions(questions.filter((q) => q.id !== id));
   };
@@ -112,12 +84,9 @@ export default function PrescreeningQuestions({
       question: "How long is your notice period?",
       type: "dropdown" as const,
       options: [
-        "Immediate",
-        "1 week",
-        "2 weeks",
-        "1 month",
-        "2 months",
-        "3 months",
+        "Immediately",
+        "< 30 days",
+        "> 30 days",
       ],
     },
     {
@@ -125,12 +94,10 @@ export default function PrescreeningQuestions({
       question: "How often are you willing to report to the office each week?",
       type: "dropdown" as const,
       options: [
-        "Fully remote",
-        "1 day",
-        "2 days",
-        "3 days",
-        "4 days",
-        "5 days (Onsite)",
+        "At most 1-2x a week",
+        "At most 3-4x a week",
+        "Open to fully onsite work",
+        "Only open to fully remote work",
       ],
     },
     {
@@ -138,7 +105,7 @@ export default function PrescreeningQuestions({
       question: "How much is your expected monthly salary?",
       type: "range" as const,
       rangeMin: 40000,
-      rangeMax: 90000,
+      rangeMax: 60000,
       currency: "PHP",
     },
   ];
@@ -206,50 +173,22 @@ export default function PrescreeningQuestions({
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className={styles.prescreeningContainer}>
       {showHeaderControls && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#181D27" }}>
+        <div className={styles.prescreeningHeader}>
+          <div className={styles.prescreeningHeaderLeft}>
+            <span className={styles.prescreeningOptionalText}>
               (optional)
             </span>
             {questions.length > 0 && (
-              <span
-                style={{
-                  padding: "2px 10px",
-                  backgroundColor: "#F3F4F6",
-                  borderRadius: "12px",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#6B7280",
-                }}
-              >
+              <span className={styles.prescreeningCountBadge}>
                 {questions.length}
               </span>
             )}
           </div>
           <button
             onClick={addBlankCustomQuestion}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#181D27",
-              color: "#FFFFFF",
-              border: "none",
-              borderRadius: "20px",
-              cursor: "pointer",
-              fontSize: 14,
-              fontWeight: 500,
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
+            className={styles.addCustomButton}
           >
             <i className="la la-plus"></i>
             Add custom
@@ -258,20 +197,13 @@ export default function PrescreeningQuestions({
       )}
 
       {questions.length === 0 && (
-        <p
-          style={{
-            margin: "0 0 16px 0",
-            color: "#6B7280",
-            fontSize: 16,
-            fontWeight: 500,
-          }}
-        >
+        <p className={styles.prescreeningEmptyText}>
           No pre-screening questions added yet.
         </p>
       )}
 
       {questions.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className={styles.questionsListContainer}>
           {questions.map((q, index) => (
             <div
               key={q.id}
@@ -279,51 +211,16 @@ export default function PrescreeningQuestions({
               onDragStart={() => handleDragStart(index)}
               onDragOver={(e) => handleDragOver(e, index)}
               onDragEnd={handleDragEnd}
-              style={{
-                backgroundColor: "#FFFFFF",
-                marginBottom: 12,
-                cursor: draggedIndex === index ? "grabbing" : "grab",
-                opacity: draggedIndex === index ? 0.5 : 1,
-              }}
+              className={`${styles.questionItemWrapper} ${draggedIndex === index ? styles.dragging : ''}`}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                }}
-              >
+              <div className={styles.questionItemInner}>
                 {/* Drag handle icon */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "grab",
-                    color: "#9CA3AF",
-                    fontSize: 16,
-                    padding: "4px 0",
-                  }}
-                >
+                <div className={styles.dragHandle}>
                   <i className="la la-braille"></i>
                 </div>
-                <div
-                  style={{
-                    border: "1px solid #E5E7EB",
-                    borderRadius: "8px",
-                    flex: 1,
-                  }}
-                >
+                <div className={styles.questionCard}>
                   {/* Question and type on same line */}
-                  <div
-                    style={{
-                      backgroundColor: COLOR_BG_LIGHT,
-                      display: "flex",
-                      gap: 12,
-                      padding: 16,
-                      alignItems: "center",
-                    }}
-                  >
+                  <div className={styles.questionHeaderRow}>
                     <input
                       type="text"
                       placeholder="Write your question..."
@@ -336,15 +233,7 @@ export default function PrescreeningQuestions({
                         };
                         setQuestions(updatedQuestions);
                       }}
-                      style={{
-                        flex: 1,
-                        padding: "8px 12px",
-                        border: "none",
-                        borderRadius: "6px",
-                        fontSize: 14,
-                        fontFamily: "inherit",
-                        backgroundColor: "transparent",
-                      }}
+                      className={styles.questionInput}
                     />
                     <select
                       value={q.type}
@@ -356,16 +245,7 @@ export default function PrescreeningQuestions({
                         };
                         setQuestions(updatedQuestions);
                       }}
-                      style={{
-                        padding: "6px 12px",
-                        border: "1px solid #E5E7EB",
-                        borderRadius: "6px",
-                        fontSize: 13,
-                        fontFamily: "inherit",
-                        backgroundColor: "#FFFFFF",
-                        cursor: "pointer",
-                        color: "#6B7280",
-                      }}
+                      className={styles.questionTypeSelect}
                     >
                       <option value="short-answer">Short Answer</option>
                       <option value="long-answer">Long Answer</option>
@@ -379,40 +259,11 @@ export default function PrescreeningQuestions({
                   {(q.type === "dropdown" || q.type === "checkboxes") &&
                     q.options &&
                     q.options.length > 0 && (
-                      <div
-                        style={{
-                          padding: 16,
-                          borderBottom: `1px solid ${COLOR_BORDER_LIGHT}`,
-                        }}
-                      >
+                      <div className={styles.optionsContainer}>
                         {q.options.map((opt, optIndex) => (
-                          <div
-                            key={optIndex}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 8,
-                              marginBottom: 6,
-                              paddingLeft: 0,
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                border: `1px solid ${COLOR_BORDER_MEDIUM}`,
-                                borderRadius: 8,
-                                width: "100%",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  padding: 8,
-                                  fontSize: 13,
-                                  width: 24,
-                                  color: "#6B7280",
-                                }}
-                              >
+                          <div key={optIndex} className={styles.optionItem}>
+                            <div className={styles.optionInputWrapper}>
+                              <span className={styles.optionNumber}>
                                 {optIndex + 1}
                               </span>
                               <input
@@ -431,16 +282,7 @@ export default function PrescreeningQuestions({
                                   };
                                   setQuestions(updatedQuestions);
                                 }}
-                                style={{
-                                  flex: 1,
-                                  padding: "4px 8px",
-                                  backgroundColor: "transparent",
-                                  border: "none",
-                                  fontSize: 13,
-                                  color: "#181D27",
-                                  fontFamily: "inherit",
-                                  borderLeft: `1px solid ${COLOR_BORDER_MEDIUM}`,
-                                }}
+                                className={styles.optionInput}
                               />
                             </div>
                             <button
@@ -456,14 +298,7 @@ export default function PrescreeningQuestions({
                                 };
                                 setQuestions(updatedQuestions);
                               }}
-                              style={{
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                color: "#9CA3AF",
-                                fontSize: 14,
-                                padding: "4px",
-                              }}
+                              className={styles.optionRemoveButton}
                             >
                               <i className="la la-times"></i>
                             </button>
@@ -482,19 +317,7 @@ export default function PrescreeningQuestions({
                             };
                             setQuestions(updatedQuestions);
                           }}
-                          style={{
-                            padding: "4px 8px",
-                            backgroundColor: "transparent",
-                            color: COLOR_TEXT_TERTIARY,
-                            border: "none",
-                            cursor: "pointer",
-                            fontSize: 14,
-                            fontWeight: 400,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 4,
-                            marginLeft: 18,
-                          }}
+                          className={styles.addOptionButton}
                         >
                           <i className="la la-plus"></i>
                           Add Option
@@ -504,50 +327,19 @@ export default function PrescreeningQuestions({
 
                   {/* Range fields */}
                   {q.type === "range" && (
-                    <div style={{ marginTop: 12 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 16,
-                          alignItems: "center",
-                        }}
-                      >
-                        <div style={{ flex: 1 }}>
-                          <label
-                            style={{
-                              display: "block",
-                              fontSize: 12,
-                              color: "#6B7280",
-                              marginBottom: 4,
-                            }}
-                          >
-                            Minimum
+                    <div className={styles.rangeFieldsContainer}>
+                      <div className={styles.rangeFieldsInner}>
+                        <div className={styles.rangeFieldWrapper}>
+                          <label className={styles.rangeLabel}>
+                            Minimum Salary
                           </label>
-                          <div style={{ display: "flex", gap: 4 }}>
-                            <select
-                              value={q.currency || "PHP"}
-                              onChange={(e) => {
-                                const updatedQuestions = [...questions];
-                                updatedQuestions[index] = {
-                                  ...q,
-                                  currency: e.target.value,
-                                };
-                                setQuestions(updatedQuestions);
-                              }}
-                              style={{
-                                padding: "8px",
-                                border: "1px solid #E5E7EB",
-                                borderRadius: "6px",
-                                fontSize: 14,
-                                backgroundColor: "#FFFFFF",
-                              }}
-                            >
-                              <option value="PHP">₱</option>
-                              <option value="USD">$</option>
-                            </select>
+                          <div className={styles.rangeInputWithSymbols}>
+                            <span className={styles.currencySymbolLeft}>
+                              {q.currency === "USD" ? "$" : "₱"}
+                            </span>
                             <input
                               type="number"
-                              placeholder="40,000"
+                              placeholder="0"
                               value={q.rangeMin || ""}
                               onChange={(e) => {
                                 const updatedQuestions = [...questions];
@@ -557,73 +349,24 @@ export default function PrescreeningQuestions({
                                 };
                                 setQuestions(updatedQuestions);
                               }}
-                              style={{
-                                flex: 1,
-                                padding: "8px 12px",
-                                border: "1px solid #E5E7EB",
-                                borderRadius: "6px",
-                                fontSize: 14,
-                              }}
+                              className={styles.rangeInputStyled}
                             />
-                            <select
-                              value={q.currency || "PHP"}
-                              onChange={(e) => {
-                                const updatedQuestions = [...questions];
-                                updatedQuestions[index] = {
-                                  ...q,
-                                  currency: e.target.value,
-                                };
-                                setQuestions(updatedQuestions);
-                              }}
-                              style={{
-                                padding: "8px",
-                                border: "1px solid #E5E7EB",
-                                borderRadius: "6px",
-                                fontSize: 14,
-                                backgroundColor: "#FFFFFF",
-                              }}
-                            >
-                              <option value="PHP">PHP</option>
-                              <option value="USD">USD</option>
-                            </select>
+                            <span className={styles.currencyCodeRight}>
+                              {q.currency || "PHP"}
+                            </span>
                           </div>
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <label
-                            style={{
-                              display: "block",
-                              fontSize: 12,
-                              color: "#6B7280",
-                              marginBottom: 4,
-                            }}
-                          >
-                            Maximum
+                        <div className={styles.rangeFieldWrapper}>
+                          <label className={styles.rangeLabel}>
+                            Maximum Salary
                           </label>
-                          <div style={{ display: "flex", gap: 4 }}>
-                            <select
-                              value={q.currency || "PHP"}
-                              onChange={(e) => {
-                                const updatedQuestions = [...questions];
-                                updatedQuestions[index] = {
-                                  ...q,
-                                  currency: e.target.value,
-                                };
-                                setQuestions(updatedQuestions);
-                              }}
-                              style={{
-                                padding: "8px",
-                                border: "1px solid #E5E7EB",
-                                borderRadius: "6px",
-                                fontSize: 14,
-                                backgroundColor: "#FFFFFF",
-                              }}
-                            >
-                              <option value="PHP">₱</option>
-                              <option value="USD">$</option>
-                            </select>
+                          <div className={styles.rangeInputWithSymbols}>
+                            <span className={styles.currencySymbolLeft}>
+                              {q.currency === "USD" ? "$" : "₱"}
+                            </span>
                             <input
                               type="number"
-                              placeholder="90,000"
+                              placeholder="0"
                               value={q.rangeMax || ""}
                               onChange={(e) => {
                                 const updatedQuestions = [...questions];
@@ -633,35 +376,11 @@ export default function PrescreeningQuestions({
                                 };
                                 setQuestions(updatedQuestions);
                               }}
-                              style={{
-                                flex: 1,
-                                padding: "8px 12px",
-                                border: "1px solid #E5E7EB",
-                                borderRadius: "6px",
-                                fontSize: 14,
-                              }}
+                              className={styles.rangeInputStyled}
                             />
-                            <select
-                              value={q.currency || "PHP"}
-                              onChange={(e) => {
-                                const updatedQuestions = [...questions];
-                                updatedQuestions[index] = {
-                                  ...q,
-                                  currency: e.target.value,
-                                };
-                                setQuestions(updatedQuestions);
-                              }}
-                              style={{
-                                padding: "8px",
-                                border: "1px solid #E5E7EB",
-                                borderRadius: "6px",
-                                fontSize: 14,
-                                backgroundColor: "#FFFFFF",
-                              }}
-                            >
-                              <option value="PHP">PHP</option>
-                              <option value="USD">USD</option>
-                            </select>
+                            <span className={styles.currencyCodeRight}>
+                              {q.currency || "PHP"}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -671,20 +390,7 @@ export default function PrescreeningQuestions({
                   {/* Delete button at bottom left */}
                   <button
                     onClick={() => deleteQuestion(q.id)}
-                    style={{
-                      margin: "16px 16px 16px auto",
-                      padding: "6px 12px",
-                      backgroundColor: "transparent",
-                      color: COLOR_ERROR,
-                      border: `1px solid ${COLOR_ERROR}`,
-                      borderRadius: 8,
-                      cursor: "pointer",
-                      fontSize: 14,
-                      fontWeight: 500,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                    }}
+                    className={styles.deleteQuestionButton}
                   >
                     <i className="la la-trash"></i>
                     Delete Question
@@ -697,46 +403,22 @@ export default function PrescreeningQuestions({
       )}
 
       {showAddForm && (
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#F9FAFB",
-            border: "1px solid #E5E7EB",
-            borderRadius: "8px",
-            marginTop: 16,
-          }}
-        >
-          <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-            <div style={{ flex: 1 }}>
+        <div className={styles.addFormContainer}>
+          <div className={styles.addFormTopRow}>
+            <div className={styles.addFormInputWrapper}>
               <input
                 type="text"
                 placeholder="Write your question..."
                 value={newQuestion}
                 onChange={(e) => setNewQuestion(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "6px",
-                  fontSize: 14,
-                  fontFamily: "inherit",
-                }}
+                className={styles.addFormInput}
               />
             </div>
-            <div style={{ width: "200px" }}>
+            <div className={styles.addFormSelectWrapper}>
               <select
                 value={questionType}
                 onChange={(e) => setQuestionType(e.target.value as any)}
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "6px",
-                  fontSize: 14,
-                  fontFamily: "inherit",
-                  backgroundColor: "#FFFFFF",
-                  cursor: "pointer",
-                }}
+                className={styles.addFormSelect}
               >
                 <option value="short-answer">Short Answer</option>
                 <option value="long-answer">Long Answer</option>
@@ -748,24 +430,10 @@ export default function PrescreeningQuestions({
           </div>
 
           {(questionType === "dropdown" || questionType === "checkboxes") && (
-            <div style={{ marginBottom: 16 }}>
+            <div className={styles.addFormOptionsContainer}>
               {newOptions.map((option, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 8,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 14,
-                      color: "#6B7280",
-                      minWidth: "20px",
-                    }}
-                  >
+                <div key={index} className={styles.addFormOptionItem}>
+                  <span className={styles.addFormOptionNumber}>
                     {index + 1}
                   </span>
                   <input
@@ -773,50 +441,21 @@ export default function PrescreeningQuestions({
                     placeholder={`Option ${index + 1}`}
                     value={option}
                     onChange={(e) => updateOption(index, e.target.value)}
-                    style={{
-                      flex: 1,
-                      padding: "8px 12px",
-                      border: "1px solid #E5E7EB",
-                      borderRadius: "6px",
-                      fontSize: 14,
-                      fontFamily: "inherit",
-                    }}
+                    className={styles.addFormOptionInput}
                   />
                   {newOptions.length > 1 && (
                     <button
                       onClick={() => removeOption(index)}
-                      style={{
-                        background: "none",
-                        cursor: "pointer",
-                        fontSize: 16,
-                        padding: "4px",
-                      }}
+                      className={styles.addFormOptionRemoveButton}
                     >
-                      <i
-                        style={{
-                          color: COLOR_TEXT_TERTIARY,
-                        }}
-                        className="la la-times"
-                      ></i>
+                      <i className="la la-times"></i>
                     </button>
                   )}
                 </div>
               ))}
               <button
                 onClick={addOption}
-                style={{
-                  padding: "6px 12px",
-                  backgroundColor: "transparent",
-                  color: "#181D27",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  marginLeft: "28px",
-                }}
+                className={styles.addFormAddOptionButton}
               >
                 <i className="la la-plus"></i>
                 Add Option
@@ -825,134 +464,52 @@ export default function PrescreeningQuestions({
           )}
 
           {questionType === "range" && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 12,
-                      color: "#6B7280",
-                      marginBottom: 4,
-                    }}
-                  >
-                    Minimum
+            <div className={styles.addFormRangeContainer}>
+              <div className={styles.rangeFieldsInner}>
+                <div className={styles.rangeFieldWrapper}>
+                  <label className={styles.rangeLabel}>
+                    Minimum Salary
                   </label>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    <select
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      style={{
-                        padding: "8px",
-                        border: "1px solid #E5E7EB",
-                        borderRadius: "6px",
-                        fontSize: 14,
-                        backgroundColor: "#FFFFFF",
-                      }}
-                    >
-                      <option value="PHP">₱</option>
-                      <option value="USD">$</option>
-                    </select>
+                  <div className={styles.rangeInputWithSymbols}>
+                    <span className={styles.currencySymbolLeft}>
+                      {currency === "USD" ? "$" : "₱"}
+                    </span>
                     <input
                       type="number"
-                      placeholder="40,000"
+                      placeholder="0"
                       value={rangeMin || ""}
                       onChange={(e) => setRangeMin(Number(e.target.value))}
-                      style={{
-                        flex: 1,
-                        padding: "8px 12px",
-                        border: "1px solid #E5E7EB",
-                        borderRadius: "6px",
-                        fontSize: 14,
-                      }}
+                      className={styles.rangeInputStyled}
                     />
-                    <select
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      style={{
-                        padding: "8px",
-                        border: "1px solid #E5E7EB",
-                        borderRadius: "6px",
-                        fontSize: 14,
-                        backgroundColor: "#FFFFFF",
-                      }}
-                    >
-                      <option value="PHP">PHP</option>
-                      <option value="USD">USD</option>
-                    </select>
+                    <span className={styles.currencyCodeRight}>
+                      {currency}
+                    </span>
                   </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 12,
-                      color: "#6B7280",
-                      marginBottom: 4,
-                    }}
-                  >
-                    Maximum
+                <div className={styles.rangeFieldWrapper}>
+                  <label className={styles.rangeLabel}>
+                    Maximum Salary
                   </label>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    <select
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      style={{
-                        padding: "8px",
-                        border: "1px solid #E5E7EB",
-                        borderRadius: "6px",
-                        fontSize: 14,
-                        backgroundColor: "#FFFFFF",
-                      }}
-                    >
-                      <option value="PHP">₱</option>
-                      <option value="USD">$</option>
-                    </select>
+                  <div className={styles.rangeInputWithSymbols}>
+                    <span className={styles.currencySymbolLeft}>
+                      {currency === "USD" ? "$" : "₱"}
+                    </span>
                     <input
                       type="number"
-                      placeholder="90,000"
+                      placeholder="0"
                       value={rangeMax || ""}
                       onChange={(e) => setRangeMax(Number(e.target.value))}
-                      style={{
-                        flex: 1,
-                        padding: "8px 12px",
-                        border: "1px solid #E5E7EB",
-                        borderRadius: "6px",
-                        fontSize: 14,
-                      }}
+                      className={styles.rangeInputStyled}
                     />
-                    <select
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      style={{
-                        padding: "8px",
-                        border: "1px solid #E5E7EB",
-                        borderRadius: "6px",
-                        fontSize: 14,
-                        backgroundColor: "#FFFFFF",
-                      }}
-                    >
-                      <option value="PHP">PHP</option>
-                      <option value="USD">USD</option>
-                    </select>
+                    <span className={styles.currencyCodeRight}>
+                      {currency}
+                    </span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => {}}
-                style={{
-                  marginTop: 12,
-                  padding: "6px 12px",
-                  backgroundColor: "transparent",
-                  color: "#EF4444",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                }}
+                className={styles.addFormDeleteButton}
               >
                 <i className="la la-trash"></i>
                 Delete Question
@@ -964,73 +521,30 @@ export default function PrescreeningQuestions({
 
       {/* Suggested Pre-screening Questions - Always at the bottom */}
       {(questions.length > 0 || showAddForm) && (
-        <hr
-          style={{
-            border: `1px solid ${COLOR_BORDER_LIGHT}`,
-            margin: "1.5em 0",
-          }}
-        />
+        <hr className={styles.suggestedQuestionsHr} />
       )}
 
       <div>
-        <p
-          style={{
-            fontSize: 18,
-            fontWeight: 600,
-            color: "#181D27",
-            margin: "0 0 12px 0",
-          }}
-        >
+        <p className={styles.suggestedQuestionsTitle}>
           Suggested Pre-screening Questions:
         </p>
         {suggestedQuestions.map((sq, index) => {
           const isAdded = isSuggestedQuestionAdded(sq.title);
 
           return (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                padding: "12px 0",
-              }}
-            >
-              <div style={{ flex: 1 }}>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: "#181D27",
-                  }}
-                >
+            <div key={index} className={styles.suggestedQuestionItem}>
+              <div className={styles.suggestedQuestionContent}>
+                <p className={styles.suggestedQuestionTitle}>
                   {sq.title}
                 </p>
-                <p
-                  style={{
-                    margin: "4px 0 0 0",
-                    fontSize: 14,
-                    color: "#6B7280",
-                  }}
-                >
+                <p className={styles.suggestedQuestionText}>
                   {sq.question}
                 </p>
               </div>
               <button
                 onClick={() => !isAdded && addSuggestedQuestion(index)}
                 disabled={isAdded}
-                style={{
-                  padding: "6px 20px",
-                  backgroundColor: isAdded ? "#F3F4F6" : "#FFFFFF",
-                  color: isAdded ? "#9CA3AF" : "#181D27",
-                  border: `1px solid ${isAdded ? "#E5E7EB" : "#D1D5DB"}`,
-                  borderRadius: "20px",
-                  cursor: isAdded ? "not-allowed" : "pointer",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  marginLeft: 16,
-                }}
+                className={`${styles.suggestedQuestionButton} ${isAdded ? styles.added : ''}`}
               >
                 {isAdded ? "Added" : "Add"}
               </button>

@@ -107,7 +107,11 @@ export default function Layout({ children }) {
           footerNavItems={footerNavItems}
           superAdminNavItems={superAdminNavItems}
         />
-        <div className="main-content bg-white" id="panel">
+        <div
+          className="main-content bg-white"
+          id="panel"
+          style={{ marginLeft: "260px", minHeight: "93vh", overflowY: "scroll" }}
+        >
           {children}
         </div>
       </div>

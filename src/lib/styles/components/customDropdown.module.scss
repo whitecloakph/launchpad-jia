@@ -1,0 +1,164 @@
+@use "../variables";
+
+.dropdownWrapper {
+  width: 100%;
+  box-shadow: variables.$shadow-xs;
+}
+
+.dropdownButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-transform: capitalize;
+  text-align: left;
+  font-weight: normal;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #ddd;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &.hasError {
+    border-color: variables.$color-border-destructive;
+    border-width: 2px;
+  }
+}
+
+.buttonText {
+  color: var(--text-color);
+
+  &.isPlaceholder {
+    color: variables.$color-text-tertiary;
+  }
+}
+
+.dropdownIcon {
+  color: variables.$color-text-tertiary;
+  margin-left: 10px;
+}
+
+.dropdownMenu {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 8px;
+
+  .menuItemWrapper:not(:last-child) {
+    margin-bottom: 0.25em;
+  }
+}
+
+.menuItemWrapper {
+  padding: 0;
+  border-bottom: none;
+  margin: 0 0.5em;
+}
+
+button.menuItem {
+  width: 100%;
+  padding: 12px 16px;
+  color: #181d27;
+  font-weight: 500;
+  background: transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  white-space: wrap;
+  text-transform: capitalize;
+  border-radius: 12px !important;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+
+  &:hover {
+    background: #f8f9fc;
+  }
+
+  &.isSelected {
+    font-weight: 700;
+    background-color: variables.$color-secondary-indigo-50;
+  }
+
+  // For items with description - increase padding
+  &.hasDescription {
+    padding: 12px 16px;
+    align-items: flex-start;
+  }
+}
+
+.menuItemIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  width: 24px;
+}
+
+.checkIconPlaceholder {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.menuItemContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.menuItemText {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.menuItemName {
+  font-size: 14px;
+  color: variables.$color-text-primary;
+}
+
+.menuItemDescription {
+  font-size: 12px;
+  font-weight: 400;
+  color: variables.$color-text-tertiary;
+  line-height: 1.4;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: left;
+  text-transform: none;
+  max-width: 100%;
+}
+
+.checkIcon {
+  font-size: 20px;
+  background-image: linear-gradient(
+    90deg,
+    variables.$color-gradient-stop-blue 0%,
+    variables.$color-gradient-stop-purple 34%,
+    variables.$color-gradient-stop-pink 67%,
+    variables.$color-gradient-stop-yellow 100%
+  );
+  background-clip: text;
+  color: transparent;
+}

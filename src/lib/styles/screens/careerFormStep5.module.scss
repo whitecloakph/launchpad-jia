@@ -12,10 +12,6 @@
   margin-bottom: 12px;
 }
 
-.sectionCardClickable {
-  cursor: pointer;
-}
-
 // Section Header
 .sectionHeader {
   display: flex;
@@ -28,6 +24,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
 }
 
 .toggleIcon {
@@ -59,15 +56,6 @@
   padding: 2em;
   border-radius: 20px;
   box-shadow: variables.$inner-shadow-xs;
-}
-
-.expandedContentAlt {
-  padding: 0 16px 16px 16px;
-  border-top: 1px solid variables.$color-border-primary;
-}
-
-.innerPadding {
-  padding: 16px 0;
 }
 
 // Field Sections
@@ -117,7 +105,7 @@
 }
 
 .fieldValue {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 500;
   color: variables.$color-text-secondary;
   margin: 0;
@@ -125,11 +113,9 @@
 
 // Job Description
 .descriptionContainer {
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.6;
   color: variables.$color-text-secondary;
-  max-height: 400px;
-  overflow-y: auto;
 }
 
 // Team Access
@@ -157,6 +143,11 @@
   font-weight: 600;
   font-size: 14px;
   color: variables.$color-text-primary;
+}
+
+.youBadge {
+  font-weight: 400;
+  color: variables.$color-text-tertiary;
 }
 
 .teamEmail {
@@ -207,15 +198,6 @@
   font-weight: 500;
   color: variables.$color-text-primary;
   margin: 0;
-}
-
-.questionsCount {
-  padding: 2px 8px;
-  background-color: variables.$color-white;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: variables.$color-text-primary;
 }
 
 .questionsContainer {
@@ -339,6 +321,21 @@
 }
 
 // Pipeline Stages Grid
+
+.pipelineCount, .questionsCount {
+  width: 28px;
+  height: 28px;
+  background-color: variables.$color-secondary-blue-gray-50;
+  border: 1px solid variables.$color-secondary-blue-gray-200;
+  border-radius: 50%;
+  color: variables.$color-secondary-blue-gray-700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .pipelineGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -362,7 +359,7 @@
 
 .stageIcon {
   font-size: 18px;
-  color: variables.$color-text-primary;
+  color: variables.$color-primary-neutral-400;
 }
 
 .stageName {
@@ -380,7 +377,7 @@
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: variables.$color-text-secondary;
+  color: variables.$color-text-tertiary;
   margin-bottom: 6px;
 }
 
@@ -392,6 +389,7 @@
 
 .substageItem {
   border: 1px solid variables.$color-border-primary;
+  border-radius: 8px;
   background-color: variables.$color-white;
   margin: 0;
   padding: 0.75em;

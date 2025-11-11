@@ -8,6 +8,7 @@ import {
   candidateActionToast,
 } from "@/lib/Utils";
 import FullScreenLoadingAnimation from "./FullScreenLoadingAnimation";
+import styles from "@/lib/styles/components/interviewQuestionGenerator.module.scss";
 
 export default function (props) {
   const { questions, setQuestions, jobTitle, description, showValidation } = props;
@@ -372,144 +373,50 @@ export default function (props) {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginLeft: 8,
-          padding: 4,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              backgroundColor: "#181D27",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 600 }}>
-              2.
-            </span>
-          </div>
-          <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-            AI Interview Questions
-          </span>
+      <div className={styles.questionHeader}>
+        <div className={styles.questionHeaderLeft}>
+          <h2 className={styles.sectionTitle}>2. AI Interview Questions</h2>
           {totalQuestions > 0 && (
-            <div
-              style={{
-                borderRadius: "50%",
-                width: 30,
-                height: 22,
-                border: "1px solid #D5D9EB",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 14,
-                backgroundColor: "#F8F9FC",
-                color: "#181D27",
-                fontWeight: 700,
-              }}
-            >
-              {totalQuestions}
-            </div>
+            <div className={styles.questionCountBadge}>{totalQuestions}</div>
           )}
         </div>
         <button
-          style={{
-            width: "fit-content",
-            background: "black",
-            color: "#fff",
-            border: "1px solid #E9EAEB",
-            padding: "8px 16px",
-            borderRadius: "60px",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
+          className={styles.generateAllButton}
           onClick={() => {
             generateAllQuestions();
           }}
         >
-          <i className="la la-bolt" style={{ fontSize: 20 }}></i> Generate All
-          Questions
+          <i className="la la-bolt"></i> Generate All Questions
         </button>
       </div>
       {showValidation && !hasMinimumQuestions && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "12px 16px",
-            backgroundColor: "#FEF3F2",
-            border: "1px solid #FECDCA",
-            borderRadius: "8px",
-            margin: "16px 16px 0 16px",
-          }}
-        >
-          <i className="la la-exclamation-triangle" style={{ color: "#F04438", fontSize: 16 }}></i>
-          <span style={{ color: "#B42318", fontSize: 14, fontWeight: 500 }}>
+        <div className={styles.validationAlert}>
+          <i className={`la la-exclamation-triangle ${styles.validationIcon}`}></i>
+          <span className={styles.validationText}>
             Please add at least 5 interview questions.
           </span>
         </div>
       )}
       <div className="layered-card-content">
-        <div className="questions-set">
+        <div className={styles.questionsSet}>
           {questions.map((group, index) => (
-            <div
-              className="question-group"
-              key={index}
-              style={
-                group.category === "Others" ? { borderBottom: "none" } : {}
-              }
-            >
+            <div className={styles.questionGroup} key={index}>
               {/* Row of category */}
               <div>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <h3
-                    style={{
-                      whiteSpace: "nowrap",
-                      minWidth: "fit-content",
-                      marginRight: "10px",
-                    }}
-                  >
-                    {group.category}
-                  </h3>
+                <div className={styles.categoryHeader}>
+                  <h3 className={styles.categoryTitle}>{group.category}</h3>
                 </div>
                 {/* Empty drop zone for categories with no questions */}
                 {group.questions.length === 0 && (
                   <div
-                    style={{
-                      padding: "20px",
-                      border: "2px dashed #E5E7EB",
-                      borderRadius: "8px",
-                      backgroundColor: "#F9FAFB",
-                      textAlign: "center",
-                      color: "#9CA3AF",
-                      fontSize: 14,
-                      marginBottom: 12,
-                    }}
+                    className={styles.emptyDropZone}
                     onDragOver={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      e.currentTarget.style.borderColor = "#9CA3AF";
-                      e.currentTarget.style.backgroundColor = "#F3F4F6";
-                    }}
-                    onDragLeave={(e) => {
-                      e.currentTarget.style.borderColor = "#E5E7EB";
-                      e.currentTarget.style.backgroundColor = "#F9FAFB";
                     }}
                     onDrop={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      e.currentTarget.style.borderColor = "#E5E7EB";
-                      e.currentTarget.style.backgroundColor = "#F9FAFB";
 
                       const draggedQuestionId =
                         e.dataTransfer.getData("questionId");
@@ -536,14 +443,7 @@ export default function (props) {
 
                   return (
                     <div
-                      className="question-item"
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 12,
-                        marginBottom: 12,
-                      }}
+                      className={styles.questionItem}
                       key={question.id}
                       draggable={!isEditing}
                       onDragStart={(e) => {
@@ -581,32 +481,12 @@ export default function (props) {
                       }}
                     >
                       {/* Drag handle */}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: isEditing ? "default" : "grab",
-                          color: "#9CA3AF",
-                          fontSize: 16,
-                        }}
-                      >
+                      <div className={`${styles.dragHandle} ${isEditing ? styles.disabled : ''}`}>
                         <i className="la la-braille"></i>
                       </div>
 
                       {/* Question content */}
-                      <div
-                        style={{
-                          flex: 1,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          padding: "12px 16px",
-                          backgroundColor: "#FFFFFF",
-                          border: "1px solid #E5E7EB",
-                          borderRadius: "8px",
-                        }}
-                      >
+                      <div className={styles.questionContent}>
                         {isEditing ? (
                           <input
                             type="text"
@@ -614,49 +494,19 @@ export default function (props) {
                             onChange={(e) =>
                               setTempQuestionText(e.target.value)
                             }
-                            style={{
-                              flex: 1,
-                              padding: "8px 12px",
-                              border: "1px solid #E5E7EB",
-                              borderRadius: "6px",
-                              fontSize: 14,
-                              fontFamily: "inherit",
-                            }}
+                            className={styles.questionInput}
                             autoFocus
                           />
                         ) : (
-                          <span
-                            style={{
-                              flex: 1,
-                              wordBreak: "break-word",
-                              whiteSpace: "pre-line",
-                              fontSize: 14,
-                            }}
-                          >
+                          <span className={styles.questionText}>
                             {question.question}
                           </span>
                         )}
 
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                          }}
-                        >
+                        <div className={styles.questionActions}>
                           {isEditing ? (
                             <button
-                              style={{
-                                background: "#fff",
-                                border: "1px solid #E9EAEB",
-                                borderRadius: "60px",
-                                cursor: "pointer",
-                                padding: "8px 16px",
-                                fontSize: 14,
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 6,
-                              }}
+                              className={styles.saveButton}
                               onClick={() => {
                                 editQuestion(
                                   group.id,
@@ -672,17 +522,7 @@ export default function (props) {
                             </button>
                           ) : (
                             <button
-                              style={{
-                                background: "#fff",
-                                border: "1px solid #E9EAEB",
-                                borderRadius: "60px",
-                                cursor: "pointer",
-                                padding: "8px 16px",
-                                fontSize: 14,
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 6,
-                              }}
+                              className={styles.editButton}
                               onClick={() => {
                                 setEditingQuestionId(question.id);
                                 setTempQuestionText(question.question);
@@ -694,27 +534,12 @@ export default function (props) {
                           )}
 
                           <button
-                            style={{
-                              color: "#B42318",
-                              background: "#fff",
-                              border: "1px solid #B42318",
-                              borderRadius: "50%",
-                              width: 32,
-                              height: 32,
-                              cursor: "pointer",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              padding: 0,
-                            }}
+                            className={styles.deleteButton}
                             onClick={() => {
                               deleteQuestion(group.id, question.id);
                             }}
                           >
-                            <i
-                              className="la la-trash"
-                              style={{ fontSize: 18 }}
-                            ></i>
+                            <i className="la la-trash"></i>
                           </button>
                         </div>
                       </div>
@@ -722,45 +547,18 @@ export default function (props) {
                   );
                 })}
                 {/* Buttons to add or generate questions */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div
-                    style={{ display: "flex", gap: 8, alignItems: "center" }}
-                  >
+                <div className={styles.actionBar}>
+                  <div className={styles.actionBarLeft}>
                     <button
-                      style={{
-                        width: "fit-content",
-                        background: "black",
-                        color: "#fff",
-                        border: "1px solid #E9EAEB",
-                        padding: "8px 16px",
-                        borderRadius: "60px",
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                      }}
+                      className={styles.generateButton}
                       onClick={() => {
                         generateQuestions(group.category);
                       }}
                     >
-                      <i className="la la-bolt" style={{ fontSize: 20 }}></i>{" "}
-                      Generate Questions
+                      <i className="la la-bolt"></i> Generate Questions
                     </button>
                     <button
-                      style={{
-                        width: "fit-content",
-                        color: "#414651",
-                        background: "#fff",
-                        border: "1px solid #D5D7DA",
-                        padding: "8px 16px",
-                        borderRadius: "60px",
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                      }}
+                      className={styles.manualAddButton}
                       onClick={() => {
                         // Add a blank question and set it to editing mode
                         const newQuestionId = addQuestion(group.id, "");
@@ -770,28 +568,12 @@ export default function (props) {
                         }
                       }}
                     >
-                      <i
-                        className="la la-plus-circle"
-                        style={{ fontSize: 20 }}
-                      ></i>{" "}
-                      Manually add
+                      <i className="la la-plus-circle"></i> Manually add
                     </button>
                   </div>
                   {group.questions.length > 0 && (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 14,
-                          color: "#6B7280",
-                          fontWeight: 400,
-                        }}
-                      >
+                    <div className={styles.actionBarRight}>
+                      <span className={styles.questionCountLabel}>
                         # of questions to ask
                       </span>
                       <input
@@ -804,18 +586,7 @@ export default function (props) {
                         }
                         max={group.questions.length}
                         min={0}
-                        style={{
-                          width: "50px",
-                          height: "36px",
-                          padding: "8px",
-                          border: "1px solid #E5E7EB",
-                          borderRadius: "6px",
-                          fontSize: 14,
-                          textAlign: "center",
-                          appearance: "textfield",
-                          MozAppearance: "textfield",
-                          WebkitAppearance: "none",
-                        }}
+                        className={styles.questionCountInput}
                         onChange={(e) => {
                           let value = parseInt(e.target.value);
 

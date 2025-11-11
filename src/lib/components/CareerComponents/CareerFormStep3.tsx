@@ -57,141 +57,130 @@ export default function CareerFormStep3({
       {/* Form Content */}
       <div className={styles.formContent}>
         {/* AI Interview Settings Section */}
-        <div className="layered-card-outer">
-          <div className="layered-card-middle">
-            <div className={styles.sectionHeader}>
-              <div className={styles.numberBadge}>
-                <span className={styles.numberBadgeText}>1.</span>
-              </div>
-              <span className={styles.sectionTitle}>
-                AI Interview Settings
-              </span>
-            </div>
+        <div className="layered-card-middle">
+          <div className={styles.sectionHeader}>
+            <h1 className={styles.sectionTitle}>1. AI Interview Settings</h1>
+          </div>
 
-            <div className="layered-card-content">
-              <div className={styles.settingGroup}>
-                <label className={styles.formLabel}>
-                  AI Interview Screening
-                </label>
-                <p className={styles.descriptionText}>
-                  Jia automatically endorses candidates who meet the chosen
-                  criteria.
+          <div className="layered-card-content">
+            <div className={styles.settingGroup}>
+              <label className={styles.formLabel}>
+                AI Interview Screening
+              </label>
+              <p className={styles.descriptionText}>
+                Jia automatically endorses candidates who meet the chosen
+                criteria.
+              </p>
+              <CustomDropdown
+                onSelectSetting={(setting: string) => {
+                  updateFormData({ screeningSetting: setting });
+                }}
+                screeningSetting={
+                  formData.screeningSetting || "Good Fit and above"
+                }
+                settingList={screeningSettingList}
+              />
+            </div>
+            <hr className={styles.divider} />
+            <div className={styles.settingGroup}>
+              <label className={styles.formLabel}>
+                Require Video On Interview
+              </label>
+              <div className={styles.videoToggleWrapper}>
+                <p className={styles.videoToggleDescription}>
+                  When enabled, applicants must complete a video interview as
+                  part of the application process.
                 </p>
-                <CustomDropdown
-                  onSelectSetting={(setting: string) => {
-                    updateFormData({ screeningSetting: setting });
-                  }}
-                  screeningSetting={
-                    formData.screeningSetting || "Good Fit and above"
-                  }
-                  settingList={screeningSettingList}
-                />
-              </div>
-              <hr className={styles.divider} />
-              <div className={styles.settingGroup}>
-                <label className={styles.formLabel}>
-                  Require Video On Interview
-                </label>
-                <div className={styles.videoToggleWrapper}>
-                  <p className={styles.videoToggleDescription}>
-                    When enabled, applicants must complete a video interview as
-                    part of the application process.
-                  </p>
-                  <div className={styles.toggleControls}>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={formData.requireVideo !== false}
-                        onChange={() =>
-                          updateFormData({
-                            requireVideo: !formData.requireVideo,
-                          })
-                        }
-                      />
-                      <span className="slider round"></span>
-                    </label>
-                    <span className={styles.toggleLabel}>
-                      {formData.requireVideo !== false ? "Yes" : "No"}
-                    </span>
-                  </div>
+                <div className={styles.toggleControls}>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={formData.requireVideo !== false}
+                      onChange={() =>
+                        updateFormData({
+                          requireVideo: !formData.requireVideo,
+                        })
+                      }
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                  <span className={styles.toggleLabel}>
+                    {formData.requireVideo !== false ? "Yes" : "No"}
+                  </span>
                 </div>
               </div>
-              <hr className={styles.divider} />
-              <div>
-                <label className={styles.formLabelFlex}>
-                  <img
-                    src="/career-form/sparkles.svg"
-                    alt="AI Interview Secret Prompt Icon"
-                  />
-                  AI Interview Secret Prompt (optional)
-                  <img
-                    src="/career-form/help-circle.svg"
-                    alt="Help Tooltip"
-                    data-tooltip-id="ai-secret-prompt-tooltip"
-                    data-tooltip-html="These prompts remain hidden from candidates and the public job portal. Additionally, only Admins and the Job Owner can view the secret prompt."
-                    className={styles.helpIconCursor}
-                  />
-                </label>
-                <p className={styles.descriptionText}>
-                  Secret Prompts give you extra control over Jia's evaluation
-                  style, complementing her accurate assessment of requirements
-                  from the job description.
-                </p>
-                <textarea
-                  className={styles.textarea}
-                  placeholder="Enter a secret prompt (e.g. Give higher fit scores to candidates who participate in hackathons or competitions.)"
-                  value={formData.aiInterviewSecretPrompt || ""}
-                  onChange={(e) =>
-                    updateFormData({ aiInterviewSecretPrompt: e.target.value })
-                  }
+            </div>
+            <hr className={styles.divider} />
+            <div>
+              <label className={styles.formLabelFlex}>
+                <img
+                  src="/career-form/sparkles.svg"
+                  alt="AI Interview Secret Prompt Icon"
                 />
-              </div>
+                AI Interview Secret Prompt (optional)
+                <img
+                  src="/career-form/help-circle.svg"
+                  alt="Help Tooltip"
+                  data-tooltip-id="ai-secret-prompt-tooltip"
+                  data-tooltip-html="These prompts remain hidden from candidates and the public job portal. Additionally, only Admins and the Job Owner can view the secret prompt."
+                  className={styles.helpIconCursor}
+                />
+              </label>
+              <p className={styles.descriptionText}>
+                Secret Prompts give you extra control over Jia's evaluation
+                style, complementing her accurate assessment of requirements
+                from the job description.
+              </p>
+              <textarea
+                className={styles.textarea}
+                placeholder="Enter a secret prompt (e.g. Treat candidates who speak in Taglish, English, or Tagalog equally. Focus on clarity, coherence, and confidence rather than language preference or accent.)"
+                value={formData.aiInterviewSecretPrompt || ""}
+                onChange={(e) =>
+                  updateFormData({ aiInterviewSecretPrompt: e.target.value })
+                }
+              />
             </div>
           </div>
         </div>
 
         {/* AI Interview Questions Section */}
-        <div className={`layered-card-outer ${styles.questionsCard}`}>
-          <div className="layered-card-middle">
-            <InterviewQuestionGeneratorV2
-              questions={formData.questions || []}
-              setQuestions={(questions: any) => updateFormData({ questions })}
-              jobTitle={formData.jobTitle || ""}
-              description={formData.description || ""}
-              hideHeader={false}
-              showHeaderControls={true}
-              showValidation={showValidation}
-            />
-          </div>
+        <div className="layered-card-middle">
+          <InterviewQuestionGeneratorV2
+            questions={formData.questions || []}
+            setQuestions={(questions: any) => updateFormData({ questions })}
+            jobTitle={formData.jobTitle || ""}
+            description={formData.description || ""}
+            hideHeader={false}
+            showHeaderControls={true}
+            showValidation={showValidation}
+          />
         </div>
       </div>
 
       {/* Tips Section */}
       <div className={styles.tipsSidebar}>
-        <div className="layered-card-outer">
-          <div className="layered-card-middle">
-            <div className={styles.tipsHeader}>
-              <img src="/career-form/tips.svg" alt="Tips Icon" />
-              <h3 className={styles.tipsHeaderTitle}>Tips</h3>
-            </div>
+        <div className="layered-card-middle">
+          <div className={styles.tipsHeader}>
+            <img src="/career-form/tips.svg" alt="Tips Icon" />
+            <h3 className={styles.tipsTitle}>Tips</h3>
+          </div>
 
-            <div className="layered-card-content">
-              <div className={styles.tipsContainer}>
-                <p className={styles.tipsParagraph}>
-                  <strong className={styles.tipsStrong}>
-                    Add a Secret Prompt
-                  </strong>{" "}
-                  to fine-tune how Jia scores and evaluates the interview
-                  responses.
-                </p>
-                <p className={styles.tipsParagraph}>
-                  <strong className={styles.tipsStrong}>
-                    Use "Generate Questions"
-                  </strong>{" "}
-                  to quickly create tailored interview questions, then refine or
-                  mix them with your own for balanced results.
-                </p>
-              </div>
+          <div className="layered-card-content">
+            <div className={styles.tipsContainer}>
+              <p className={styles.tipsParagraph}>
+                <strong className={styles.tipsStrong}>
+                  Add a Secret Prompt
+                </strong>{" "}
+                to fine-tune how Jia scores and evaluates the interview
+                responses.
+              </p>
+              <p className={styles.tipsParagraph}>
+                <strong className={styles.tipsStrong}>
+                  Use "Generate Questions"
+                </strong>{" "}
+                to quickly create tailored interview questions, then refine or
+                mix them with your own for balanced results.
+              </p>
             </div>
           </div>
         </div>

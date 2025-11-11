@@ -34,19 +34,28 @@ export default function CareerFormStep1({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Currency configuration
+  const currencyConfig = {
+    PHP: { symbol: "₱", code: "PHP" },
+    USD: { symbol: "$", code: "USD" },
+  };
+  const currentCurrency = currencyConfig[formData.currency as keyof typeof currencyConfig] || currencyConfig.PHP;
+
   useEffect(() => {
     const parseProvinces = () => {
       setProvinceList(philippineCitiesAndProvinces.provinces);
-      const defaultProvince = philippineCitiesAndProvinces.provinces[0];
-      if (!formData.province) {
-        updateFormData({ province: defaultProvince.name });
-      }
-      const cities = philippineCitiesAndProvinces.cities.filter(
-        (city: any) => city.province === defaultProvince.key
-      );
-      setCityList(cities);
-      if (!formData.city) {
-        updateFormData({ city: cities[0].name });
+
+      // Only set city list if province is already selected
+      if (formData.province) {
+        const provinceObj = philippineCitiesAndProvinces.provinces.find(
+          (p: any) => p.name === formData.province
+        );
+        if (provinceObj) {
+          const cities = philippineCitiesAndProvinces.cities.filter(
+            (city: any) => city.province === provinceObj.key
+          );
+          setCityList(cities);
+        }
       }
     };
     parseProvinces();
@@ -121,6 +130,12 @@ export default function CareerFormStep1({
         }
         return "";
       case "minimumSalary":
+        if (!value || value.toString().trim().length === 0) {
+          return "Minimum salary is required";
+        }
+        if (Number(value) <= 0) {
+          return "Minimum salary must be greater than 0";
+        }
         if (
           formData.minimumSalary &&
           formData.maximumSalary &&
@@ -130,6 +145,12 @@ export default function CareerFormStep1({
         }
         return "";
       case "maximumSalary":
+        if (!value || value.toString().trim().length === 0) {
+          return "Maximum salary is required";
+        }
+        if (Number(value) <= 0) {
+          return "Maximum salary must be greater than 0";
+        }
         if (
           formData.minimumSalary &&
           formData.maximumSalary &&
@@ -176,11 +197,11 @@ export default function CareerFormStep1({
       formData.country?.trim().length > 0 &&
       formData.province?.trim().length > 0 &&
       formData.city?.trim().length > 0 &&
-      !(
-        formData.minimumSalary &&
-        formData.maximumSalary &&
-        Number(formData.minimumSalary) > Number(formData.maximumSalary)
-      )
+      formData.minimumSalary &&
+      Number(formData.minimumSalary) > 0 &&
+      formData.maximumSalary &&
+      Number(formData.maximumSalary) > 0 &&
+      Number(formData.minimumSalary) <= Number(formData.maximumSalary)
     );
   };
 
@@ -188,136 +209,89 @@ export default function CareerFormStep1({
     <div className={styles.container}>
       {/* Form Content */}
       <div className={styles.formContent}>
-        <div className="layered-card-outer">
-          <div className="layered-card-middle">
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionBadge}>
-                <span className={styles.sectionBadgeText}>1.</span>
+        {/* 1. Career Information */}
+        <div className="layered-card-middle">
+          {/* Title */}
+          <div className={styles.sectionHeader}>
+            <h1 className={styles.sectionTitle}>1. Career Information</h1>
+          </div>
+
+          <div className="layered-card-content">
+            {/* Content */}
+            <div className={styles.fieldWrapper}>
+              {/* Basic Information */}
+              <h2 className={styles.inputTitle}>Basic Information</h2>
+              <label className={styles.label}>Job Title</label>
+              <div className={styles.inputWrapper}>
+                <input
+                  value={formData.jobTitle || ""}
+                  className={`form-control ${errors.jobTitle ? styles.inputError : styles.noJobTitleError}`}
+                  placeholder="Enter job title"
+                  onChange={(e) => {
+                    updateFormData({ jobTitle: e.target.value || "" });
+                  }}
+                />
+                {errors.jobTitle && (
+                  <i className={`la la-exclamation-circle ${styles.warningIcon}`}></i>
+                )}
               </div>
-              <span className={styles.sectionTitle}>Career Information</span>
+              {errors.jobTitle && (
+                <p className={styles.errorText}>
+                  {errors.jobTitle}
+                </p>
+              )}
             </div>
 
-            <div className="layered-card-content">
-              <div className={styles.fieldWrapper}>
-                <label className={styles.label}>Job Title</label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    value={formData.jobTitle || ""}
-                    className={`form-control ${errors.jobTitle ? styles.inputError : ''}`}
-                    placeholder="Enter job title"
-                    onChange={(e) => {
-                      updateFormData({ jobTitle: e.target.value || "" });
+            {/* Work Setting */}
+            <div className={styles.fieldWrapper}>
+              <h2 className={styles.inputTitle}>Work Setting</h2>
+              <div className={styles.gridTwoColumn}>
+                <div>
+                  <label className={styles.label}>
+                    Employment Type
+                  </label>
+                  <CustomDropdown
+                    onSelectSetting={(employmentType: string) => {
+                      updateFormData({ employmentType });
                     }}
+                    screeningSetting={formData.employmentType || ""}
+                    settingList={employmentTypeOptions}
+                    placeholder="Choose employment type"
+                    hasError={!!errors.employmentType}
                   />
-                  {errors.jobTitle && (
-                    <img
-                      src="/career-form/warning-step-icon.svg"
-                      alt="Warning"
-                      className={styles.warningIcon}
-                    />
+                  {errors.employmentType && (
+                    <p className={styles.errorText}>
+                      {errors.employmentType}
+                    </p>
                   )}
                 </div>
-                {errors.jobTitle && (
-                  <p className={styles.errorText}>
-                    {errors.jobTitle}
-                  </p>
-                )}
-              </div>
-
-              <div className={styles.fieldWrapper}>
-                <label className={styles.label}>
-                  Description
-                </label>
-                <div className={errors.description ? styles.editorError : ''}>
-                  <RichTextEditor
-                    setText={(text: string) =>
-                      updateFormData({ description: text })
-                    }
-                    text={formData.description || ""}
+                <div>
+                  <label className={styles.label}>
+                    Arrangement
+                  </label>
+                  <CustomDropdown
+                    onSelectSetting={(setting: string) => {
+                      updateFormData({ workSetup: setting });
+                    }}
+                    screeningSetting={formData.workSetup || ""}
+                    settingList={workSetupOptions}
+                    placeholder="Choose work arrangement"
+                    hasError={!!errors.workSetup}
                   />
+                  {errors.workSetup && (
+                    <p className={styles.errorText}>
+                      {errors.workSetup}
+                    </p>
+                  )}
                 </div>
-                {errors.description && (
-                  <p className={styles.errorText}>
-                    {errors.description}
-                  </p>
-                )}
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className={`layered-card-outer ${styles.cardSpacing}`}>
-          <div className="layered-card-middle">
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionBadge}>
-                <span className={styles.sectionBadgeText}>
-                  2
-                </span>
-              </div>
-              <span className={styles.sectionTitle}>
-                Work Setting
-              </span>
-            </div>
-
-            <div className="layered-card-content">
-              <div className={styles.fieldWrapper}>
-                <label className={styles.label}>
-                  Employment Type
-                </label>
-                <CustomDropdown
-                  onSelectSetting={(employmentType: string) => {
-                    updateFormData({ employmentType });
-                  }}
-                  screeningSetting={formData.employmentType || ""}
-                  settingList={employmentTypeOptions}
-                  placeholder="Choose employment type"
-                  hasError={!!errors.employmentType}
-                />
-                {errors.employmentType && (
-                  <p className={styles.errorText}>
-                    {errors.employmentType}
-                  </p>
-                )}
-              </div>
-
-              <div className={styles.fieldWrapper}>
-                <label className={styles.label}>
-                  Arrangement
-                </label>
-                <CustomDropdown
-                  onSelectSetting={(setting: string) => {
-                    updateFormData({ workSetup: setting });
-                  }}
-                  screeningSetting={formData.workSetup || ""}
-                  settingList={workSetupOptions}
-                  placeholder="Choose work arrangement"
-                  hasError={!!errors.workSetup}
-                />
-                {errors.workSetup && (
-                  <p className={styles.errorText}>
-                    {errors.workSetup}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={`layered-card-outer ${styles.cardSpacing}`}>
-          <div className="layered-card-middle">
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionBadge}>
-                <span className={styles.sectionBadgeText}>
-                  3
-                </span>
-              </div>
-              <span className={styles.sectionTitle}>
-                Location
-              </span>
-            </div>
-
-            <div className="layered-card-content">
-              <div className={styles.gridThreeColumn}>
+            {/* Location */}
+            <div className={styles.fieldWrapper}>
+              <h2 className={styles.inputTitle}>Location</h2>
+              <div className={styles.locationGrid}>
+                {/* Country */}
                 <div>
                   <label className={styles.label}>
                     Country
@@ -332,6 +306,7 @@ export default function CareerFormStep1({
                   />
                 </div>
 
+                {/* State / Province */}
                 <div>
                   <label className={styles.label}>
                     State / Province
@@ -360,6 +335,7 @@ export default function CareerFormStep1({
                   )}
                 </div>
 
+                {/* City */}
                 <div>
                   <label className={styles.label}>
                     City
@@ -381,48 +357,41 @@ export default function CareerFormStep1({
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className={`layered-card-outer ${styles.cardSpacing}`}>
-          <div className="layered-card-middle">
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionBadge}>
-                <span className={styles.sectionBadgeText}>
-                  4
-                </span>
+            {/* Salary */}
+            <div className="fieldWrapper">
+              {/* Header */}
+              <div className={styles.salaryHeader}>
+                <h2 className={styles.inputTitle}>Salary</h2>
+                <div className={styles.toggleContainer}>
+                  <label className="switch" style={{ margin: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.salaryNegotiable !== false}
+                      onChange={() =>
+                        updateFormData({
+                          salaryNegotiable: !formData.salaryNegotiable,
+                        })
+                      }
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                  <span className={styles.toggleLabel}>
+                    {formData.salaryNegotiable !== false ? "Negotiable" : "Fixed"}
+                  </span>
+                </div>
               </div>
-              <span className={styles.sectionTitle}>
-                Salary
-              </span>
-              <div className={styles.toggleContainer}>
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={formData.salaryNegotiable !== false}
-                    onChange={() =>
-                      updateFormData({
-                        salaryNegotiable: !formData.salaryNegotiable,
-                      })
-                    }
-                  />
-                  <span className="slider round"></span>
-                </label>
-                <span className={styles.toggleLabel}>
-                  {formData.salaryNegotiable !== false ? "Negotiable" : "Fixed"}
-                </span>
-              </div>
-            </div>
 
-            <div className="layered-card-content">
+              {/* Inputs */}
               <div className={styles.gridTwoColumn}>
+                {/* Minimum Salary */}
                 <div>
                   <label className={styles.label}>
                     Minimum Salary
                   </label>
                   <div className={styles.inputWrapper}>
                     <span className={styles.currencySymbol}>
-                      ₱
+                      {currentCurrency.symbol}
                     </span>
                     <input
                       type="number"
@@ -433,17 +402,24 @@ export default function CareerFormStep1({
                       onChange={(e) => {
                         updateFormData({ minimumSalary: e.target.value || "" });
                       }}
+                      onBlur={() => {
+                        setTouched((prev) => ({ ...prev, minimumSalary: true }));
+                      }}
                     />
                     {errors.minimumSalary && (
-                      <img
-                        src="/career-form/warning-step-icon.svg"
-                        alt="Warning"
-                        className={styles.warningIconSalary}
-                      />
+                      <i className={`la la-exclamation-circle ${styles.warningIconSalary}`}></i>
                     )}
-                    <span className={styles.currencyCode}>
-                      PHP
-                    </span>
+                    <button
+                      type="button"
+                      className={styles.currencyToggle}
+                      onClick={() => {
+                        const newCurrency = formData.currency === "USD" ? "PHP" : "USD";
+                        updateFormData({ currency: newCurrency });
+                      }}
+                    >
+                      <span>{currentCurrency.code}</span>
+                      <i className="la la-angle-down"></i>
+                    </button>
                   </div>
                   {errors.minimumSalary && (
                     <p className={styles.errorText}>
@@ -452,13 +428,14 @@ export default function CareerFormStep1({
                   )}
                 </div>
 
+                {/* Maximum Salary */}
                 <div>
                   <label className={styles.label}>
                     Maximum Salary
                   </label>
                   <div className={styles.inputWrapper}>
                     <span className={styles.currencySymbol}>
-                      ₱
+                      {currentCurrency.symbol}
                     </span>
                     <input
                       type="number"
@@ -469,17 +446,24 @@ export default function CareerFormStep1({
                       onChange={(e) => {
                         updateFormData({ maximumSalary: e.target.value || "" });
                       }}
+                      onBlur={() => {
+                        setTouched((prev) => ({ ...prev, maximumSalary: true }));
+                      }}
                     />
                     {errors.maximumSalary && (
-                      <img
-                        src="/career-form/warning-step-icon.svg"
-                        alt="Warning"
-                        className={styles.warningIconSalary}
-                      />
+                      <i className={`la la-exclamation-circle ${styles.warningIconSalary}`}></i>
                     )}
-                    <span className={styles.currencyCode}>
-                      PHP
-                    </span>
+                    <button
+                      type="button"
+                      className={styles.currencyToggle}
+                      onClick={() => {
+                        const newCurrency = formData.currency === "USD" ? "PHP" : "USD";
+                        updateFormData({ currency: newCurrency });
+                      }}
+                    >
+                      <span>{currentCurrency.code}</span>
+                      <i className="la la-angle-down"></i>
+                    </button>
                   </div>
                   {errors.maximumSalary && (
                     <p className={styles.errorText}>
@@ -492,27 +476,56 @@ export default function CareerFormStep1({
           </div>
         </div>
 
-        <div className={`layered-card-outer ${styles.cardSpacing}`}>
-          <div className="layered-card-middle">
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionBadge}>
-                <span className={styles.sectionBadgeText}>
-                  5
-                </span>
-              </div>
-              <span className={styles.sectionTitle}>
-                Team Access
-              </span>
-            </div>
+        {/* 2. Job Description */}
+        <div className="layered-card-middle">
+          {/* Title */}
+          <div className={styles.sectionHeader}>
+            <h1 className={styles.sectionTitle}>2. Job Description</h1>
+          </div>
 
-            <div className="layered-card-content">
-              <div className={styles.fieldWrapper}>
-                <label className={styles.label}>
-                  Add more members
-                </label>
-                <p className={styles.description}>
-                  You can add other members to collaborate on this career.
+          {/* Content */}
+          <div className="layered-card-content">
+            <div className={styles.fieldWrapper}>
+              <label className={styles.label}>
+                Description
+              </label>
+              <div className={`${styles.descEditor} ${errors.description ? styles.editorError : ''}`}>
+                <RichTextEditor
+                  setText={(text: string) =>
+                    updateFormData({ description: text })
+                  }
+                  text={formData.description || ""}
+                />
+              </div>
+              {errors.description && (
+                <p className={styles.errorText}>
+                  {errors.description}
                 </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Team Access */}
+        <div className="layered-card-middle">
+          {/* Title */}
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>
+              3. Team Access
+            </h2>
+          </div>
+
+          {/* Content */}
+          <div className="layered-card-content">
+            <div className={styles.teamAccessContainer}>
+              {/* Add Members Section */}
+              <div className={styles.addMembersSection}>
+                <div className={styles.addMembersHeader}>
+                  <h3 className={styles.addMembersTitle}>Add more members</h3>
+                  <p className={styles.addMembersDescription}>
+                    You can add other members to collaborate on this career.
+                  </p>
+                </div>
                 <CustomDropdown
                   onSelectSetting={(member: string) => {
                     // This would require integrating with members API
@@ -524,28 +537,59 @@ export default function CareerFormStep1({
                 />
               </div>
 
-              <div className={styles.memberCard}>
-                <img
-                  src={user?.image}
-                  alt={user?.name}
-                  className={styles.memberAvatar}
-                />
-                <div className={styles.memberInfo}>
-                  <p className={styles.memberName}>
-                    {user?.name} (You)
-                  </p>
-                  <p className={styles.memberEmail}>
-                    {user?.email}
-                  </p>
-                </div>
-                <div className={styles.roleBadge}>
-                  Job Owner
+              {/* Members List */}
+              <div className={styles.membersList}>
+                <div className={styles.memberRow}>
+                  <div className={styles.memberDetails}>
+                    <img
+                      src={user?.image}
+                      alt={user?.name}
+                      className={styles.memberAvatar}
+                    />
+                    <div className={styles.memberInfo}>
+                      <p className={styles.memberName}>
+                        {user?.name} <span className={styles.youBadge}>(You)</span>
+                      </p>
+                      <p className={styles.memberEmail}>
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={styles.memberActions}>
+                    <div className={styles.roleSelector}>
+                      <CustomDropdown
+                        onSelectSetting={(role: string) => {
+                          // Handle role change
+                          console.log("Role changed to:", role);
+                        }}
+                        screeningSetting="Job Owner"
+                        settingList={[
+                          {
+                            name: "Job Owner",
+                            description: "Leads the hiring process for assigned jobs. Has access with all career settings."
+                          },
+                          {
+                            name: "Contributor",
+                            description: "Helps evaluate candidates and assist with hiring tasks. Can move candidates throughout the pipeline, but cannot change any career settings."
+                          },
+                          {
+                            name: "Reviewer",
+                            description: "Reviews candidates and provides feedback. Can only view candidate profiles and comment."
+                          }
+                        ]}
+                        placeholder="Select role"
+                      />
+                    </div>
+                    <button type="button" className={styles.deleteButton}>
+                      <i className="la la-trash"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
 
+              {/* Disclaimer */}
               <p className={styles.disclaimer}>
-                *Admins can view all careers regardless of specific access
-                settings.
+                *Admins can view all careers regardless of specific access settings.
               </p>
             </div>
           </div>
@@ -554,39 +598,37 @@ export default function CareerFormStep1({
 
       {/* Tips Section */}
       <div className={styles.sidebarTips}>
-        <div className="layered-card-outer">
-          <div className="layered-card-middle">
-            <div className={styles.tipsHeader}>
-              <img src="/career-form/tips.svg" alt="Tips Icon" />
-              <h3 className={styles.tipsTitle}>
-                Tips
-              </h3>
-            </div>
+        <div className="layered-card-middle">
+          <div className={styles.tipsHeader}>
+            <img src="/career-form/tips.svg" alt="Tips Icon" />
+            <h3 className={styles.tipsTitle}>
+              Tips
+            </h3>
+          </div>
 
-            <div className="layered-card-content">
-              <div className={styles.tipsContent}>
-                <p className={styles.tipsParagraph}>
-                  <strong className={styles.tipsStrong}>
-                    Use clear, standard job titles
-                  </strong>{" "}
-                  for better searchability (e.g., "Software Engineer",
-                  "Marketing Manager" instead of "Tech Rockstar").
-                </p>
-                <p className={styles.tipsParagraph}>
-                  <strong className={styles.tipsStrong}>
-                    Avoid abbreviations
-                  </strong>{" "}
-                  of your role unless it's standard "aka" form (e.g., use
-                  "Quality Assurance" instead of "QA IT" or "QA LT").
-                </p>
-                <p className={styles.tipsParagraph}>
-                  <strong className={styles.tipsStrong}>
-                    Keep job titles concise
-                  </strong>{" "}
-                  - try to use no more than a few words (2-4 max), avoiding
-                  fluff or marketing terms.
-                </p>
-              </div>
+          <div className="layered-card-content">
+            <div className={styles.tipsContent}>
+              <p className={styles.tipsParagraph}>
+                <strong className={styles.tipsStrong}>
+                  Use clear, standard job titles
+                </strong>{" "}
+                for better searchability (e.g., "Software Engineer",
+                "Marketing Manager" instead of "Tech Rockstar").
+              </p>
+              <p className={styles.tipsParagraph}>
+                <strong className={styles.tipsStrong}>
+                  Avoid abbreviations
+                </strong>{" "}
+                of your role unless it's standard "aka" form (e.g., use
+                "Quality Assurance" instead of "QA IT" or "QA LT").
+              </p>
+              <p className={styles.tipsParagraph}>
+                <strong className={styles.tipsStrong}>
+                  Keep job titles concise
+                </strong>{" "}
+                - try to use no more than a few words (2-4 max), avoiding
+                fluff or marketing terms.
+              </p>
             </div>
           </div>
         </div>

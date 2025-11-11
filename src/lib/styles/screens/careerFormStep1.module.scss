@@ -11,6 +11,10 @@
 
 .formContent {
   flex: 1;
+
+  > *:not(:first-child) {
+    margin-top: 16px; 
+  }
 }
 
 .sidebarTips {
@@ -20,34 +24,15 @@
 
 // Section Headers
 .sectionHeader {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
   margin-left: 8px;
-  padding: 4px;
-}
-
-.sectionBadge {
-  width: 32px;
-  height: 32px;
-  background-color: $color-primary-dark;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sectionBadgeText {
-  color: $color-white;
-  font-size: 18px;
-  font-weight: 600;
+  padding: 8px;
 }
 
 .sectionTitle {
-  font-size: 16px;
-  color: $color-primary-dark;
+  font-size: 18px;
+  color: variables.$color-primary-dark;
   font-weight: 700;
+  margin: 0
 }
 
 .cardSpacing {
@@ -59,25 +44,74 @@
   margin-bottom: 16px;
 }
 
-.label {
+.inputTitle {
+  color: variables.$color-text-primary;
+  font-size: 16px;
   font-weight: 500;
+}
+
+.label {
+  color: variables.$color-text-secondary;
   margin-bottom: 8px;
   display: block;
 }
 
 .inputWrapper {
   position: relative;
+
+  input {
+    box-shadow: variables.$shadow-xs;
+
+    // Remove number input arrows/spinners
+    &[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+  }
 }
 
 .inputError {
-  border-color: $color-error !important;
+  border-color: variables.$color-border-destructive !important;
   border-width: 2px !important;
   padding-right: 40px !important;
 }
 
-.editorError {
-  outline: 2px solid $color-error;
+.noJobTitleError {
+  border: 1px solid variables.$color-border-primary !important;
+}
+
+.descEditor {
+  border: 1px solid variables.$color-border-light;
   border-radius: 8px;
+  box-shadow: variables.$shadow-xs;
+
+  > *:first-child {
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid variables.$color-border-light !important;
+    border-top-left-radius: 10px !important; 
+    border-top-right-radius: 10px !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  
+  > *:not(:first-child) {
+    border: unset !important;
+    border-radius: 0 !important;
+    border-bottom-left-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+  }
+}
+
+.editorError {
+  border: 2px solid variables.$color-border-destructive;
 }
 
 // Grid Layouts
@@ -93,6 +127,18 @@
   gap: 16px;
 }
 
+.locationGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  gap: 16px;
+}
+
+.salaryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 // Currency Input Styles
 .currencySymbol {
   position: absolute;
@@ -104,22 +150,41 @@
   pointer-events: none;
 }
 
-.currencyCode {
+.currencyToggle {
   position: absolute;
-  right: 30px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6c757d;
-  font-size: 16px;
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: variables.$color-text-tertiary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: variables.$color-bg-light;
+  }
+
+  i {
+    font-size: 12px;
+  }
 }
 
 .salaryInput {
-  padding-left: 28px;
+  border: 1px solid variables.$color-border-primary !important;
+  padding-left: 28px !important;
+  padding-right: 70px !important;
 }
 
 .salaryInputError {
-  border-color: $color-error !important;
+  border-color: variables.$color-border-destructive !important;
   border-width: 2px !important;
   padding-right: 100px !important;
 }
@@ -135,6 +200,8 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  color: variables.$color-error;
+  font-size: 20px;
 }
 
 .warningIconSalary {
@@ -143,20 +210,39 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  color: variables.$color-error;
+  font-size: 20px;
 }
 
 // Error Messages
 .errorText {
-  color: $color-error;
+  color: variables.$color-error;
   font-size: 14px;
   margin-top: 6px;
   margin-bottom: 0;
 }
 
+.membersMessageText {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 12px;
+  padding: 0 12px;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
 // Toggle Section
 .toggleContainer {
-  margin-left: auto;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 8px;
 }
@@ -164,21 +250,57 @@
 .toggleLabel {
   font-size: 14px;
   font-weight: 500;
+  color: variables.$color-text-secondary
 }
 
 // Team Access Section
-.description {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 12px;
+.teamAccessContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.memberCard {
+.addMembersSection {
+  display: grid;
+  grid-template-columns: 1fr 0.75fr;
+  gap: 16px;
+}
+
+.addMembersHeader {
+  flex: 1;
+}
+
+.addMembersTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: variables.$color-text-primary;
+  margin: 0 0 4px 0;
+}
+
+.addMembersDescription {
+  font-size: 12px;
+  color: variables.$color-text-tertiary;
+  margin: 0;
+}
+
+.membersList {
+  border-top: 1px solid variables.$color-border-primary;
+  display: flex;
+  flex-direction: column;
+}
+
+.memberRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 12px;
+  padding: 0 12px;
+  background: variables.$color-white;
+}
+
+.memberDetails {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  border-radius: 8px;
 }
 
 .memberAvatar {
@@ -186,38 +308,75 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .memberInfo {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .memberName {
   margin: 0;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14px;
+  color: variables.$color-text-primary;
+}
+
+.youBadge {
+  font-weight: 400;
+  color: variables.$color-text-tertiary;
 }
 
 .memberEmail {
   margin: 0;
   font-size: 12px;
-  color: #6b7280;
+  color: variables.$color-text-tertiary;
 }
 
-.roleBadge {
-  padding: 4px 12px;
-  background-color: $color-white;
-  border: 1px solid $color-border-dark;
+.memberActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.roleSelector {
+  flex: 1;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid variables.$color-border-primary;
   border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  background: variables.$color-white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 18px;
+    color: variables.$color-text-tertiary;
+  }
+
+  &:hover {
+    background: variables.$color-bg-light;
+    border-color: variables.$color-border-dark;
+
+    i {
+      color: variables.$color-error;
+    }
+  }
 }
 
 .disclaimer {
   font-size: 12px;
-  color: #9ca3af;
-  margin-top: 12px;
-  margin-bottom: 0;
+  color: variables.$color-text-tertiary;
+  margin: 0;
 }
 
 // Tips Section
@@ -226,25 +385,25 @@
   align-items: center;
   gap: 8px;
   margin-left: 8px;
-  padding: 4px;
+  padding: 8px;
 }
 
 .tipsTitle {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: $color-primary-dark;
+  font-size: 18px;
+  font-weight: 700;
+  color: variables.$color-primary-dark;
 }
 
 .tipsContent {
   font-size: 14px;
   line-height: 1.6;
-  color: $color-text-tips;
 }
 
 .tipsParagraph {
   font-weight: 410;
   margin-bottom: 12px;
+  color: variables.$color-text-tertiary;
 
   &:last-child {
     margin-bottom: 0;
@@ -252,6 +411,6 @@
 }
 
 .tipsStrong {
-  color: $color-primary-dark;
+  color: variables.$color-primary-dark;
   font-weight: 550;
 }
