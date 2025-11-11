@@ -1,11 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import RichTextEditor from "@/lib/components/CareerComponents/RichTextEditor";
 import CustomDropdown from "@/lib/components/CareerComponents/CustomDropdown";
 import philippineCitiesAndProvinces from "@/../public/philippines-locations.json";
 import { useAppContext } from "@/lib/context/AppContext";
 import styles from "@/lib/styles/screens/careerFormStep1.module.scss";
+
+// Member interface based on schema
+interface Member {
+  _id?: string;
+  name: string;
+  email: string;
+  image: string;
+  orgID?: string;
+  role: "Job Owner" | "Contributor" | "Reviewer";
+  careers?: string[];
+  addedAt?: Date;
+  lastLogin?: Date | null;
+  status?: string;
+}
 
 const employmentTypeOptions = [{ name: "Full-Time" }, { name: "Part-Time" }];
 
@@ -28,11 +43,14 @@ export default function CareerFormStep1({
   onValidationChange,
   triggerValidation,
 }: CareerFormStep1Props) {
-  const { user } = useAppContext();
+  const { user, orgID } = useAppContext();
   const [provinceList, setProvinceList] = useState([]);
   const [cityList, setCityList] = useState([]);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [teamAccess, setTeamAccess] = useState<Member[]>([]);
+  const [orgMembers, setOrgMembers] = useState<Member[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
 
   // Currency configuration
   const currencyConfig = {
@@ -40,6 +58,51 @@ export default function CareerFormStep1({
     USD: { symbol: "$", code: "USD" },
   };
   const currentCurrency = currencyConfig[formData.currency as keyof typeof currencyConfig] || currencyConfig.PHP;
+
+  // Initialize team access with current user or from formData
+  useEffect(() => {
+    if (formData.teamAccess && formData.teamAccess.length > 0) {
+      // Load existing team access from formData
+      setTeamAccess(formData.teamAccess);
+    } else if (user && teamAccess.length === 0) {
+      // Initialize with current user as Job Owner
+      const initialMember: Member = {
+        name: user.name || "",
+        email: user.email || "",
+        image: user.image || "",
+        role: "Job Owner",
+      };
+      setTeamAccess([initialMember]);
+    }
+  }, [user, formData.teamAccess]);
+
+  // Sync teamAccess with parent formData
+  useEffect(() => {
+    if (teamAccess.length > 0) {
+      updateFormData({ teamAccess });
+    }
+  }, [teamAccess, updateFormData]);
+
+  // Fetch organization members
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (!orgID) return;
+
+      setLoadingMembers(true);
+      try {
+        const response = await axios.post("/api/fetch-members", {
+          orgID: orgID,
+        });
+        setOrgMembers(response.data);
+      } catch (error) {
+        console.error("Failed to fetch members:", error);
+      } finally {
+        setLoadingMembers(false);
+      }
+    };
+
+    fetchMembers();
+  }, [orgID]);
 
   useEffect(() => {
     const parseProvinces = () => {
@@ -91,6 +154,42 @@ export default function CareerFormStep1({
       }
     }
   }, [formData, touched]);
+
+  // Member management functions
+  const addMember = (memberEmail: string) => {
+    const member = orgMembers.find((m) => m.email === memberEmail);
+    if (!member) return;
+
+    // Check if member is already added
+    if (teamAccess.some((m) => m.email === memberEmail)) {
+      return;
+    }
+
+    const newMember: Member = {
+      ...member,
+      role: "Contributor", // Default role for new members
+    };
+
+    setTeamAccess([...teamAccess, newMember]);
+  };
+
+  const removeMember = (email: string) => {
+    // Prevent removing if only one member left
+    if (teamAccess.length <= 1) return;
+
+    setTeamAccess(teamAccess.filter((m) => m.email !== email));
+  };
+
+  const updateMemberRole = (email: string, role: Member["role"]) => {
+    setTeamAccess(
+      teamAccess.map((m) => (m.email === email ? { ...m, role } : m))
+    );
+  };
+
+  // Check if at least one Job Owner exists
+  const hasJobOwner = () => {
+    return teamAccess.some((m) => m.role === "Job Owner");
+  };
 
   const validateField = (fieldName: string, value: any): string => {
     switch (fieldName) {
@@ -185,6 +284,11 @@ export default function CareerFormStep1({
       }
     });
 
+    // At least one Job Owner required
+    if (!hasJobOwner() && touched.teamAccess) {
+      newErrors.teamAccess = "At least one member must have the Job Owner role";
+    }
+
     setErrors(newErrors);
   };
 
@@ -201,7 +305,9 @@ export default function CareerFormStep1({
       Number(formData.minimumSalary) > 0 &&
       formData.maximumSalary &&
       Number(formData.maximumSalary) > 0 &&
-      Number(formData.minimumSalary) <= Number(formData.maximumSalary)
+      Number(formData.minimumSalary) <= Number(formData.maximumSalary) &&
+      teamAccess.length >= 1 &&
+      hasJobOwner()
     );
   };
 
@@ -527,64 +633,96 @@ export default function CareerFormStep1({
                   </p>
                 </div>
                 <CustomDropdown
-                  onSelectSetting={(member: string) => {
-                    // This would require integrating with members API
-                    console.log("Add member:", member);
+                  onSelectSetting={(memberEmail: string) => {
+                    addMember(memberEmail);
+                    setTouched((prev) => ({ ...prev, teamAccess: true }));
                   }}
                   screeningSetting=""
-                  settingList={[]}
-                  placeholder="Add member"
+
+                  // Filter org members who are not yet in teamAcess.
+                  // Formatted with name (email) and description (full name)
+                  settingList={orgMembers
+                    .filter((m) => !teamAccess.some((t) => t.email === m.email))
+                    .map((m) => ({ name: m.email, description: m.name }))}
+                  placeholder={loadingMembers ? "Loading members..." : "Add member"}
                 />
               </div>
 
-              {/* Members List */}
+              {/* Team Access */}
               <div className={styles.membersList}>
-                <div className={styles.memberRow}>
-                  <div className={styles.memberDetails}>
-                    <img
-                      src={user?.image}
-                      alt={user?.name}
-                      className={styles.memberAvatar}
-                    />
-                    <div className={styles.memberInfo}>
-                      <p className={styles.memberName}>
-                        {user?.name} <span className={styles.youBadge}>(You)</span>
-                      </p>
-                      <p className={styles.memberEmail}>
-                        {user?.email}
-                      </p>
-                    </div>
+                {/* Error message */}
+                {errors.teamAccess && (
+                  <div className={styles.membersMessageText}>
+                    <img src="/career-form/warning-step-icon.svg" alt="Warning step"></img>
+                    <p className={styles.errorText}>
+                      {errors.teamAccess}
+                    </p>
                   </div>
-                  <div className={styles.memberActions}>
-                    <div className={styles.roleSelector}>
-                      <CustomDropdown
-                        onSelectSetting={(role: string) => {
-                          // Handle role change
-                          console.log("Role changed to:", role);
-                        }}
-                        screeningSetting="Job Owner"
-                        settingList={[
-                          {
-                            name: "Job Owner",
-                            description: "Leads the hiring process for assigned jobs. Has access with all career settings."
-                          },
-                          {
-                            name: "Contributor",
-                            description: "Helps evaluate candidates and assist with hiring tasks. Can move candidates throughout the pipeline, but cannot change any career settings."
-                          },
-                          {
-                            name: "Reviewer",
-                            description: "Reviews candidates and provides feedback. Can only view candidate profiles and comment."
-                          }
-                        ]}
-                        placeholder="Select role"
+                )}
+
+                {teamAccess.map((member, index) => (
+                  <div key={member.email} className={styles.memberRow}>
+                    <div className={styles.memberDetails}>
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className={styles.memberAvatar}
                       />
+                      <div className={styles.memberInfo}>
+                        <p className={styles.memberName}>
+                          {member.name}
+                          {member.email === user?.email && (
+                            <span className={styles.youBadge}> (You)</span>
+                          )}
+                        </p>
+                        <p className={styles.memberEmail}>
+                          {member.email}
+                        </p>
+                      </div>
                     </div>
-                    <button type="button" className={styles.deleteButton}>
-                      <i className="la la-trash"></i>
-                    </button>
+                    <div className={styles.memberActions}>
+                      <div className={styles.roleSelector}>
+                        <CustomDropdown
+                          onSelectSetting={(role: string) => {
+                            updateMemberRole(member.email, role as Member["role"]);
+                            setTouched((prev) => ({ ...prev, teamAccess: true }));
+                          }}
+                          screeningSetting={member.role}
+                          settingList={[
+                            {
+                              name: "Job Owner",
+                              description: "Leads the hiring process for assigned jobs. Has access with all career settings."
+                            },
+                            {
+                              name: "Contributor",
+                              description: "Helps evaluate candidates and assist with hiring tasks. Can move candidates throughout the pipeline, but cannot change any career settings."
+                            },
+                            {
+                              name: "Reviewer",
+                              description: "Reviews candidates and provides feedback. Can only view candidate profiles and comment."
+                            }
+                          ]}
+                          placeholder="Select role"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.deleteButton}
+                        onClick={() => {
+                          removeMember(member.email);
+                          setTouched((prev) => ({ ...prev, teamAccess: true }));
+                        }}
+                        disabled={teamAccess.length <= 1}
+                        style={{
+                          opacity: teamAccess.length <= 1 ? 0.5 : 1,
+                          cursor: teamAccess.length <= 1 ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        <i className="la la-trash"></i>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
 
               {/* Disclaimer */}

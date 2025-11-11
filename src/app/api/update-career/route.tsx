@@ -280,7 +280,49 @@ export async function POST(request: Request) {
     }
 
     // ========================================================================
-    // Step 10: Sanitize and Validate Interview Questions
+    // Step 10: Validate and Sanitize Team Access
+    // ========================================================================
+
+    if (dataUpdates.teamAccess !== undefined) {
+      // Validate teamAccess array
+      if (!Array.isArray(dataUpdates.teamAccess)) {
+        return NextResponse.json(
+          { error: "Team access must be an array" },
+          { status: 400 }
+        );
+      }
+
+      // Validate and sanitize team access members
+      const sanitizedTeamAccess = dataUpdates.teamAccess.map((member: any) => {
+        if (!member.email || !validateEmail(member.email)) {
+          throw new Error("Invalid team member email address");
+        }
+        return {
+          name: sanitizeText(member.name || ""),
+          email: member.email.toLowerCase().trim(),
+          image: sanitizeText(member.image || ""),
+          role: sanitizeText(member.role || "Contributor"),
+        };
+      });
+
+      // Validate at least one Job Owner for published careers
+      if (isPublishing) {
+        const hasJobOwner = sanitizedTeamAccess.some(
+          (member: any) => member.role === "Job Owner"
+        );
+        if (!hasJobOwner && sanitizedTeamAccess.length > 0) {
+          return NextResponse.json(
+            { error: "At least one member must have the Job Owner role" },
+            { status: 400 }
+          );
+        }
+      }
+
+      dataUpdates.teamAccess = sanitizedTeamAccess;
+    }
+
+    // ========================================================================
+    // Step 11: Sanitize and Validate Interview Questions
     // ========================================================================
 
     if (dataUpdates.questions) {
@@ -303,7 +345,7 @@ export async function POST(request: Request) {
     }
 
     // ========================================================================
-    // Step 11: Sanitize and Validate Prescreening Questions
+    // Step 12: Sanitize and Validate Prescreening Questions
     // ========================================================================
 
     if (dataUpdates.prescreeningQuestions) {
@@ -327,7 +369,7 @@ export async function POST(request: Request) {
     }
 
     // ========================================================================
-    // Step 12: Type Coercion for Specific Fields
+    // Step 13: Type Coercion for Specific Fields
     // ========================================================================
 
     if (dataUpdates.requireVideo !== undefined) {
@@ -355,7 +397,7 @@ export async function POST(request: Request) {
     }
 
     // ========================================================================
-    // Step 13: Update Career Document
+    // Step 14: Update Career Document
     // ========================================================================
 
     dataUpdates.updatedAt = new Date();

@@ -39,7 +39,6 @@ export async function POST(request: Request) {
       requireVideo,
       location,
       workSetup,
-      workSetupRemarks,
       status,
       salaryNegotiable,
       minimumSalary,
@@ -50,6 +49,7 @@ export async function POST(request: Request) {
       prescreeningQuestions,
       isUnpublished,
       currentStep,
+      teamAccess
     } = await request.json();
 
     // ========================================================================
@@ -178,11 +178,6 @@ export async function POST(request: Request) {
       { value: jobTitle, max: MAX_LENGTHS.jobTitle, field: "Job title" },
       { value: description, max: MAX_LENGTHS.description, field: "Description" },
       { value: location, max: MAX_LENGTHS.location, field: "Location" },
-      {
-        value: workSetupRemarks,
-        max: MAX_LENGTHS.workSetupRemarks,
-        field: "Work setup remarks",
-      },
       { value: country, max: MAX_LENGTHS.country, field: "Country" },
       { value: province, max: MAX_LENGTHS.province, field: "Province" },
     ];
@@ -321,20 +316,59 @@ export async function POST(request: Request) {
     }
 
     // ========================================================================
-    // Step 13: Sanitize All Text Fields
+    // Step 13: Validate and Sanitize Team Access
+    // ========================================================================
+
+    // Validate teamAccess array
+    if (teamAccess && !Array.isArray(teamAccess)) {
+      return NextResponse.json(
+        { error: "Team access must be an array" },
+        { status: 400 }
+      );
+    }
+
+    // Validate team access members
+    const sanitizedTeamAccess = teamAccess
+      ? teamAccess.map((member: any) => {
+          if (!member.email || !validateEmail(member.email)) {
+            throw new Error("Invalid team member email address");
+          }
+          return {
+            name: sanitizeText(member.name || ""),
+            email: member.email.toLowerCase().trim(),
+            image: sanitizeText(member.image || ""),
+            role: sanitizeText(member.role || "Contributor"),
+          };
+        })
+      : [];
+
+    // Validate at least one Job Owner for published careers
+    if (isPublishing) {
+      const hasJobOwner = sanitizedTeamAccess.some(
+        (member: any) => member.role === "Job Owner"
+      );
+      if (!hasJobOwner && sanitizedTeamAccess.length > 0) {
+        return NextResponse.json(
+          { error: "At least one member must have the Job Owner role" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // ========================================================================
+    // Step 14: Sanitize All Text Fields
     // ========================================================================
 
     const sanitizedJobTitle = sanitizeText(jobTitle);
     const sanitizedDescription = sanitizeHTML(description);
     const sanitizedLocation = sanitizeText(location);
-    const sanitizedWorkSetupRemarks = sanitizeText(workSetupRemarks || "");
     const sanitizedCountry = sanitizeText(country);
     const sanitizedProvince = sanitizeText(province);
     const sanitizedLastEditedBy = sanitizeUserInfo(lastEditedBy);
     const sanitizedCreatedBy = sanitizeUserInfo(createdBy);
 
     // ========================================================================
-    // Step 14: Create Career Document with Sanitized Data
+    // Step 15: Create Career Document with Sanitized Data
     // ========================================================================
 
     const career = {
@@ -344,7 +378,6 @@ export async function POST(request: Request) {
       questions: sanitizedQuestions, // Already sanitized in Step 7
       location: sanitizedLocation,
       workSetup,
-      workSetupRemarks: sanitizedWorkSetupRemarks,
       createdAt: new Date(),
       updatedAt: new Date(),
       lastEditedBy: sanitizedLastEditedBy,
@@ -369,10 +402,11 @@ export async function POST(request: Request) {
       prescreeningQuestions: sanitizedPrescreeningQuestions,
       isUnpublished: Boolean(isUnpublished ?? false),
       currentStep: Number(currentStep) || 5,
+      teamAccess: sanitizedTeamAccess,
     };
 
     // ========================================================================
-    // Step 15: Insert Career into Database
+    // Step 16: Insert Career into Database
     // ========================================================================
 
     await db.collection("careers").insertOne(career);

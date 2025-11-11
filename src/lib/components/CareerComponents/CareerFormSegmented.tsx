@@ -17,9 +17,8 @@ import styles from "@/lib/styles/screens/careerFormSegmented.module.scss";
 const getInitialFormData = () => ({
   jobTitle: "",
   description: "",
-  employmentType: "Full-Time",
+  employmentType: "",
   workSetup: "",
-  workSetupRemarks: "",
   country: "Philippines",
   province: "",
   city: "",
@@ -62,6 +61,7 @@ const getInitialFormData = () => ({
   ],
   requireVideo: true,
   isUnpublished: false,
+  teamAccess: []
 });
 
 interface CareerFormSegmentedProps {
@@ -150,7 +150,9 @@ export default function CareerFormSegmented({
             formData.minimumSalary &&
             formData.maximumSalary &&
             Number(formData.minimumSalary) > Number(formData.maximumSalary)
-          )
+          ) &&
+          formData.teamAccess?.length >= 1 &&
+          formData.teamAccess?.some((m: any) => m.role === "Job Owner")
         );
       case 2:
         // Step 2: No validation required
@@ -241,7 +243,6 @@ export default function CareerFormSegmented({
       jobTitle: formData.jobTitle,
       description: formData.description,
       workSetup: formData.workSetup,
-      workSetupRemarks: formData.workSetupRemarks,
       questions: formData.questions,
       prescreeningQuestions: formData.prescreeningQuestions || [],
       lastEditedBy: userInfoSlice,
@@ -263,6 +264,7 @@ export default function CareerFormSegmented({
       employmentType: formData.employmentType,
       isUnpublished: status === "inactive",
       currentStep: 5,
+      teamAccess: formData.teamAccess || [],
     };
 
     try {
@@ -310,7 +312,6 @@ export default function CareerFormSegmented({
       jobTitle: formData.jobTitle,
       description: formData.description,
       workSetup: formData.workSetup,
-      workSetupRemarks: formData.workSetupRemarks,
       questions: formData.questions,
       prescreeningQuestions: formData.prescreeningQuestions || [],
       lastEditedBy: userInfoSlice,
@@ -330,6 +331,7 @@ export default function CareerFormSegmented({
       location: formData.city,
       employmentType: formData.employmentType,
       isUnpublished: status === "inactive",
+      teamAccess: formData.teamAccess || [],
     };
 
     try {
@@ -416,11 +418,13 @@ export default function CareerFormSegmented({
     }
   };
 
+  const renderTitle = (): string => (currentStep !== 1 && formData.jobTitle) ? `[Draft] ${formData.jobTitle}` : "Add new career";
+
   return (
     <div className="col">
       <div className={styles.header}>
         <h1 className={styles.headerTitle}>
-          {formType === "add" ? "Add new career" : "Edit Career Details"}
+          {formType === "add" ? renderTitle(): "Edit Career Details"}
         </h1>
         {currentStep !== 5 && (
           <div className={styles.buttonContainer}>
