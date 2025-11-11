@@ -1,4 +1,5 @@
 "use client";
+import { PreScreeningQuestion } from "@/lib/types";
 
 export default function SegmentReview({
   jobTitle,
@@ -15,6 +16,7 @@ export default function SegmentReview({
   requireVideo,
   questions,
   setCurrentSegment,
+  preScreeningQuestions,
 }: {
   jobTitle: string;
   description: string;
@@ -30,11 +32,25 @@ export default function SegmentReview({
   requireVideo: boolean;
   questions: any[];
   setCurrentSegment: (segment: number) => void;
+  preScreeningQuestions: PreScreeningQuestion[];
 }) {
+  const getAnswerTypeLabel = (
+    answerType: PreScreeningQuestion["answerType"]
+  ) => {
+    const labels: { [key in PreScreeningQuestion["answerType"]]: string } = {
+      short_answer: "Short Answer",
+      long_answer: "Long Answer",
+      dropdown: "Dropdown",
+      checkboxes: "Checkboxes",
+      range: "Range",
+    };
+    return labels[answerType] || answerType;
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Career Information Review */}
-      <div className="layered-card-outer">
+      <div>
         <div className="layered-card-middle">
           <div
             style={{
@@ -52,25 +68,7 @@ export default function SegmentReview({
                 gap: 8,
               }}
             >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <i
-                  className="la la-suitcase"
-                  style={{ color: "#FFFFFF", fontSize: 20 }}
-                ></i>
-              </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-                Career Information
-              </span>
+              <span className="career-label">Career Information</span>
             </div>
             <button
               onClick={() => setCurrentSegment(0)}
@@ -134,7 +132,7 @@ export default function SegmentReview({
       </div>
 
       {/* Additional Information Review */}
-      <div className="layered-card-outer">
+      <div>
         <div className="layered-card-middle">
           <div
             style={{
@@ -152,25 +150,7 @@ export default function SegmentReview({
                 gap: 8,
               }}
             >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <i
-                  className="la la-ellipsis-h"
-                  style={{ color: "#FFFFFF", fontSize: 20 }}
-                ></i>
-              </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-                Additional Information
-              </span>
+              <span className="career-label">Additional Information</span>
             </div>
             <button
               onClick={() => setCurrentSegment(0)}
@@ -271,7 +251,7 @@ export default function SegmentReview({
       </div>
 
       {/* Settings Review */}
-      <div className="layered-card-outer">
+      <div>
         <div className="layered-card-middle">
           <div
             style={{
@@ -289,25 +269,7 @@ export default function SegmentReview({
                 gap: 8,
               }}
             >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <i
-                  className="la la-cog"
-                  style={{ color: "#FFFFFF", fontSize: 20 }}
-                ></i>
-              </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-                Settings
-              </span>
+              <span className="career-label">Settings</span>
             </div>
             <button
               onClick={() => setCurrentSegment(1)}
@@ -371,8 +333,134 @@ export default function SegmentReview({
         </div>
       </div>
 
+      <div className="layered-card-middle">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span className="career-label">Pre-Screening Questions</span>
+          <button
+            style={{
+              background: "#fff",
+              border: "1px solid #E9EAEB",
+              borderRadius: "60px",
+              padding: "8px 16px",
+              cursor: "pointer",
+            }}
+            onClick={() => setCurrentSegment(1)}
+          >
+            <i className="la la-pencil-alt"></i> Edit
+          </button>
+        </div>
+        <div className="layered-card-content">
+          {preScreeningQuestions.length === 0 ? (
+            <div style={{ color: "#6B7280", fontStyle: "italic" }}>
+              No pre-screening questions added
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {preScreeningQuestions.map((question, index) => (
+                <div
+                  key={question.id}
+                  style={{
+                    padding: "16px",
+                    backgroundColor: "#F9FAFB",
+                    borderRadius: "8px",
+                    border: "1px solid #E5E7EB",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <div
+                      style={{ display: "flex", gap: 8, alignItems: "center" }}
+                    >
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>
+                        Question {index + 1}:
+                      </span>
+                      {question.required && (
+                        <span
+                          style={{
+                            color: "#EF4444",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          Required
+                        </span>
+                      )}
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: "#6B7280",
+                        backgroundColor: "#fff",
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        border: "1px solid #E5E7EB",
+                      }}
+                    >
+                      {getAnswerTypeLabel(question.answerType)}
+                    </span>
+                  </div>
+                  <div style={{ marginBottom: "8px", color: "#111827" }}>
+                    {question.question}
+                  </div>
+                  {(question.answerType === "dropdown" ||
+                    question.answerType === "checkboxes") &&
+                    question.options && (
+                      <div style={{ marginTop: "12px" }}>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: "#6B7280",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Options:
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 6,
+                          }}
+                        >
+                          {question.options.map((option, optIndex) => (
+                            <div
+                              key={optIndex}
+                              style={{
+                                padding: "8px 12px",
+                                backgroundColor: "#fff",
+                                borderRadius: "6px",
+                                border: "1px solid #E5E7EB",
+                                fontSize: 14,
+                              }}
+                            >
+                              • {option}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Interview Questions Review */}
-      <div className="layered-card-outer">
+      <div>
         <div className="layered-card-middle">
           <div
             style={{
@@ -390,25 +478,7 @@ export default function SegmentReview({
                 gap: 8,
               }}
             >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "#181D27",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <i
-                  className="la la-comments"
-                  style={{ color: "#FFFFFF", fontSize: 20 }}
-                ></i>
-              </div>
-              <span style={{ fontSize: 16, color: "#181D27", fontWeight: 700 }}>
-                Interview Questions
-              </span>
+              <span className="career-label">Interview Questions</span>
               <div
                 style={{
                   borderRadius: "50%",

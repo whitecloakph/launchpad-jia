@@ -84,7 +84,7 @@ export default function SegmentInterviewQuestions({
             </span>
             <div
               style={{
-                width: "30%",
+                width: "40%",
                 borderBottom: "1px solid #E5E7EB",
                 paddingBottom: 30,
               }}
