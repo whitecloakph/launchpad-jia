@@ -115,12 +115,56 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
     ]);
     // CV review & pre-screening
     const [cvSecretPrompt, setCvSecretPrompt] = useState<string>(career?.cvSecretPrompt || "");
-    const [preScreeningQuestions, setPreScreeningQuestions] = useState<string[]>(career?.preScreeningQuestions || []);
+    type PreScreeningType = "dropdown" | "range";
+    type PreScreeningItem = {
+      id: string;
+      question: string;
+      type: PreScreeningType;
+      options?: string[];
+      range?: { min?: string; max?: string; minCurrency?: string; maxCurrency?: string };
+    };
+
+    const normalizePSQ = (val: any): PreScreeningItem[] => {
+      if (!Array.isArray(val)) return [];
+      return val.map((item) => {
+        if (typeof item === "string") {
+          return {
+            id: `${Date.now()}-${Math.random()}`,
+            question: item,
+            type: "dropdown" as PreScreeningType,
+            options: ["", ""],
+          };
+        }
+        // Already structured
+        return {
+          id: item.id || `${Date.now()}-${Math.random()}`,
+          question: item.question || "",
+          type: (item.type as PreScreeningType) || "dropdown",
+          options: item.options || (item.type === "dropdown" ? ["", ""] : undefined),
+          range:
+            item.type === "range"
+              ? {
+                  min: item.range?.min ?? "",
+                  max: item.range?.max ?? "",
+                  minCurrency: item.range?.minCurrency || "PHP",
+                  maxCurrency: item.range?.maxCurrency || "PHP",
+                }
+              : undefined,
+        };
+      });
+    };
+
+    const [preScreeningQuestions, setPreScreeningQuestions] = useState<PreScreeningItem[]>(normalizePSQ(career?.preScreeningQuestions || []));
     const suggestedPreScreeningQuestions = [
       "How long is your notice period?",
       "How often are you willing to report to the office each week?",
       "What is your expected monthly salary?",
     ];
+    // UI state for pre-screening add/edit
+    const [showAddPSQ, setShowAddPSQ] = useState<boolean>(false);
+    const [psqInput, setPsqInput] = useState<string>("");
+    const [psqEditingIndex, setPsqEditingIndex] = useState<number | null>(null);
+    const [psqEditInput, setPsqEditInput] = useState<string>("");
     // AI interview setup
     const [aiScreeningSetting, setAiScreeningSetting] = useState<string>(career?.aiScreeningSetting || screeningSetting || "Good Fit and above");
     const [aiSecretPrompt, setAiSecretPrompt] = useState<string>(career?.aiSecretPrompt || "");
@@ -237,7 +281,7 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                 setCity(draft.city ?? "");
                 setCurrentStep(draft.currentStep ?? 1);
                 setCvSecretPrompt(draft.cvSecretPrompt ?? "");
-                setPreScreeningQuestions(draft.preScreeningQuestions ?? []);
+                setPreScreeningQuestions(normalizePSQ(draft.preScreeningQuestions ?? []));
                 setAiScreeningSetting(draft.aiScreeningSetting ?? (draft.screeningSetting || "Good Fit and above"));
                 setAiSecretPrompt(draft.aiSecretPrompt ?? "");
             }
@@ -968,47 +1012,286 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                           type="button"
                           className="button-primary-v2"
                           style={{ color: "#414651", background: "#FFFFFF", width: "fit-content" }}
-                          onClick={() => {
-                            const text = window.prompt("Add custom pre-screening question");
-                            if (text && text.trim()) {
-                              setPreScreeningQuestions((prev) => [...prev, text.trim()]);
-                            }
-                          }}
+                          onClick={() => { setShowAddPSQ(true); setPsqInput(""); }}
                         >
                           <span><i className="la la-plus" style={{ fontSize: 17, marginRight: 8 }}></i>Add custom</span>
                         </button>
                       </div>
                       <div className="layered-card-content">
+                        {showAddPSQ && (
+                          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}>
+                            <input
+                              className="form-control"
+                              placeholder="Enter a pre-screening question"
+                              value={psqInput}
+                              onChange={(e) => setPsqInput(e.target.value)}
+                              style={{ flex: 1 }}
+                            />
+                            <button
+                              type="button"
+                              className="button-primary-v2"
+                              style={{ color: "#fff", background: "#111827" }}
+                              onClick={() => {
+                                const text = psqInput.trim();
+                                if (text.length > 0) {
+                                  setPreScreeningQuestions((prev) => [
+                                    ...prev,
+                                    {
+                                      id: `${Date.now()}-${Math.random()}`,
+                                      question: text,
+                                      type: "dropdown",
+                                      options: ["", ""],
+                                    },
+                                  ]);
+                                  setPsqInput("");
+                                  setShowAddPSQ(false);
+                                }
+                              }}
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              className="button-primary-v2"
+                              style={{ color: "#414651", background: "#FFFFFF" }}
+                              onClick={() => { setShowAddPSQ(false); setPsqInput(""); }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
                         {preScreeningQuestions.length === 0 && (
                           <div style={{ color: "#667085", marginBottom: 12 }}>No pre-screening questions added yet.</div>
                         )}
                         {preScreeningQuestions.length > 0 && (
-                          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-                            {preScreeningQuestions.map((q, idx) => (
-                              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #E9EAEB", borderRadius: 8, padding: "8px 12px" }}>
-                                <span>{q}</span>
-                                <div style={{ display: "flex", gap: 8 }}>
-                                  <button
-                                    type="button"
-                                    className="button-primary-v2"
-                                    style={{ color: "#414651", background: "#FFFFFF" }}
-                                    onClick={() => {
-                                      const text = window.prompt("Edit question", q);
-                                      if (text && text.trim()) {
-                                        setPreScreeningQuestions((prev) => prev.map((item, i) => (i === idx ? text.trim() : item)));
-                                      }
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="button-primary-v2"
-                                    style={{ color: "#B42318", background: "#FFFFFF" }}
-                                    onClick={() => setPreScreeningQuestions((prev) => prev.filter((_, i) => i !== idx))}
-                                  >
-                                    Remove
-                                  </button>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+                            {preScreeningQuestions.map((item, idx) => (
+                              <div key={item.id} style={{ border: "1px solid #E9EAEB", borderRadius: 12 }}>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#F6F7F9", padding: "10px 12px", borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
+                                  {psqEditingIndex === idx ? (
+                                    <input
+                                      className="form-control"
+                                      value={psqEditInput}
+                                      onChange={(e) => setPsqEditInput(e.target.value)}
+                                      style={{ flex: 1, marginRight: 8 }}
+                                    />
+                                  ) : (
+                                    <span style={{ fontWeight: 600 }}>{item.question}</span>
+                                  )}
+                                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <select
+                                      value={item.type}
+                                      onChange={(e) => {
+                                        const type = e.target.value as PreScreeningType;
+                                        setPreScreeningQuestions((prev) =>
+                                          prev.map((q, i) =>
+                                            i === idx
+                                              ? {
+                                                  ...q,
+                                                  type,
+                                                  options: type === "dropdown" ? q.options || ["", ""] : undefined,
+                                                  range:
+                                                    type === "range"
+                                                      ? {
+                                                          min: q.range?.min ?? "",
+                                                          max: q.range?.max ?? "",
+                                                          minCurrency: q.range?.minCurrency || "PHP",
+                                                          maxCurrency: q.range?.maxCurrency || "PHP",
+                                                        }
+                                                      : undefined,
+                                                }
+                                              : q
+                                          )
+                                        );
+                                      }}
+                                      style={{ border: "1px solid #E9EAEB", borderRadius: 8, padding: "6px 8px", background: "#FFFFFF" }}
+                                    >
+                                      <option value="dropdown">Dropdown</option>
+                                      <option value="range">Range</option>
+                                    </select>
+                                  </div>
+                                </div>
+
+                                <div style={{ padding: "12px" }}>
+                                  {item.type === "dropdown" && (
+                                    <>
+                                      {(item.options || []).map((opt, optIdx) => (
+                                        <div key={optIdx} style={{ display: "grid", gridTemplateColumns: "40px 1fr 32px", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                                          <div style={{ border: "1px solid #E9EAEB", borderRadius: 8, padding: "6px 8px", textAlign: "center" }}>{optIdx + 1}</div>
+                                          <input
+                                            className="form-control"
+                                            value={opt}
+                                            placeholder={`Option ${optIdx + 1}`}
+                                            onChange={(e) => {
+                                              const value = e.target.value;
+                                              setPreScreeningQuestions((prev) =>
+                                                prev.map((q, i) =>
+                                                  i === idx
+                                                    ? { ...q, options: (q.options || []).map((o, oi) => (oi === optIdx ? value : o)) }
+                                                    : q
+                                                )
+                                              );
+                                            }}
+                                          />
+                                          <button
+                                            type="button"
+                                            className="button-primary-v2"
+                                            style={{ color: "#B42318", background: "#FFFFFF" }}
+                                            onClick={() => {
+                                              setPreScreeningQuestions((prev) =>
+                                                prev.map((q, i) =>
+                                                  i === idx
+                                                    ? { ...q, options: (q.options || []).filter((_, oi) => oi !== optIdx) }
+                                                    : q
+                                                )
+                                              );
+                                            }}
+                                          >
+                                            <i className="la la-times"></i>
+                                          </button>
+                                        </div>
+                                      ))}
+                                      <button
+                                        type="button"
+                                        className="button-primary-v2"
+                                        style={{ color: "#414651", background: "#FFFFFF" }}
+                                        onClick={() => {
+                                          setPreScreeningQuestions((prev) =>
+                                            prev.map((q, i) => (i === idx ? { ...q, options: [...(q.options || []), ""] } : q))
+                                          );
+                                        }}
+                                      >
+                                        <i className="la la-plus" style={{ marginRight: 6 }}></i> Add Option
+                                      </button>
+                                    </>
+                                  )}
+
+                                  {item.type === "range" && (
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                                      <div>
+                                        <div style={{ color: "#667085", marginBottom: 6 }}>Minimum</div>
+                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: 8 }}>
+                                          <div style={{ position: "relative" }}>
+                                            <span style={{ position: "absolute", left: 10, top: 8, color: "#6c757d" }}>₱</span>
+                                            <input
+                                              className="form-control"
+                                              style={{ paddingLeft: 24 }}
+                                              value={item.range?.min || ""}
+                                              onChange={(e) => {
+                                                const v = e.target.value;
+                                                setPreScreeningQuestions((prev) =>
+                                                  prev.map((q, i) =>
+                                                    i === idx ? { ...q, range: { ...(q.range || {}), min: v } } : q
+                                                  )
+                                                );
+                                              }}
+                                            />
+                                          </div>
+                                          <select
+                                            value={item.range?.minCurrency || "PHP"}
+                                            onChange={(e) => {
+                                              setPreScreeningQuestions((prev) =>
+                                                prev.map((q, i) =>
+                                                  i === idx ? { ...q, range: { ...(q.range || {}), minCurrency: e.target.value } } : q
+                                                )
+                                              );
+                                            }}
+                                            style={{ border: "1px solid #E9EAEB", borderRadius: 8, padding: "6px 8px", background: "#FFFFFF" }}
+                                          >
+                                            <option>PHP</option>
+                                          </select>
+                                        </div>
+                                      </div>
+
+                                      <div>
+                                        <div style={{ color: "#667085", marginBottom: 6 }}>Maximum</div>
+                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: 8 }}>
+                                          <div style={{ position: "relative" }}>
+                                            <span style={{ position: "absolute", left: 10, top: 8, color: "#6c757d" }}>₱</span>
+                                            <input
+                                              className="form-control"
+                                              style={{ paddingLeft: 24 }}
+                                              value={item.range?.max || ""}
+                                              onChange={(e) => {
+                                                const v = e.target.value;
+                                                setPreScreeningQuestions((prev) =>
+                                                  prev.map((q, i) =>
+                                                    i === idx ? { ...q, range: { ...(q.range || {}), max: v } } : q
+                                                  )
+                                                );
+                                              }}
+                                            />
+                                          </div>
+                                          <select
+                                            value={item.range?.maxCurrency || "PHP"}
+                                            onChange={(e) => {
+                                              setPreScreeningQuestions((prev) =>
+                                                prev.map((q, i) =>
+                                                  i === idx ? { ...q, range: { ...(q.range || {}), maxCurrency: e.target.value } } : q
+                                                )
+                                              );
+                                            }}
+                                            style={{ border: "1px solid #E9EAEB", borderRadius: 8, padding: "6px 8px", background: "#FFFFFF" }}
+                                          >
+                                            <option>PHP</option>
+                                          </select>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                                    {psqEditingIndex === idx ? (
+                                      <>
+                                        <button
+                                          type="button"
+                                          className="button-primary-v2"
+                                          style={{ color: "#fff", background: "#111827", marginRight: 8 }}
+                                          onClick={() => {
+                                            const text = psqEditInput.trim();
+                                            if (text.length > 0) {
+                                              setPreScreeningQuestions((prev) =>
+                                                prev.map((it, i) => (i === idx ? { ...it, question: text } : it))
+                                              );
+                                              setPsqEditingIndex(null);
+                                              setPsqEditInput("");
+                                            }
+                                          }}
+                                        >
+                                          Save Question
+                                        </button>
+                                        <button
+                                          type="button"
+                                          className="button-primary-v2"
+                                          style={{ color: "#414651", background: "#FFFFFF" }}
+                                          onClick={() => { setPsqEditingIndex(null); setPsqEditInput(""); }}
+                                        >
+                                          Cancel
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <button
+                                          type="button"
+                                          className="button-primary-v2"
+                                          style={{ color: "#414651", background: "#FFFFFF", marginRight: 8 }}
+                                          onClick={() => { setPsqEditingIndex(idx); setPsqEditInput(item.question); }}
+                                        >
+                                          Edit Question
+                                        </button>
+                                        <button
+                                          type="button"
+                                          className="button-primary-v2"
+                                          style={{ color: "#B42318", background: "#FFFFFF" }}
+                                          onClick={() => {
+                                            setPreScreeningQuestions((prev) => prev.filter((_, i) => i !== idx));
+                                          }}
+                                        >
+                                          Delete Question
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             ))}
@@ -1029,9 +1312,22 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                                   className="button-primary-v2"
                                   style={{ color: "#414651", background: "#FFFFFF" }}
                                   onClick={() => {
-                                    if (!preScreeningQuestions.includes(item)) {
-                                      setPreScreeningQuestions((prev) => [...prev, item]);
-                                    }
+                                    const lower = item.toLowerCase();
+                                    const type: PreScreeningType = lower.includes("salary") ? "range" : "dropdown";
+                                    const defaults =
+                                      lower.includes("notice period")
+                                        ? ["Immediately", "< 30 days", "> 30 days"]
+                                        : ["", ""];
+                                    setPreScreeningQuestions((prev) => [
+                                      ...prev,
+                                      {
+                                        id: `${Date.now()}-${Math.random()}`,
+                                        question: item,
+                                        type,
+                                        options: type === "dropdown" ? defaults : undefined,
+                                        range: type === "range" ? { min: "", max: "", minCurrency: "PHP", maxCurrency: "PHP" } : undefined,
+                                      },
+                                    ]);
                                   }}
                                 >
                                   Add
@@ -1331,9 +1627,22 @@ export default function CareerForm({ career, formType, setShowEditModal }: { car
                       <div style={{ marginLeft: 4, background: "#EEF2F6", borderRadius: 12, padding: "0 8px", fontSize: 12, color: "#667085" }}>{preScreeningQuestions.length}</div>
                     </div>
                     {preScreeningQuestions.length > 0 ? (
-                      <ol style={{ marginTop: 8, paddingLeft: 18 }}>
-                        {preScreeningQuestions.map((q, i) => (<li key={i}>{q}</li>))}
-                      </ol>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
+                        {preScreeningQuestions.map((q, i) => (
+                          <div key={q.id}>
+                            <div style={{ fontWeight: 600 }}>{i + 1}. {q.question}</div>
+                            <div style={{ color: "#667085" }}>
+                              Type: {q.type === "dropdown" ? "Dropdown" : "Range"}
+                              {q.type === "dropdown" && (
+                                <div>Options: {(q.options || []).filter(o => o?.trim()?.length).join(", ") || "-"}</div>
+                              )}
+                              {q.type === "range" && (
+                                <div>Range: {q.range?.min || "—"} {q.range?.minCurrency || ""} to {q.range?.max || "—"} {q.range?.maxCurrency || ""}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     ) : (
                       <div style={{ color: "#667085", marginTop: 6 }}>No pre-screening questions added.</div>
                     )}

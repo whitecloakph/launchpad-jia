@@ -10,15 +10,17 @@ export async function POST(request: Request) {
   let globalSettings = {};
 
   if (!fields || Object.keys(fields).length === 0) {
-    globalSettings = await db
-      .collection("global-settings")
-      .findOne({ name: "global-settings" });
+    globalSettings =
+      (await db
+        .collection("global-settings")
+        .findOne({ name: "global-settings" })) || {};
   }
 
   if (Object.keys(fields).length > 0) {
-    globalSettings = await db
-      .collection("global-settings")
-      .findOne({ name: "global-settings" }, { projection: fields });
+    globalSettings =
+      (await db
+        .collection("global-settings")
+        .findOne({ name: "global-settings" }, { projection: fields })) || {};
   }
 
   return NextResponse.json(globalSettings);

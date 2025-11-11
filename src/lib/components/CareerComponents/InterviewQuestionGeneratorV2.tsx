@@ -326,18 +326,21 @@ export default function (props) {
   }
 
   async function fetchInstructionPrompt() {
-    const configData = await axios
-      .post("/api/fetch-global-settings", {
+    try {
+      const res = await axios.post("/api/fetch-global-settings", {
         fields: { question_gen_prompt: 1 },
-      })
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {
-        console.log("[Question Generator Fetch Prompt Error]", err);
       });
-
-    setQuestionGenPrompt(configData.question_gen_prompt.prompt);
+      const configData = res?.data ?? {};
+      const prompt =
+        configData?.question_gen_prompt?.prompt &&
+        typeof configData.question_gen_prompt.prompt === "string"
+          ? configData.question_gen_prompt.prompt
+          : "";
+      setQuestionGenPrompt(prompt);
+    } catch (err) {
+      console.log("[Question Generator Fetch Prompt Error]", err);
+      setQuestionGenPrompt("");
+    }
   }
 
   useEffect(() => {
