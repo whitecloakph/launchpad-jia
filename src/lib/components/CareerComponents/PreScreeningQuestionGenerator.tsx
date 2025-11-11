@@ -24,7 +24,7 @@ const SUGGESTED_QUESTIONS = [
     rangeConfig: {
       min: 30000,
       max: 60000,
-      step: 1000,
+      step: 1,
       minLabel: "₱30,000",
       maxLabel: "₱60,000",
     },
